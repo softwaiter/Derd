@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<model name="User" table="t_user">
+    <property name="Name" field="f_name" notNull="true" primary="true" joinInsert="true" joinUpdate="true" />
+</model>
