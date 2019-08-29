@@ -16,6 +16,15 @@ namespace CodeM.Common.Orm
 
         public static string ModelPath { get; set; } = Path.Combine(Environment.CurrentDirectory, "models");
 
+        public static void ParseConnectionFile(FileInfo connectionFile, string parent)
+        {
+            string connectionFilePath = connectionFile.FullName;
+
+            XmlUtils.Iterate(connectionFilePath, (nodeInfo) => {
+                return true;
+            });
+        }
+
         private static void ParseModelFile(FileInfo modelFile, string parent)
         {
             string modelFilePath = modelFile.FullName;
@@ -117,10 +126,42 @@ namespace CodeM.Common.Orm
                         p.Description = desc;
                     }
 
+                    string notNull = nodeInfo.GetAttribute("notNull");
+                    if (notNull != null)
+                    {
+                        if (string.IsNullOrWhiteSpace(notNull))
+                        {
+                            throw new Exception("notNull属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                        }
+
+                        if (!reBool.IsMatch(notNull))
+                        {
+                            throw new Exception("notNull属性必须是布尔型。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                        }
+
+                        p.IsNotNull = bool.Parse(notNull);
+                    }
+
+                    string unique = nodeInfo.GetAttribute("unique");
+                    if (unique != null)
+                    {
+                        if (string.IsNullOrWhiteSpace(unique))
+                        {
+                            throw new Exception("unique属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                        }
+
+                        if (!reBool.IsMatch(unique))
+                        {
+                            throw new Exception("unique属性必须是布尔型。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                        }
+
+                        p.IsUnique = bool.Parse(unique);
+                    }
+
                     string primary = nodeInfo.GetAttribute("primary");
                     if (primary != null)
                     {
-                        if (string.IsNullOrEmpty(primary))
+                        if (string.IsNullOrWhiteSpace(primary))
                         {
                             throw new Exception("primary属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
                         }
@@ -136,7 +177,7 @@ namespace CodeM.Common.Orm
                     string joinInsert = nodeInfo.GetAttribute("joinInsert");
                     if (joinInsert != null)
                     {
-                        if (string.IsNullOrEmpty(joinInsert))
+                        if (string.IsNullOrWhiteSpace(joinInsert))
                         {
                             throw new Exception("joinInsert属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
                         }
@@ -152,7 +193,7 @@ namespace CodeM.Common.Orm
                     string joinUpdate = nodeInfo.GetAttribute("joinUpdate");
                     if (joinUpdate != null)
                     {
-                        if (string.IsNullOrEmpty(joinUpdate))
+                        if (string.IsNullOrWhiteSpace(joinUpdate))
                         {
                             throw new Exception("joinUpdate属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
                         }
@@ -188,6 +229,13 @@ namespace CodeM.Common.Orm
 
         private static void EnumDirectory(DirectoryInfo di, string parent, bool increment)
         {
+            FileInfo fiConn = new FileInfo(Path.Combine(di.FullName, ".connection.xml"));
+            if (fiConn.Exists)
+            {
+                //就一个文件，无论是否increment都重新解析一遍
+                ParseConnectionFile(fiConn, parent);
+            }
+
             IEnumerable<FileInfo> modelFiles = di.EnumerateFiles("*.model.xml", SearchOption.TopDirectoryOnly);
             IEnumerator<FileInfo> modelFilesEnumerator = modelFiles.GetEnumerator();
             while (modelFilesEnumerator.MoveNext())
