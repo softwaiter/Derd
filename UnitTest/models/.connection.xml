@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <connection>
-    <host>127.0.0.1</host>
-    <port>3306</port>
-    <user>root</user>
-    <password>root</password>
+    <dialect>sqlite</dialect>
+    <host></host>
+    <port></port>
+    <user></user>
+    <password></password>
     <database>test</database>
+    <pool max="100" min="0">true</pool>
 </connection>

@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <model name="User" table="t_user">
-    <property name="Name" field="f_name" notNull="true" primary="true" unique="true" joinInsert="true" joinUpdate="true" />
+    <property name="Id" field="f_id" notNull="True" primary="true" unique="true" joinInsert="true" jojnUpdate="false"/>
+    <property name="Name" field="f_name" notNull="true" unique="true" joinInsert="true" joinUpdate="true" />
 </model>

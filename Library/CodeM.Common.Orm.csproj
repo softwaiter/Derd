@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CodeM.Common.DbHelper" Version="1.0.0" />
     <PackageReference Include="CodeM.Common.Tools" Version="1.0.1" />
   </ItemGroup>
 
