@@ -16,7 +16,7 @@ namespace CodeM.Common.Orm
 
         internal static void Load(string modelPath, bool increment = false)
         {
-            ModelUtils.ClearConnections();
+            ConnectionUtils.ClearConnections();
 
             if (!increment)
             {
@@ -27,7 +27,8 @@ namespace CodeM.Common.Orm
             DirectoryInfo di = new DirectoryInfo(modelPath);
             EnumDirectory(di, "/", increment);
 
-            //TODO 注册数据源
+            //注册数据源
+            ConnectionUtils.RegisterAllConnections();
         }
 
         private static void EnumDirectory(DirectoryInfo di, string parent, bool increment)
@@ -63,8 +64,8 @@ namespace CodeM.Common.Orm
         {
             string connectionFilePath = connectionFile.FullName;
             ConnectionSetting conn = ParseConnectionSetting(connectionFilePath);
-            conn.ModelPath = parent.ToLower();
-            ModelUtils.AddConnection(parent, conn);
+            conn.DataSource = parent.ToLower();
+            ConnectionUtils.AddConnection(parent, conn);
         }
 
         private static bool ModelFileIsModified(FileInfo modelFile)

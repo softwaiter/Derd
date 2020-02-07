@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CodeM.Common.DbHelper;
+using System;
 using System.IO;
 
 namespace CodeM.Common.Orm
@@ -35,7 +36,8 @@ namespace CodeM.Common.Orm
 
         public static object ExecSql(string sql, string path = "/")
         {
-            return false;
+            DbUtils.ExecuteNonQuery(path.ToLower(), sql);
+            return true;
         }
 
         public static bool CreateTables(string path, bool force = false)

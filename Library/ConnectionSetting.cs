@@ -1,10 +1,14 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 
 namespace CodeM.Common.Orm
 {
     public class ConnectionSetting
     {
-        public string ModelPath { get; set; }
+        /// <summary>
+        /// 数据源名称，即connection定义路径
+        /// </summary>
+        public string DataSource { get; set; }
 
         public string Dialect { get; set; }
 
@@ -18,7 +22,7 @@ namespace CodeM.Common.Orm
 
         public string Database { get; set; }
 
-        public bool Pooling { get; set; } = true;
+        public bool Pooling { get; set; } = false;
 
         public int MaxPoolSize { get; set; } = 100;
 
@@ -26,9 +30,14 @@ namespace CodeM.Common.Orm
 
         public override string ToString()
         {
-            StringBuilder sbResult = new StringBuilder(200);
+            List<string> settings = new List<string>();
 
-            return sbResult.ToString();
+            if (!string.IsNullOrWhiteSpace(Database))
+            {
+                settings.Add(string.Concat("Version=3;Data Source=", Database));
+            }
+
+            return string.Join(';', settings);
         }
 
     }

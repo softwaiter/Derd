@@ -1,25 +1,10 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace CodeM.Common.Orm
 {
     internal class ModelUtils
     {
-        internal static ConcurrentDictionary<string, ConnectionSetting> sConnectionSettings = new ConcurrentDictionary<string, ConnectionSetting>();
-
         internal static ConcurrentDictionary<string, Model> sModels = new ConcurrentDictionary<string, Model>();
-        internal static ConcurrentDictionary<string, ConnectionSetting> sModelConnections = new ConcurrentDictionary<string, ConnectionSetting>();
-
-        internal static void ClearConnections()
-        {
-            sConnectionSettings.Clear();
-            sModelConnections.Clear();
-        }
-
-        internal static bool AddConnection(string path, ConnectionSetting conn)
-        {
-            return sConnectionSettings.TryAdd(path.ToLower(), conn);
-        }
 
         internal static void ClearModels()
         {
@@ -64,61 +49,6 @@ namespace CodeM.Common.Orm
                 return sModels[fullModelName.ToLower()];
             }
             return null;
-        }
-
-        internal static ConnectionSetting GetConnectionByModel(Model model)
-        {
-            string fullModelName = model.Path;
-            if (fullModelName.EndsWith("/"))
-            {
-                fullModelName += model.Name;
-            }
-            else
-            {
-                fullModelName += ("/" + model.Name);
-            }
-            return GetConnectionByModelName(fullModelName);
-        }
-
-        internal static ConnectionSetting GetConnectionByModelName(string modelName)
-        {
-            string fullModelName = GetFullModelName(modelName).ToLower();
-            if (sModelConnections.ContainsKey(fullModelName))
-            {
-                ConnectionSetting result;
-                if (sModelConnections.TryGetValue(fullModelName, out result))
-                {
-                    return result;
-                }
-            }
-
-            string modelPath = fullModelName;
-            int pos = modelPath.LastIndexOf("/");
-            while (pos >= 0)
-            {
-                modelPath = modelPath.Substring(0, pos);
-                if (pos == 0)
-                {
-                    modelPath = "/";
-                }
-
-                if (sConnectionSettings.ContainsKey(modelPath))
-                {
-                    ConnectionSetting conns = sConnectionSettings[modelPath];
-                    sModelConnections.AddOrUpdate(fullModelName, conns, (key, value) =>
-                    {
-                        return conns;
-                    });
-                    return conns;
-                }
-
-                if (pos == 0)
-                {
-                    break;
-                }
-            }
-
-            throw new Exception("未定义数据源：" + modelName);
         }
 
     }

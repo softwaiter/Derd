@@ -5,6 +5,6 @@
     <port></port>
     <user></user>
     <password></password>
-    <database>test</database>
+    <database>test.db</database>
     <pool max="100" min="0">true</pool>
 </connection>

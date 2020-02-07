@@ -8,8 +8,7 @@ namespace UnitTest
     [TestClass]
     public class UnitTest1
     {
-        [TestInitialize]
-        public void Init()
+        public UnitTest1()
         {
             string modelPath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\models");
             OrmUtils.ModelPath = modelPath;
@@ -18,18 +17,33 @@ namespace UnitTest
 
         [TestMethod]
         [Description("加载模型定义，判断是否定义User模型应返回True")]
-        public void LoadModels()
+        public void T1_LoadModels()
         {
             Assert.IsTrue(OrmUtils.IsDefind("User"));
         }
 
         [TestMethod]
         [Description("获取User模型，应该返回True")]
-        public void GetUserModel()
+        public void T2_GetUserModel()
         {
             Model m = OrmUtils.Model("User");
             Assert.IsNotNull(m);
-            Assert.AreEqual<int>(m.PropertyCount, 2);
+            Assert.AreEqual<int>(m.PropertyCount, 3);
         }
+
+        [TestMethod]
+        public void T3_ExecuteSql()
+        {
+            string sql = "Create Table test(id int not null primary key, name varchar(64), age int, address varchar(255))";
+            OrmUtils.ExecSql(sql);
+        }
+
+        [TestMethod]
+        public void T4_DropTable()
+        {
+            string sql = "Drop Table test";
+            OrmUtils.ExecSql(sql);
+        }
+
     }
 }
