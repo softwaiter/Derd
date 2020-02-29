@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CodeM.Common.Orm.Dialect;
+using System;
 using System.Data;
+using System.Text;
 
 namespace CodeM.Common.Orm
 {
@@ -47,11 +49,6 @@ namespace CodeM.Common.Orm
         public bool IsPrimaryKey { get; set; } = false;
 
         /// <summary>
-        /// 是否唯一
-        /// </summary>
-        public bool IsUnique { get; set; } = false;
-
-        /// <summary>
         /// 是否不能为空
         /// </summary>
         public bool IsNotNull { get; set; } = false;
@@ -60,6 +57,26 @@ namespace CodeM.Common.Orm
         /// 属性值的最大长度，默认为0，不限制
         /// </summary>
         public long Length { get; set; } = 0;
+
+        /// <summary>
+        /// 浮点数类型的精度，即保留小数位数
+        /// </summary>
+        public int Precision { get; set; } = 0;
+
+        /// <summary>
+        /// 是否自增
+        /// </summary>
+        public bool AutoIncrement { get; set; } = false;
+
+        /// <summary>
+        /// 用来设置数值是否为无符号形式
+        /// </summary>
+        public bool Unsigned { get; set; } = false;
+
+        /// <summary>
+        /// 唯一约束设置，值相同的字段形成组合唯一约束
+        /// </summary>
+        public string UniqueGroup { get; set; } = null;
 
         /// <summary>
         /// 属性是否参与插入操作
@@ -308,6 +325,46 @@ namespace CodeM.Common.Orm
             {
                 SetValue(value);
             }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(64);
+            string fieldType = FieldUtils.GetFieldType(Owner, FieldType);
+            sb.Append(string.Concat(Field, " ", fieldType));
+            if (Length > 0)
+            {
+                if (FieldUtils.IsFloat(FieldType))
+                {
+                    sb.Append(string.Concat("(", Length, ",", Precision, ")"));
+                }
+                else
+                {
+                    sb.Append(string.Concat("(", Length, ")"));
+                }
+            }
+            if (IsNotNull)
+            {
+                sb.Append(" NOT NULL");
+            }
+            if (IsPrimaryKey && Owner.PrimaryKeyCount == 1)
+            {
+                sb.Append(" PRIMARY KEY");
+            }
+            if (Features.IsSupportUnsigned(Owner) && Unsigned)
+            {
+                sb.Append(" UNSIGNED");
+            }
+            if (AutoIncrement && Features.IsSupportAutoIncrement(Owner))
+            {
+                sb.Append(string.Concat(" ", FieldUtils.GetFieldAutoIncrementTag(Owner)));
+            }
+            if (Features.IsSupportUnsigned(Owner) && 
+                !string.IsNullOrWhiteSpace(Description))
+            {
+                sb.Append(string.Concat(" COMMENT '", Description, "'"));
+            }
+            return sb.ToString();
         }
 
         public object Clone()

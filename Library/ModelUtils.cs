@@ -19,6 +19,7 @@ namespace CodeM.Common.Orm
                 key = string.Concat(key, "/");
             }
             key = string.Concat(key, model.Name);
+
             return sModels.TryAdd(key.ToLower(), model);
         }
 

@@ -1,10 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <connection>
     <dialect>sqlite</dialect>
-    <host></host>
+    <host>test.db</host>
     <port></port>
     <user></user>
     <password></password>
-    <database>test.db</database>
+    <database></database>
     <pool max="100" min="0">true</pool>
 </connection>
+<!--<connection>
+    <dialect>mysql</dialect>
+    <host>127.0.0.1</host>
+    <port></port>
+    <user>root</user>
+    <password>EbookChain2018</password>
+    <database>lingxigw</database>
+    <pool max="100" min="0">true</pool>
+</connection>-->

@@ -1,4 +1,5 @@
-﻿using CodeM.Common.Tools.Xml;
+﻿using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Tools.Xml;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -85,7 +86,7 @@ namespace CodeM.Common.Orm
         private static void ParseModelFile(FileInfo modelFile, string parent)
         {
             string modelFilePath = modelFile.FullName;
-            Model model = ParseModel(modelFilePath);
+            Model model = ParseModel(modelFilePath, parent);
             ModelUtils.AddModel(parent, model);
         }
 
@@ -258,9 +259,11 @@ namespace CodeM.Common.Orm
             return DbType.Object;
         }
 
-        internal static Model ParseModel(string modelFilePath)
+        internal static Model ParseModel(string modelFilePath, string parent)
         {
             Model model = new Model();
+            model.Path = parent.ToLower();
+
             XmlUtils.Iterate(modelFilePath, (nodeInfo) =>
             {
                 if (nodeInfo.Path == "/model")
@@ -334,6 +337,18 @@ namespace CodeM.Common.Orm
                                 throw new Exception("type属性非法。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
                         }
+                        else
+                        {
+                            string aiStr = nodeInfo.GetAttribute("autoIncrement");
+                            if (aiStr != null)
+                            {
+                                if (!string.IsNullOrWhiteSpace(aiStr) &&
+                                    reBool.IsMatch(aiStr))
+                                {
+                                    type = typeof(Int32);
+                                }
+                            }
+                        }
                         p.Type = type;
 
                         p.FieldType = Type2DbType(type);
@@ -365,11 +380,32 @@ namespace CodeM.Common.Orm
 
                             p.Length = int.Parse(lengthStr);
                         }
-
-                        string descStr = nodeInfo.GetAttribute("desc");
-                        if (!string.IsNullOrEmpty(descStr))
+                        else
                         {
-                            p.Description = descStr;
+                            p.Length = FieldUtils.GetFieldLength(model, p.FieldType);
+                        }
+
+                        string precisionStr = nodeInfo.GetAttribute("precision");
+                        if (precisionStr != null)
+                        {
+                            if (FieldUtils.IsFloat(p.FieldType))
+                            {
+                                if (string.IsNullOrWhiteSpace(precisionStr))
+                                {
+                                    throw new Exception("precision属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+
+                                if (!reNaturalInt.IsMatch(precisionStr))
+                                {
+                                    throw new Exception("precision属性必须是有效自然数。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+
+                                p.Precision = int.Parse(precisionStr);
+                            }
+                            else
+                            {
+                                throw new NotSupportedException(p.FieldType.ToString() + "类型不支持precision设置。" + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
                         }
 
                         string notNullStr = nodeInfo.GetAttribute("notNull");
@@ -388,20 +424,66 @@ namespace CodeM.Common.Orm
                             p.IsNotNull = bool.Parse(notNullStr);
                         }
 
-                        string uniqueStr = nodeInfo.GetAttribute("unique");
-                        if (uniqueStr != null)
+                        string descStr = nodeInfo.GetAttribute("desc");
+                        if (!string.IsNullOrEmpty(descStr))
                         {
-                            if (string.IsNullOrWhiteSpace(uniqueStr))
-                            {
-                                throw new Exception("unique属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
-                            }
+                            p.Description = descStr;
+                        }
 
-                            if (!reBool.IsMatch(uniqueStr))
+                        string autoIncrStr = nodeInfo.GetAttribute("autoIncrement");
+                        if (autoIncrStr != null)
+                        {
+                            if (FieldUtils.IsInteger(p.FieldType))
                             {
-                                throw new Exception("unique属性必须是布尔型。 " + modelFilePath + " - Line " + nodeInfo.Line);
-                            }
+                                if (string.IsNullOrWhiteSpace(autoIncrStr))
+                                {
+                                    throw new Exception("autoIncrement属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
 
-                            p.IsUnique = bool.Parse(uniqueStr);
+                                if (!reBool.IsMatch(autoIncrStr))
+                                {
+                                    throw new Exception("autoIncrement属性必须是布尔型。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+
+                                p.AutoIncrement = bool.Parse(autoIncrStr);
+                            }
+                            else
+                            {
+                                throw new NotSupportedException(p.FieldType.ToString() + "类型不支持autoIncrement设置。" + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string unsignedStr = nodeInfo.GetAttribute("unsigned");
+                        if (unsignedStr != null)
+                        {
+                            if (FieldUtils.IsNumeric(p.FieldType))
+                            {
+                                if (string.IsNullOrWhiteSpace(unsignedStr))
+                                {
+                                    throw new Exception("unsigned属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+
+                                if (!reBool.IsMatch(unsignedStr))
+                                {
+                                    throw new Exception("unsigned属性必须是布尔型。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+
+                                p.Unsigned = bool.Parse(unsignedStr);
+                            }
+                            else
+                            {
+                                throw new NotSupportedException(p.FieldType.ToString() + "类型不支持unsigned设置。" + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string uniqueGroupStr = nodeInfo.GetAttribute("uniqueGroup");
+                        if (uniqueGroupStr != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(uniqueGroupStr))
+                            {
+                                throw new Exception("uniqueGroup属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                            p.UniqueGroup = uniqueGroupStr.Trim();
                         }
 
                         string primaryStr = nodeInfo.GetAttribute("primary");
@@ -418,10 +500,6 @@ namespace CodeM.Common.Orm
                             }
 
                             p.IsPrimaryKey = bool.Parse(primaryStr);
-                            if (p.IsPrimaryKey)
-                            {
-                                p.IsUnique = true;
-                            }
                         }
 
                         string joinInsertStr = nodeInfo.GetAttribute("joinInsert");
