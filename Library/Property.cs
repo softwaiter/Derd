@@ -343,17 +343,17 @@ namespace CodeM.Common.Orm
                     sb.Append(string.Concat("(", Length, ")"));
                 }
             }
-            if (IsNotNull)
+            if (Features.IsSupportUnsigned(Owner) && Unsigned)
             {
-                sb.Append(" NOT NULL");
+                sb.Append(" UNSIGNED");
             }
             if (IsPrimaryKey && Owner.PrimaryKeyCount == 1)
             {
                 sb.Append(" PRIMARY KEY");
             }
-            if (Features.IsSupportUnsigned(Owner) && Unsigned)
+            if (IsNotNull)
             {
-                sb.Append(" UNSIGNED");
+                sb.Append(" NOT NULL");
             }
             if (AutoIncrement && Features.IsSupportAutoIncrement(Owner))
             {

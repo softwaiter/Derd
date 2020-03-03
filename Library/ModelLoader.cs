@@ -87,6 +87,21 @@ namespace CodeM.Common.Orm
         {
             string modelFilePath = modelFile.FullName;
             Model model = ParseModel(modelFilePath, parent);
+            if (model.PrimaryKeyCount == 0)
+            {
+                Property p = new Property();
+                p.Name = "Id";
+                p.Type = typeof(Int32);
+                p.Field = "Id";
+                p.FieldType = DbType.Int32;
+                p.IsPrimaryKey = true;
+                p.AutoIncrement = true;
+                p.Unsigned = true;
+                p.JoinInsert = false;
+                p.JoinUpdate = false;
+                p.Description = "自动生成主键";
+                model.AddProperty(p);
+            }
             ModelUtils.AddModel(parent, model);
         }
 

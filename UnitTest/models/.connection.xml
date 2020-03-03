@@ -13,7 +13,7 @@
     <host>127.0.0.1</host>
     <port></port>
     <user>root</user>
-    <password>EbookChain2018</password>
-    <database>lingxigw</database>
+    <password>root</password>
+    <database>test</database>
     <pool max="100" min="0">true</pool>
 </connection>-->
