@@ -21,36 +21,29 @@ namespace UnitTest
         }
 
         [TestMethod]
-        [Description("����ģ�Ͷ��壬�ж��Ƿ���Userģ��Ӧ����True")]
+        [Description("加载模型定义，判断是否定义User模型应返回True")]
         public void T1_LoadModels()
         {
-            Console.WriteLine("T1_LoadModels");
             Assert.IsTrue(OrmUtils.IsDefind("User"));
         }
 
         [TestMethod]
-        [Description("��ȡUserģ�ͣ�Ӧ�÷���True")]
+        [Description("获取User模型，应该返回True")]
         public void T2_GetUserModel()
         {
-            Console.WriteLine("T2_GetUserModel");
             Model m = OrmUtils.Model("User");
             Assert.IsNotNull(m);
-            Assert.AreEqual<int>(m.PropertyCount, 4);
+            Assert.AreEqual<string>(m.Table, "t_user");
         }
 
         [TestMethod]
+        [Description("使用Orm方法直接执行sql语句创建表格、删除表格")]
         public void T3_ExecuteSql()
         {
-            Console.WriteLine("T3_ExecuteSql");
-            string sql = "Create Table test(id integer primary key, name varchar(64), age int, address varchar(255))";
+            string sql = "Create Table orm_test(id integer primary key, name varchar(64), age int, address varchar(255))";
             OrmUtils.ExecSql(sql);
-        }
 
-        [TestMethod]
-        public void T4_DropTable()
-        {
-            Console.WriteLine("T4_DropTable");
-            string sql = "Drop Table test";
+            sql = "Drop Table orm_test";
             OrmUtils.ExecSql(sql);
         }
 

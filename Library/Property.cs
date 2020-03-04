@@ -351,13 +351,13 @@ namespace CodeM.Common.Orm
             {
                 sb.Append(" PRIMARY KEY");
             }
-            if (IsNotNull)
-            {
-                sb.Append(" NOT NULL");
-            }
             if (AutoIncrement && Features.IsSupportAutoIncrement(Owner))
             {
                 sb.Append(string.Concat(" ", FieldUtils.GetFieldAutoIncrementTag(Owner)));
+            }
+            if (IsNotNull)
+            {
+                sb.Append(" NOT NULL");
             }
             if (Features.IsSupportUnsigned(Owner) && 
                 !string.IsNullOrWhiteSpace(Description))
@@ -377,6 +377,10 @@ namespace CodeM.Common.Orm
             cloneObj.FieldType = this.FieldType;
             cloneObj.Description = this.Description;
             cloneObj.Length = this.Length;
+            cloneObj.Precision = this.Precision;
+            cloneObj.AutoIncrement = this.AutoIncrement;
+            cloneObj.Unsigned = this.Unsigned;
+            cloneObj.UniqueGroup = this.UniqueGroup;
             cloneObj.IsNotNull = this.IsNotNull;
             cloneObj.IsPrimaryKey = this.IsPrimaryKey;
             cloneObj.DefaultValue = this.DefaultValue;

@@ -153,15 +153,15 @@ namespace CodeM.Common.Orm.Dialect
                 { "default", "boolean" }
             }},
             { DbType.DateTime, new Hashtable() {
-
+                { "default", "datetime" }
             }},
             { DbType.Date, new Hashtable()
             {
-
+                { "default", "date" }
             }},
             { DbType.Time, new Hashtable()
             {
-
+                { "default", "time" }
             }}
         });
 

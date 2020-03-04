@@ -366,7 +366,6 @@ namespace CodeM.Common.Orm
                         }
                         p.Type = type;
 
-                        p.FieldType = Type2DbType(type);
                         string fieldTypeStr = nodeInfo.GetAttribute("fieldType");
                         if (fieldTypeStr != null)
                         {
@@ -378,6 +377,10 @@ namespace CodeM.Common.Orm
                             {
                                 throw new Exception("fieldType属性非法。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
+                        }
+                        else
+                        {
+                            p.FieldType = Type2DbType(type);
                         }
 
                         string lengthStr = nodeInfo.GetAttribute("length");
