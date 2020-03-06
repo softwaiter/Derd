@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 
 namespace CodeM.Common.Orm
 {
-    public class ConnectionSetting
+    internal class ConnectionSetting
     {
         /// <summary>
         /// 数据源名称，即connection定义路径

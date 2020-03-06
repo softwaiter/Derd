@@ -135,7 +135,13 @@ namespace CodeM.Common.Orm
 
         public bool TruncateTable()
         {
-            return true;
+            string sql = string.Concat("TRUNCATE TABLE ", Table);
+            return DbUtils.ExecuteNonQuery(Path.ToLower(), sql) == 0;
+        }
+
+        public dynamic NewObject()
+        {
+            return ModelObject.New(this);
         }
 
         public override string ToString()
