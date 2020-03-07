@@ -24,6 +24,8 @@ namespace UnitTest
             Test2();
             Test3();
             Test4();
+            Test7();
+            Test5();
         }
 
         [Description("创建User模型的物理表。")]
@@ -62,12 +64,28 @@ namespace UnitTest
             }
             catch (Exception exp)
             {
-                Assert.IsTrue(exp.Message.ToUpper().Contains("UNIQUE"));
+                Assert.IsTrue(exp.Message.ToUpper().Contains("UNIQUE") || exp.Message.ToUpper().Contains("DUPLICATE"));
             }
         }
 
-        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        [Description("根据名称更新Test3中写入的数据，修改对应Age为25，Deposit为99999999")]
         public void Test4()
+        {
+            dynamic newuser = ModelObject.New("User");
+            newuser.Name = "wangxm";
+            newuser.Age = 25;
+            newuser.Deposit = 99999999;
+            bool ret = newuser.Update("uc_name");
+            Assert.IsTrue(ret);
+        }
+
+        public void Test7()
+        {
+            OrmUtils.Model("User").TruncateTable();
+        }
+
+        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        public void Test5()
         {
             bool ret = OrmUtils.Model("User").RemoveTable();
             Assert.IsTrue(ret);

@@ -59,6 +59,23 @@ namespace CodeM.Common.Orm
             return false;
         }
 
+        internal string GetPrimaryFields()
+        {
+            string result = null;
+            if (mPrimaryKeys.Count > 0)
+            {
+                result = string.Join(',', mPrimaryKeys.Keys);
+            }
+            return result;
+        }
+
+        internal string GetUniqueGroupFields(string uniqueGroup)
+        {
+            string result = null;
+            mUniqueConstraints.TryGetValue(uniqueGroup, out result);
+            return result;
+        }
+
         public Property GetProperty(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -130,13 +147,15 @@ namespace CodeM.Common.Orm
         public bool RemoveTable()
         {
             string sql = string.Concat("DROP TABLE ", Table);
-            return DbUtils.ExecuteNonQuery(Path.ToLower(), sql) == 0;
+            DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+            return true;
         }
 
         public bool TruncateTable()
         {
             string sql = string.Concat("TRUNCATE TABLE ", Table);
-            return DbUtils.ExecuteNonQuery(Path.ToLower(), sql) == 0;
+            int ret = DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+            return ret == 0;
         }
 
         public dynamic NewObject()
