@@ -1,4 +1,5 @@
 ﻿using CodeM.Common.DbHelper;
+using CodeM.Common.Orm.Dialect;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -154,8 +155,12 @@ namespace CodeM.Common.Orm
         public bool TruncateTable()
         {
             string sql = string.Concat("TRUNCATE TABLE ", Table);
-            int ret = DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
-            return ret == 0;
+            if (!Features.IsSupportTruncate (this))
+            {
+                sql = string.Concat("DELETE FROM ", Table);
+            }
+            DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+            return true;
         }
 
         public dynamic NewObject()

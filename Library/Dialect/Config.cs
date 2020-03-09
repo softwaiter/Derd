@@ -22,6 +22,10 @@ namespace CodeM.Common.Orm.Dialect
             { "autoincrement", new Hashtable() {
                 { "default", true },
                 { "oracle", false }
+            }},
+            { "truncate", new Hashtable() {
+                { "default", true },
+                { "sqlite", false }
             }}
         });
 

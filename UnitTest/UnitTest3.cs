@@ -24,8 +24,8 @@ namespace UnitTest
             Test2();
             Test3();
             Test4();
-            Test7();
             Test5();
+            Test6();
         }
 
         [Description("创建User模型的物理表。")]
@@ -79,13 +79,14 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
-        public void Test7()
+        public void Test5()
         {
-            OrmUtils.Model("User").TruncateTable();
+            bool ret = OrmUtils.Model("User").TruncateTable();
+            Assert.IsTrue(ret);
         }
 
         [Description("删除Test1测试中创建的User模型物理表，应成功。")]
-        public void Test5()
+        public void Test6()
         {
             bool ret = OrmUtils.Model("User").RemoveTable();
             Assert.IsTrue(ret);
