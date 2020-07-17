@@ -41,17 +41,56 @@ namespace CodeM.Common.Orm
 
         public static bool CreateTables(string path, bool force = false)
         {
-            return false;
+            try
+            {
+                int count = ModelUtils.ModelCount;
+                for (int i = 0; i < count; i++)
+                {
+                    Model m = ModelUtils.Get(i);
+                    m.CreateTable(force);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
 
         public static bool RemoveTables()
         {
-            return false;
+            try
+            {
+                int count = ModelUtils.ModelCount;
+                for (int i = 0; i < count; i++)
+                {
+                    Model m = ModelUtils.Get(i);
+                    m.RemoveTable();
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
 
         public static bool TruncateTables()
         {
-            return false;
+            try
+            {
+                int count = ModelUtils.ModelCount;
+                for (int i = 0; i < count; i++)
+                {
+                    Model m = ModelUtils.Get(i);
+                    m.TruncateTable();
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
 
     }

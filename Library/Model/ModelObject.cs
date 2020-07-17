@@ -8,6 +8,29 @@ using System.Dynamic;
 namespace CodeM.Common.Orm
 {
 
+    public enum SQLCommandType
+    {
+        Insert = 0,
+        Delete = 1,
+        Update = 2
+    }
+
+    internal class SQLExecuteObj
+    {
+        public SQLExecuteObj(SQLCommandType type)
+        {
+            this.CommandType = type;
+        }
+
+        public string Command { get; set; }
+
+        public SQLCommandType CommandType { get; set; }
+
+        public List<DbParameter> Values { get; set; }
+
+        public List<DbParameter> Wheres { get; set; }
+    }
+
     public class ModelObject : DynamicObject
     {
         private Model mModel;
@@ -16,6 +39,16 @@ namespace CodeM.Common.Orm
         private ModelObject(Model model)
         {
             mModel = model;
+        }
+
+        public override IEnumerable<string> GetDynamicMemberNames()
+        {
+            List<string> names = new List<string>();
+            for (int i = 0; i < mModel.PropertyCount; i++)
+            {
+                names.Add(mModel.GetProperty(i).Name);
+            }
+            return names;
         }
 
         public override bool TrySetMember(SetMemberBinder binder, object value)
@@ -35,7 +68,7 @@ namespace CodeM.Common.Orm
             mValues[binder.Name] = value;
             return true;
         }
-
+        
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             if (mValues.ContainsKey(binder.Name))
@@ -71,11 +104,26 @@ namespace CodeM.Common.Orm
             return result != Undefined.Value;
         }
 
-        public bool Save()
+        internal SQLExecuteObj BuildSQLCommand(SQLCommandType type = SQLCommandType.Insert, string uniqueGroup = null)
         {
+            switch (type)
+            {
+                case SQLCommandType.Delete:
+                    return null;
+                case SQLCommandType.Update:
+                    return BuildUpdateSQL(uniqueGroup);
+                default:
+                    return BuildInsertSQL();
+            }
+        }
+
+        private SQLExecuteObj BuildInsertSQL()
+        {
+            SQLExecuteObj result = new SQLExecuteObj(SQLCommandType.Insert);
+            result.Values = new List<DbParameter>();
+
             string insertFields = string.Empty;
             string insertValues = string.Empty;
-            List<DbParameter> paramList = new List<DbParameter>();
             for (int i = 0; i < mModel.PropertyCount; i++)
             {
                 Property p = mModel.GetProperty(i);
@@ -84,10 +132,10 @@ namespace CodeM.Common.Orm
                 {
                     object value;
                     if (TryGetValue(p.Name, out value))
-                    { 
+                    {
                         DbParameter dp = DbUtils.CreateParam(mModel.Path, p.Name,
                             value, p.FieldType, ParameterDirection.Input);
-                        paramList.Add(dp);
+                        result.Values.Add(dp);
 
                         if (insertFields.Length > 0)
                         {
@@ -103,14 +151,14 @@ namespace CodeM.Common.Orm
                     }
                 }
             }
+            result.Command = string.Concat("INSERT INTO ", mModel.Table, " (", insertFields, ") VALUES(", insertValues + ")");
 
-            string sql = string.Concat("INSERT INTO ", mModel.Table, " (", insertFields, ") VALUES(", insertValues + ")");
-            return DbUtils.ExecuteNonQuery(mModel.Path, sql, paramList.ToArray()) == 1;
+            return result;
         }
 
-        public bool Update(string uniqueGroup=null)
+        private SQLExecuteObj BuildUpdateSQL(string uniqueGroup = null)
         {
-            string whereFields = null;
+            string whereFields;
             if (uniqueGroup != null)
             {
                 whereFields = mModel.GetUniqueGroupFields(uniqueGroup);
@@ -126,12 +174,14 @@ namespace CodeM.Common.Orm
 
             if (!string.IsNullOrWhiteSpace(whereFields))
             {
+                SQLExecuteObj execObj = new SQLExecuteObj(SQLCommandType.Update);
+                execObj.Values = new List<DbParameter>();
+                execObj.Wheres = new List<DbParameter>();
+
                 whereFields = string.Concat(whereFields.ToLower(), ",");
 
                 string updateContent = string.Empty;
                 string whereCondition = string.Empty;
-                List<DbParameter> updateParams = new List<DbParameter>();
-                List<DbParameter> whereParams = new List<DbParameter>();
                 for (int i = 0; i < mModel.PropertyCount; i++)
                 {
                     Property p = mModel.GetProperty(i);
@@ -143,7 +193,7 @@ namespace CodeM.Common.Orm
                         {
                             DbParameter dp = DbUtils.CreateParam(mModel.Path, p.Name,
                                 value, p.FieldType, ParameterDirection.Input);
-                            whereParams.Add(dp);
+                            execObj.Wheres.Add(dp);
 
                             if (whereCondition.Length > 0)
                             {
@@ -164,7 +214,7 @@ namespace CodeM.Common.Orm
                             {
                                 DbParameter dp = DbUtils.CreateParam(mModel.Path, p.Name,
                                     value, p.FieldType, ParameterDirection.Input);
-                                updateParams.Add(dp);
+                                execObj.Values.Add(dp);
 
                                 if (updateContent.Length > 0)
                                 {
@@ -175,17 +225,100 @@ namespace CodeM.Common.Orm
                         }
                     }
                 }
+                execObj.Command = string.Concat("UPDATE ", mModel.Table, " SET ", updateContent, " WHERE ", whereCondition);
 
-                updateParams.AddRange(whereParams);
-                string sql = string.Concat("UPDATE ", mModel.Table, " SET ", updateContent, " WHERE ", whereCondition);
-                return DbUtils.ExecuteNonQuery(mModel.Path, sql, updateParams.ToArray()) == 1;
+                return execObj;
             }
 
             throw new Exception("缺少主键定义信息，无法定位要更新的数据。");
         }
 
-        public void Delete()
-        { 
+        private SQLExecuteObj BuildDeleteSQL(string uniqueGroup = null)
+        {
+            string whereFields;
+            if (uniqueGroup != null)
+            {
+                whereFields = mModel.GetUniqueGroupFields(uniqueGroup);
+                if (string.IsNullOrWhiteSpace(whereFields))
+                {
+                    throw new Exception(string.Concat("未找到Unique Group定义：", uniqueGroup));
+                }
+            }
+            else
+            {
+                whereFields = mModel.GetPrimaryFields();
+            }
+
+            if (!string.IsNullOrWhiteSpace(whereFields))
+            {
+                SQLExecuteObj execObj = new SQLExecuteObj(SQLCommandType.Delete);
+                execObj.Wheres = new List<DbParameter>();
+
+                object value;
+                string whereCondition = string.Empty;
+                string[] whereFieldItems = whereFields.Split(',');
+                foreach (string field in whereFieldItems)
+                {
+                    Property p = mModel.GetPropertyByField(field);
+                    if (TryGetValue(p.Name, out value))
+                    {
+                        DbParameter dp = DbUtils.CreateParam(mModel.Path, p.Name,
+                            value, p.FieldType, ParameterDirection.Input);
+                        execObj.Wheres.Add(dp);
+
+                        if (whereCondition.Length > 0)
+                        {
+                            whereCondition += " AND ";
+                        }
+                        whereCondition += string.Concat("(", p.Field, "=?)");
+                    }
+                    else
+                    {
+                        throw new Exception(string.Concat("缺少定位字段数据，无法定位要删除的数据。"));
+                    }
+                }
+                execObj.Command = string.Concat("DElETE FROM ", mModel.Table, " WHERE ", whereCondition);
+
+                return execObj;
+            }
+
+            throw new Exception("缺少主键定义信息，无法定位要删除的数据。");
+        }
+
+        /// <summary>
+        /// 将对象信息保存到数据库
+        /// </summary>
+        /// <param name="replace">对已存在的记录是否替换，默认false</param>
+        /// <returns></returns>
+        public bool Save()
+        {
+            SQLExecuteObj execObj = BuildSQLCommand();
+            return DbUtils.ExecuteNonQuery(mModel.Path, execObj.Command, execObj.Values.ToArray()) == 1;
+        }
+
+        /// <summary>
+        /// 将对象信息更新到数据库
+        /// </summary>
+        /// <param name="uniqueGroup">匹配更新对象的约束条件，默认未设置；使用主键信息</param>
+        /// <returns></returns>
+        public bool Update(string uniqueGroup=null)
+        {
+            SQLExecuteObj seo = BuildUpdateSQL(uniqueGroup);
+            List<DbParameter> updateParams = new List<DbParameter>();
+            updateParams.AddRange(seo.Values);
+            updateParams.AddRange(seo.Wheres);
+            return DbUtils.ExecuteNonQuery(mModel.Path, seo.Command, updateParams.ToArray()) > 0;
+        }
+
+        /// <summary>
+        /// 删除和当前对象匹配的数据记录
+        /// </summary>
+        /// <param name="uniqueGroup">匹配删除对象的约束条件，默认未设置；使用主键信息</param>
+        /// <returns></returns>
+        public bool Delete(string uniqueGroup = null)
+        {
+            SQLExecuteObj seo = BuildDeleteSQL(uniqueGroup);
+            return DbUtils.ExecuteNonQuery(mModel.Path, seo.Command, seo.Wheres.ToArray()) > 0;
         }
 
         public static ModelObject New(string modelName)

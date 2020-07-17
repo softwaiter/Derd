@@ -276,6 +276,8 @@ namespace CodeM.Common.Orm
 
         internal static Model ParseModel(string modelFilePath, string parent)
         {
+            //TODO defaultValue、type=Model
+
             Model model = new Model();
             model.Path = parent.ToLower();
 

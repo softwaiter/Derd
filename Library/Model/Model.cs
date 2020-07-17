@@ -10,6 +10,7 @@ namespace CodeM.Common.Orm
     public class Model : ICloneable
     {
         private ConcurrentDictionary<string, Property> mProperties = new ConcurrentDictionary<string, Property>();
+        private ConcurrentDictionary<string, Property> mPropertyFields = new ConcurrentDictionary<string, Property>();
         private ConcurrentDictionary<int, string> mPropertyIndexes = new ConcurrentDictionary<int, string>();
 
         private ConcurrentDictionary<string, Property> mPrimaryKeys = new ConcurrentDictionary<string, Property>();
@@ -29,6 +30,11 @@ namespace CodeM.Common.Orm
 
             if (mProperties.TryAdd(p.Name.ToLower(), p))
             {
+                mPropertyFields.AddOrUpdate(p.Field.ToLower(), p, (key, value) =>
+                {
+                    return p;
+                });
+
                 mPropertyIndexes.AddOrUpdate(mPropertyIndexes.Count, p.Name, (key, value) => {
                     return p.Name;
                 });
@@ -91,6 +97,22 @@ namespace CodeM.Common.Orm
             }
 
             throw new Exception(string.Concat("未找到Property：", name));
+        }
+
+        public Property GetPropertyByField(string field)
+        {
+            if (string.IsNullOrWhiteSpace(field))
+            {
+                throw new NullReferenceException(field);
+            }
+
+            Property result;
+            if (mPropertyFields.TryGetValue(field.ToLower(), out result))
+            {
+                return result;
+            }
+
+            throw new Exception(string.Concat("未找到Property：", field));
         }
 
         public Property GetProperty(int index)
@@ -161,6 +183,62 @@ namespace CodeM.Common.Orm
             }
             DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
             return true;
+        }
+
+        public bool Save(params dynamic[] objs)
+        {
+            //TODO
+            return true;
+        }
+
+        public bool Update(string uniqueGroup, params dynamic[] objs)
+        {
+            //TODO
+            return true;
+        }
+        public bool Update(params dynamic[] objs)
+        {
+            //TODO
+            return true;
+        }
+
+        public bool Delete(string uniqueGroup, params dynamic[] objs)
+        {
+            //TODO
+            return true;
+        }
+        
+        public bool Delete(params dynamic[] objs)
+        {
+            //TODO
+            return true;
+        }
+
+        public void FindAll()
+        { 
+            //TODO
+        }
+
+        public void FindPage()
+        {
+            //TODO
+        }
+
+        public void FindFirst()
+        { 
+        }
+
+        public long Count()
+        {
+            //TODO
+            string sql = string.Concat("SELECT COUNT(1) FROM ", this.Table);
+            object count = DbUtils.ExecuteScalar(this.Path, sql, null);
+            return (long)count;
+        }
+
+        public void Exists()
+        {
+            //TODO
         }
 
         public dynamic NewObject()

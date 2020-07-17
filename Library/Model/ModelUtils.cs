@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace CodeM.Common.Orm
 {
@@ -48,6 +49,24 @@ namespace CodeM.Common.Orm
             if (sModels.ContainsKey(fullModelName.ToLower()))
             {
                 return sModels[fullModelName.ToLower()];
+            }
+            return null;
+        }
+
+        internal static int ModelCount
+        {
+            get
+            {
+                return sModels.Count;
+            }
+        }
+
+        internal static Model Get(int index)
+        {
+            KeyValuePair<string, Model>[] models = sModels.ToArray();
+            if (index >= 0 && index < models.Length)
+            {
+                return models[index].Value;
             }
             return null;
         }

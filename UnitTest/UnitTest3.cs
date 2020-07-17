@@ -26,6 +26,7 @@ namespace UnitTest
             Test4();
             Test5();
             Test6();
+            Test7();
         }
 
         [Description("创建User模型的物理表。")]
@@ -35,7 +36,7 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
-        [Description("向User模型的物理表写入一条数据。")]
+        [Description("向User模型的物理表写入一条数据，应成功。")]
         public void Test2()
         {
             dynamic newuser = ModelObject.New("User");
@@ -48,14 +49,14 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
-        [Description("向User模型的物理表写入一条数据。")]
+        [Description("向User模型的物理表写入一条数据，Name重复，应失败。")]
         public void Test3()
         {
             try
             {
                 dynamic newuser = ModelObject.New("User");
                 newuser.Name = "wangxm";
-                newuser.Age = 18;
+                newuser.Age = 19;
                 newuser.Birthday = new DateTime(1980, 6, 14);
                 newuser.Deposit = 10000000.58;
                 newuser.IsAdmin = true;
@@ -68,7 +69,7 @@ namespace UnitTest
             }
         }
 
-        [Description("根据名称更新Test3中写入的数据，修改对应Age为25，Deposit为99999999")]
+        [Description("根据名称更新Test3中写入的数据，修改对应Age为25，Deposit为99999999；应成功。")]
         public void Test4()
         {
             dynamic newuser = ModelObject.New("User");
@@ -79,14 +80,27 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
+        [Description("向User模型的物理表写入一条合法新数据，应成功。")]
         public void Test5()
         {
-            bool ret = OrmUtils.Model("User").TruncateTable();
+            dynamic newuser = ModelObject.New("User");
+            newuser.Name = "jishuwen";
+            newuser.Age = 100;
+            newuser.Birthday = new DateTime(1947, 1, 16);
+            newuser.Deposit = 10000000.58;
+            newuser.IsAdmin = true;
+            bool ret = newuser.Save();
             Assert.IsTrue(ret);
         }
 
-        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        [Description("查看User模型物理表记录条数，应为2。")]
         public void Test6()
+        {
+            Assert.IsTrue(OrmUtils.Model("User").Count() == 2);
+        }
+
+        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        public void Test7()
         {
             bool ret = OrmUtils.Model("User").RemoveTable();
             Assert.IsTrue(ret);
