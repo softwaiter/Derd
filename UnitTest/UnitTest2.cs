@@ -28,7 +28,7 @@ namespace UnitTest
         [Description("根据User模型创建物理表，应成功")]
         public void Test1()
         {
-            bool ret = OrmUtils.Model("User").CreateTable();
+            bool ret = OrmUtils.Model("User").CreateTable(true);
             Assert.IsTrue(ret);
         }
 

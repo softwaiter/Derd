@@ -1,6 +1,7 @@
 ﻿using CodeM.Common.Orm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Dynamic;
 using System.IO;
 
 namespace UnitTest
@@ -24,9 +25,9 @@ namespace UnitTest
             Test2();
             Test3();
             Test4();
-            Test5();
-            Test6();
-            Test7();
+            //Test5();
+            //Test6();
+            //Test7();
         }
 
         [Description("创建User模型的物理表。")]
@@ -45,7 +46,7 @@ namespace UnitTest
             newuser.Birthday = new DateTime(1980, 6, 14);
             newuser.Deposit = 10000000.58;
             newuser.IsAdmin = true;
-            bool ret = newuser.Save();
+            bool ret = OrmUtils.Model("User").SetValue(newuser).Save();
             Assert.IsTrue(ret);
         }
 
@@ -54,13 +55,7 @@ namespace UnitTest
         {
             try
             {
-                dynamic newuser = ModelObject.New("User");
-                newuser.Name = "wangxm";
-                newuser.Age = 19;
-                newuser.Birthday = new DateTime(1980, 6, 14);
-                newuser.Deposit = 10000000.58;
-                newuser.IsAdmin = true;
-                bool ret = newuser.Save();
+                bool ret = OrmUtils.Model("User").SetValue("Name", "wangxm").Save();
                 Assert.IsFalse(ret);
             }
             catch (Exception exp)
@@ -72,11 +67,12 @@ namespace UnitTest
         [Description("根据名称更新Test3中写入的数据，修改对应Age为25，Deposit为99999999；应成功。")]
         public void Test4()
         {
-            dynamic newuser = ModelObject.New("User");
-            newuser.Name = "wangxm";
-            newuser.Age = 25;
-            newuser.Deposit = 99999999;
-            bool ret = newuser.Update("uc_name");
+            //dynamic newuser = ModelObject.New("User");
+            //newuser.Name = "wangxm";
+            //newuser.Age = 25;
+            //newuser.Deposit = 99999999;
+            //bool ret = newuser.Update("uc_name");
+            bool ret = OrmUtils.Model("User").Equals("Id", 1).SetValue("Age", 999).Update();
             Assert.IsTrue(ret);
         }
 

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CodeM.Common.Orm
 {
-    public class Model : ICloneable
+    public partial class Model : ICloneable
     {
         private ConcurrentDictionary<string, Property> mProperties = new ConcurrentDictionary<string, Property>();
         private ConcurrentDictionary<string, Property> mPropertyFields = new ConcurrentDictionary<string, Property>();
@@ -183,49 +183,6 @@ namespace CodeM.Common.Orm
             }
             DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
             return true;
-        }
-
-        public bool Save(params dynamic[] objs)
-        {
-            //TODO
-            return true;
-        }
-
-        public bool Update(string uniqueGroup, params dynamic[] objs)
-        {
-            //TODO
-            return true;
-        }
-        public bool Update(params dynamic[] objs)
-        {
-            //TODO
-            return true;
-        }
-
-        public bool Delete(string uniqueGroup, params dynamic[] objs)
-        {
-            //TODO
-            return true;
-        }
-        
-        public bool Delete(params dynamic[] objs)
-        {
-            //TODO
-            return true;
-        }
-
-        public void FindAll()
-        { 
-            //TODO
-        }
-
-        public void FindPage()
-        {
-            //TODO
-        }
-
-        public void FindFirst()
-        { 
         }
 
         public long Count()

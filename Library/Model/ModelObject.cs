@@ -68,7 +68,25 @@ namespace CodeM.Common.Orm
             mValues[binder.Name] = value;
             return true;
         }
-        
+
+        public bool TrySetValue(string name, object value)
+        {
+            Property p = mModel.GetProperty(name);
+            if (p.IsNotNull && value == null)
+            {
+                throw new NoNullAllowedException(name);
+            }
+            if (p.Type == typeof(string) && value != null && p.Length > 0)
+            {
+                if (value.ToString().Length > p.Length)
+                {
+                    throw new Exception(string.Concat("属性“", name, "”的最大长度 ", p.Length));
+                }
+            }
+            mValues[name] = value;
+            return true;
+        }
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             if (mValues.ContainsKey(binder.Name))
