@@ -25,8 +25,8 @@ namespace UnitTest
             Test2();
             Test3();
             Test4();
-            //Test5();
-            //Test6();
+            Test5();
+            Test6();
             //Test7();
         }
 
@@ -67,12 +67,7 @@ namespace UnitTest
         [Description("根据名称更新Test3中写入的数据，修改对应Age为25，Deposit为99999999；应成功。")]
         public void Test4()
         {
-            //dynamic newuser = ModelObject.New("User");
-            //newuser.Name = "wangxm";
-            //newuser.Age = 25;
-            //newuser.Deposit = 99999999;
-            //bool ret = newuser.Update("uc_name");
-            bool ret = OrmUtils.Model("User").Equals("Id", 1).SetValue("Age", 999).Update();
+            bool ret = OrmUtils.Model("User").Equals("Name", "wangxm").SetValue("Age", 25).SetValue("Deposit", 99999999).Update();
             Assert.IsTrue(ret);
         }
 
@@ -85,7 +80,7 @@ namespace UnitTest
             newuser.Birthday = new DateTime(1947, 1, 16);
             newuser.Deposit = 10000000.58;
             newuser.IsAdmin = true;
-            bool ret = newuser.Save();
+            bool ret = OrmUtils.Model("User").SetValue(newuser).Save();
             Assert.IsTrue(ret);
         }
 

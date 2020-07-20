@@ -48,7 +48,8 @@ namespace CodeM.Common.Orm
             string fullModelName = GetFullModelName(modelName);
             if (sModels.ContainsKey(fullModelName.ToLower()))
             {
-                return sModels[fullModelName.ToLower()];
+                Model m = sModels[fullModelName.ToLower()];
+                return (Model)m.Clone();
             }
             return null;
         }
@@ -66,7 +67,8 @@ namespace CodeM.Common.Orm
             KeyValuePair<string, Model>[] models = sModels.ToArray();
             if (index >= 0 && index < models.Length)
             {
-                return models[index].Value;
+                Model m = models[index].Value;
+                return (Model)m.Clone();
             }
             return null;
         }

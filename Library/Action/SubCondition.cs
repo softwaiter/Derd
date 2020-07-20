@@ -18,6 +18,11 @@ namespace CodeM.Common.Orm
     {
         private List<KeyValuePair<ConditionOperator, object>> mConditions = new List<KeyValuePair<ConditionOperator, object>>();
 
+        public void Reset()
+        {
+            mConditions.Clear();
+        }
+
         public ICondition And(ICondition subCondition)
         {
             mConditions.Add(new KeyValuePair<ConditionOperator, object>(ConditionOperator.And, subCondition));
@@ -78,10 +83,24 @@ namespace CodeM.Common.Orm
                             throw new Exception(string.Concat("无效的属性：", expr.Key));
                         }
 
-                        DbParameter dp = DbUtils.CreateParam(model.Path, p.Name,
+                        DbParameter dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr.Value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
                         result.Command += string.Concat(p.Field, "=?");
+                        break;
+                    case ConditionOperator.NotEquals:
+                        KeyValuePair<string, object> expr2 = (KeyValuePair<string, object>)item.Value;
+
+                        Property p2 = model.GetProperty(expr2.Key);
+                        if (p2 == null)
+                        {
+                            throw new Exception(string.Concat("无效的属性：", expr2.Key));
+                        }
+
+                        DbParameter dp2 = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                            expr2.Value, p2.FieldType, ParameterDirection.Input);
+                        result.Params.Add(dp2);
+                        result.Command += string.Concat(p2.Field, "<>?");
                         break;
                 }
             }

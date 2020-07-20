@@ -7,9 +7,11 @@ namespace CodeM.Common.Orm
 
         bool Save();
 
-        //public bool Delete();
+        bool Delete(bool deleteAll = false);
 
-        //public bool Update();
+        bool Update(bool updateAll = false);
+
+        long Count();
 
         //Like
         //NotLike
@@ -17,7 +19,7 @@ namespace CodeM.Common.Orm
         //NotIn
         //IsNull
         //NotIsNull
-        
+
 
         //public ICommand NotEquals();
 
@@ -38,8 +40,6 @@ namespace CodeM.Common.Orm
         //public ICommand OrderBy(string properyName, bool desc);
 
         //public bool Query();
-
-        //public long Count();
 
         //public bool Exists();
     }

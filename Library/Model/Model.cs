@@ -185,19 +185,6 @@ namespace CodeM.Common.Orm
             return true;
         }
 
-        public long Count()
-        {
-            //TODO
-            string sql = string.Concat("SELECT COUNT(1) FROM ", this.Table);
-            object count = DbUtils.ExecuteScalar(this.Path, sql, null);
-            return (long)count;
-        }
-
-        public void Exists()
-        {
-            //TODO
-        }
-
         public dynamic NewObject()
         {
             return ModelObject.New(this);
@@ -239,6 +226,7 @@ namespace CodeM.Common.Orm
         public object Clone()
         {
             Model m = new Model();
+            m.Path = this.Path;
             m.Name = this.Name;
             m.Table = this.Table;
 

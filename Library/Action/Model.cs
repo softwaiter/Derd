@@ -69,6 +69,12 @@ namespace CodeM.Common.Orm
 
         #endregion
 
+        private void CommandDone()
+        {
+            mValues = null;
+            mCondition.Reset();
+        }
+
         private SQLExecuteObj BuildInsertSQL()
         {
             SQLExecuteObj result = new SQLExecuteObj(SQLCommandType.Insert);
@@ -84,7 +90,7 @@ namespace CodeM.Common.Orm
                 {
                     if (mValues.TryGetValue(p.Name, out value))
                     {
-                        DbParameter dp = DbUtils.CreateParam(Path, p.Name,
+                        DbParameter dp = DbUtils.CreateParam(Path, Guid.NewGuid().ToString("N"),
                             value, p.FieldType, ParameterDirection.Input);
                         result.Values.Add(dp);
 
@@ -113,8 +119,12 @@ namespace CodeM.Common.Orm
             {
                 throw new Exception("没有任何要保存的内容，请通过SetValue设置内容。");
             }
+
             SQLExecuteObj execObj = BuildInsertSQL();
-            return DbUtils.ExecuteNonQuery(Path, execObj.Command, execObj.Values.ToArray()) == 1;
+            bool ret = DbUtils.ExecuteNonQuery(Path, execObj.Command, execObj.Values.ToArray()) == 1;
+            CommandDone();
+
+            return ret;
         }
 
         private SQLExecuteObj BuildUpdateSQL()
@@ -131,7 +141,7 @@ namespace CodeM.Common.Orm
                 {
                     if (mValues.TryGetValue(p.Name, out value))
                     {
-                        DbParameter dp = DbUtils.CreateParam(Path, p.Name,
+                        DbParameter dp = DbUtils.CreateParam(Path, Guid.NewGuid().ToString("N"),
                             value, p.FieldType, ParameterDirection.Input);
                         execObj.Values.Add(dp);
 
@@ -169,7 +179,47 @@ namespace CodeM.Common.Orm
                 execObj.Values.AddRange(actionSQL.Params);
             }
 
-            return DbUtils.ExecuteNonQuery(Path, execObj.Command, execObj.Values.ToArray()) > 0;
+            bool ret = DbUtils.ExecuteNonQuery(Path, execObj.Command, execObj.Values.ToArray()) > 0;
+            CommandDone();
+
+            return ret;
+        }
+
+        public bool Delete(bool deleteAll = false)
+        {
+            ActionSQL actionSQL = mCondition.Build(this);
+
+            if (string.IsNullOrEmpty(actionSQL.Command) && !deleteAll)
+            {
+                throw new Exception("未设置删除的条件范围。");
+            }
+
+            string sql = string.Concat("DElETE FROM ", this.Table);
+            if (!string.IsNullOrWhiteSpace(actionSQL.Command))
+            {
+                sql += string.Concat(" WHERE ", actionSQL.Command);
+            }
+
+            bool ret = DbUtils.ExecuteNonQuery(this.Path, sql, actionSQL.Params.ToArray()) > 0;
+            CommandDone();
+
+            return ret;
+        }
+
+        public long Count()
+        {
+            ActionSQL actionSQL = mCondition.Build(this);
+
+            string sql = string.Concat("SELECT COUNT(1) FROM ", this.Table);
+            if (!string.IsNullOrWhiteSpace(actionSQL.Command))
+            {
+                sql += string.Concat(" WHERE ", actionSQL.Command);
+            }
+
+            object count = DbUtils.ExecuteScalar(this.Path, sql, actionSQL.Params.ToArray());
+            CommandDone();
+
+            return (long)count;
         }
     }
 }
