@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CodeM.Common.Orm
 {
-    public partial class Model : ISetValue, IGetValue, ICommand
+    public partial class Model : ISetValue, IGetValue, IPaging, ICommand
     {
         #region ISetValue
         ModelObject mSetValues;
@@ -92,11 +92,47 @@ namespace CodeM.Common.Orm
 
         #endregion
 
+        #region IPaging
+
+        private bool mUsePaging = false;
+        private int mPageSize = 100;
+        private int mPageIndex = 1;
+
+        public Model PageSize(int size)
+        {
+            if (size < 1)
+            {
+                throw new Exception("分页大小至少为1。");
+            }
+
+            mPageSize = size;
+            mUsePaging = true;
+            return this;
+        }
+
+        public Model PageIndex(int index)
+        {
+            if (index < 1)
+            {
+                throw new Exception("最小页码从1开始。");
+            }
+
+            mPageIndex = index;
+            mUsePaging = true;
+            return this;
+        }
+
+        #endregion
+
         private void Reset()
         {
             mSetValues = null;
             mGetValues.Clear();
             mCondition.Reset();
+
+            mUsePaging = false;
+            mPageSize = 100;
+            mPageIndex = 1;
         }
 
         private SQLExecuteObj BuildInsertSQL()
@@ -286,6 +322,11 @@ namespace CodeM.Common.Orm
                 if (!string.IsNullOrEmpty(actionSQL.SQL))
                 {
                     execObj.Command += string.Concat(" WHERE ", actionSQL.SQL);
+                }
+
+                if (mUsePaging)
+                {
+                    execObj.Command += string.Concat(" LIMIT ", (mPageIndex - 1) * mPageSize, ",", mPageSize);
                 }
 
                 dr = DbUtils.ExecuteDataReader(Path, execObj.Command, actionSQL.Params.ToArray());

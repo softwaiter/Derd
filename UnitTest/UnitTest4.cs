@@ -1,7 +1,9 @@
 ﻿using CodeM.Common.Orm;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace UnitTest
 {
@@ -20,9 +22,13 @@ namespace UnitTest
         [TestMethod]
         public void Test()
         {
+            Thread.Sleep(1000 * 3);
+
             Test1();
             Test2();
             Test3();
+            Test4();
+            Test5();
         }
 
         [Description("创建User模型的物理表。")]
@@ -50,6 +56,33 @@ namespace UnitTest
         {
             dynamic result = OrmUtils.Model("user").GetValue("name", "age").Equals("name", "wangxm").Query();
             bool ret = result[0].age == 18;
+            Assert.IsTrue(ret);
+        }
+
+        [Description("向User模型的物理表写入一条数据，应成功。")]
+        public void Test4()
+        {
+            dynamic newuser = ModelObject.New("User");
+            newuser.Name = "huxinyue";
+            newuser.Age = 11;
+            newuser.Birthday = new DateTime(1987, 4, 26);
+            newuser.Deposit = 9999999999;
+            newuser.IsAdmin = true;
+            bool ret = OrmUtils.Model("User").SetValues(newuser).Save();
+            Assert.IsTrue(ret);
+        }
+
+        [Description("按分页查询，每页1条数据，查询第1页，返回记录条数应为1条。")]
+        public void Test5()
+        {
+            List<ModelObject> result = OrmUtils.Model("user").PageSize(1).PageIndex(1).Query();
+            Assert.AreEqual(result.Count, 1);
+        }
+
+        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        public void Test6()
+        {
+            bool ret = OrmUtils.Model("User").RemoveTable();
             Assert.IsTrue(ret);
         }
 
