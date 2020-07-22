@@ -49,29 +49,29 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        internal ActionSQL Build(Model model)
+        internal CommandSQL Build(Model model)
         {
-            ActionSQL result = new ActionSQL();
+            CommandSQL result = new CommandSQL();
 
             foreach (KeyValuePair<ConditionOperator, object> item in mConditions)
             {
-                if (!string.IsNullOrEmpty(result.Command) &&
+                if (!string.IsNullOrEmpty(result.SQL) &&
                     item.Key != ConditionOperator.And &&
                     item.Key != ConditionOperator.Or)
                 {
-                    result.Command += " AND ";
+                    result.SQL += " AND ";
                 }
 
                 switch (item.Key)
                 {
                     case ConditionOperator.And:
-                        ActionSQL andActionSQL = ((SubCondition)item.Value).Build(model);
-                        result.Command += string.Concat(" AND ", andActionSQL.Command);
+                        CommandSQL andActionSQL = ((SubCondition)item.Value).Build(model);
+                        result.SQL += string.Concat(" AND ", andActionSQL.SQL);
                         result.Params.AddRange(andActionSQL.Params);
                         break;
                     case ConditionOperator.Or:
-                        ActionSQL orActionSQL = ((SubCondition)item.Value).Build(model);
-                        result.Command += string.Concat(" OR ", orActionSQL.Command);
+                        CommandSQL orActionSQL = ((SubCondition)item.Value).Build(model);
+                        result.SQL += string.Concat(" OR ", orActionSQL.SQL);
                         result.Params.AddRange(orActionSQL.Params);
                         break;
                     case ConditionOperator.Equals:
@@ -86,7 +86,7 @@ namespace CodeM.Common.Orm
                         DbParameter dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr.Value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
-                        result.Command += string.Concat(p.Field, "=?");
+                        result.SQL += string.Concat(p.Field, "=?");
                         break;
                     case ConditionOperator.NotEquals:
                         KeyValuePair<string, object> expr2 = (KeyValuePair<string, object>)item.Value;
@@ -100,14 +100,14 @@ namespace CodeM.Common.Orm
                         DbParameter dp2 = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr2.Value, p2.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp2);
-                        result.Command += string.Concat(p2.Field, "<>?");
+                        result.SQL += string.Concat(p2.Field, "<>?");
                         break;
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(result.Command))
+            if (!string.IsNullOrWhiteSpace(result.SQL))
             {
-                result.Command = string.Concat("(", result.Command, ")");
+                result.SQL = string.Concat("(", result.SQL, ")");
             }
 
             return result;

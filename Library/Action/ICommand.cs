@@ -11,7 +11,11 @@ namespace CodeM.Common.Orm
 
         bool Update(bool updateAll = false);
 
+        List<ModelObject> Query();
+
         long Count();
+
+        //bool Exists();
 
         //Like
         //NotLike
@@ -38,9 +42,5 @@ namespace CodeM.Common.Orm
         //public ICommand Top(int num);
 
         //public ICommand OrderBy(string properyName, bool desc);
-
-        //public bool Query();
-
-        //public bool Exists();
     }
 }

@@ -4,7 +4,7 @@
     {
         Model SetValue(string name, object value);
 
-        Model SetValue(ModelObject obj);
+        Model SetValues(ModelObject obj);
 
     }
 }
