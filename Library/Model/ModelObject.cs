@@ -1,35 +1,10 @@
-﻿using CodeM.Common.DbHelper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Dynamic;
 
 namespace CodeM.Common.Orm
 {
-
-    public enum SQLCommandType
-    {
-        Insert = 0,
-        Delete = 1,
-        Update = 2
-    }
-
-    internal class SQLExecuteObj
-    {
-        public SQLExecuteObj(SQLCommandType type)
-        {
-            this.CommandType = type;
-        }
-
-        public string Command { get; set; }
-
-        public SQLCommandType CommandType { get; set; }
-
-        public List<DbParameter> Values { get; set; }
-
-        public List<DbParameter> Wheres { get; set; }
-    }
 
     public class ModelObject : DynamicObject
     {

@@ -23,6 +23,11 @@ namespace CodeM.Common.Orm
             mConditions.Clear();
         }
 
+        public bool IsEmpty()
+        {
+            return mConditions.Count == 0;
+        }
+
         public ICondition And(ICondition subCondition)
         {
             mConditions.Add(new KeyValuePair<ConditionOperator, object>(ConditionOperator.And, subCondition));

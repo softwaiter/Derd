@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Text;
 
 namespace CodeM.Common.Orm
 {
@@ -11,6 +10,14 @@ namespace CodeM.Common.Orm
     {
         #region ISetValue
         ModelObject mSetValues;
+
+        internal ModelObject Values
+        {
+            get
+            {
+                return mSetValues;
+            }
+        }
 
         public Model SetValue(string name, object value)
         {
@@ -43,6 +50,14 @@ namespace CodeM.Common.Orm
         #region IGetValue
         List<string> mGetValues = new List<string>();
 
+        internal List<string> ReturnValues
+        {
+            get
+            {
+                return mGetValues;
+            }
+        }
+
         public Model GetValue(params string[] names)
         {
             foreach (string name in names)
@@ -65,6 +80,14 @@ namespace CodeM.Common.Orm
         #region ICondition
 
         private SubCondition mCondition = new SubCondition();
+
+        internal SubCondition Where
+        {
+            get
+            {
+                return mCondition;
+            }
+        }
 
         public Model And(ICondition subCondition)
         {
@@ -97,6 +120,30 @@ namespace CodeM.Common.Orm
         private bool mUsePaging = false;
         private int mPageSize = 100;
         private int mPageIndex = 1;
+
+        internal bool IsUsePaging 
+        {
+            get
+            {
+                return mUsePaging;
+            }
+        }
+
+        internal int CurrPageSize 
+        {
+            get 
+            {
+                return mPageSize;
+            }
+        }
+
+        internal int CurrPageIndex 
+        {
+            get
+            {
+                return mPageIndex;
+            }
+        }
 
         public Model PageSize(int size)
         {
@@ -135,44 +182,6 @@ namespace CodeM.Common.Orm
             mPageIndex = 1;
         }
 
-        private SQLExecuteObj BuildInsertSQL()
-        {
-            SQLExecuteObj result = new SQLExecuteObj(SQLCommandType.Insert);
-            result.Values = new List<DbParameter>();
-
-            object value;
-            string insertFields = string.Empty;
-            string insertValues = string.Empty;
-            for (int i = 0; i < PropertyCount; i++)
-            {
-                Property p = GetProperty(i);
-                if (p.JoinInsert)
-                {
-                    if (mSetValues.TryGetValue(p.Name, out value))
-                    {
-                        DbParameter dp = DbUtils.CreateParam(Path, Guid.NewGuid().ToString("N"),
-                            value, p.FieldType, ParameterDirection.Input);
-                        result.Values.Add(dp);
-
-                        if (insertFields.Length > 0)
-                        {
-                            insertFields += ",";
-                        }
-                        insertFields += p.Field;
-
-                        if (insertValues.Length > 0)
-                        {
-                            insertValues += ",";
-                        }
-                        insertValues += "?";
-                    }
-                }
-            }
-            result.Command = string.Concat("INSERT INTO ", Table, " (", insertFields, ") VALUES(", insertValues + ")");
-
-            return result;
-        }
-
         public bool Save()
         {
             try
@@ -182,45 +191,14 @@ namespace CodeM.Common.Orm
                     throw new Exception("没有任何要保存的内容，请通过SetValue设置内容。");
                 }
 
-                SQLExecuteObj execObj = BuildInsertSQL();
-                bool ret = DbUtils.ExecuteNonQuery(Path, execObj.Command, execObj.Values.ToArray()) == 1;
+                CommandSQL cmd = SQLBuilder.BuildInsertSQL(this);
+                bool ret = DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) == 1;
                 return ret;
             }
             finally
             {
                 Reset();
             }
-        }
-
-        private SQLExecuteObj BuildUpdateSQL()
-        {
-            SQLExecuteObj execObj = new SQLExecuteObj(SQLCommandType.Update);
-            execObj.Values = new List<DbParameter>();
-
-            object value;
-            string updateContent = string.Empty;
-            for (int i = 0; i < PropertyCount; i++)
-            {
-                Property p = GetProperty(i);
-                if (p.JoinUpdate)
-                {
-                    if (mSetValues.TryGetValue(p.Name, out value))
-                    {
-                        DbParameter dp = DbUtils.CreateParam(Path, Guid.NewGuid().ToString("N"),
-                            value, p.FieldType, ParameterDirection.Input);
-                        execObj.Values.Add(dp);
-
-                        if (updateContent.Length > 0)
-                        {
-                            updateContent += ",";
-                        }
-                        updateContent += string.Concat(p.Field, "=?");
-                    }
-                }
-            }
-            execObj.Command = string.Concat("UPDATE ", Table, " SET ", updateContent);
-
-            return execObj;
         }
 
         public bool Update(bool updateAll = false)
@@ -232,21 +210,14 @@ namespace CodeM.Common.Orm
                     throw new Exception("没有任何要更新的内容，请通过SetValue设置内容。");
                 }
 
-                SQLExecuteObj execObj = BuildUpdateSQL();
-                CommandSQL actionSQL = mCondition.Build(this);
-
-                if (string.IsNullOrEmpty(actionSQL.SQL) && !updateAll)
+                if (mCondition.IsEmpty() && !updateAll)
                 {
                     throw new Exception("未设置更新的条件范围。");
                 }
 
-                if (!string.IsNullOrEmpty(actionSQL.SQL))
-                {
-                    execObj.Command += string.Concat(" WHERE ", actionSQL.SQL);
-                    execObj.Values.AddRange(actionSQL.Params);
-                }
+                CommandSQL cmd = SQLBuilder.BuildUpdateSQL(this);
+                bool ret = DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) > 0;
 
-                bool ret = DbUtils.ExecuteNonQuery(Path, execObj.Command, execObj.Values.ToArray()) > 0;
                 return ret;
             }
             finally
@@ -259,12 +230,12 @@ namespace CodeM.Common.Orm
         {
             try
             {
-                CommandSQL actionSQL = mCondition.Build(this);
-
-                if (string.IsNullOrEmpty(actionSQL.SQL) && !deleteAll)
+                if (mCondition.IsEmpty() && !deleteAll)
                 {
                     throw new Exception("未设置删除的条件范围。");
                 }
+
+                CommandSQL actionSQL = mCondition.Build(this);
 
                 string sql = string.Concat("DElETE FROM ", this.Table);
                 if (!string.IsNullOrWhiteSpace(actionSQL.SQL))
@@ -281,34 +252,6 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private SQLExecuteObj BuildQuerySQL()
-        {
-            //TODO Join
-
-            SQLExecuteObj execObj = new SQLExecuteObj(SQLCommandType.Update);
-
-            StringBuilder sb = new StringBuilder();
-            if (mGetValues.Count > 0)
-            {
-                foreach (string name in mGetValues)
-                {
-                    Property p = GetProperty(name);
-                    if (sb.Length > 0)
-                    {
-                        sb.Append(",");
-                    }
-                    sb.Append(string.Concat(p.Field, " AS ", name));
-                }
-            }
-            else
-            {
-                sb.Append("*");
-            }
-            execObj.Command = string.Concat("SELECT ", sb, " FROM ", this.Table);
-
-            return execObj;
-        }
-
         public List<ModelObject> Query()
         {
             DbDataReader dr = null;
@@ -316,20 +259,8 @@ namespace CodeM.Common.Orm
             {
                 List<ModelObject> result = new List<ModelObject>();
 
-                SQLExecuteObj execObj = BuildQuerySQL();
-                CommandSQL actionSQL = mCondition.Build(this);
-
-                if (!string.IsNullOrEmpty(actionSQL.SQL))
-                {
-                    execObj.Command += string.Concat(" WHERE ", actionSQL.SQL);
-                }
-
-                if (mUsePaging)
-                {
-                    execObj.Command += string.Concat(" LIMIT ", (mPageIndex - 1) * mPageSize, ",", mPageSize);
-                }
-
-                dr = DbUtils.ExecuteDataReader(Path, execObj.Command, actionSQL.Params.ToArray());
+                CommandSQL cmd = SQLBuilder.BuildQuerySQL(this);
+                dr = DbUtils.ExecuteDataReader(Path, cmd.SQL, cmd.Params.ToArray());
                 if (dr != null)
                 {
                     while (dr.Read())
