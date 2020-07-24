@@ -7,5 +7,7 @@
 
         Model PageIndex(int index);
 
+        Model Top(int num);
+
     }
 }

@@ -169,6 +169,19 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        public Model Top(int num)
+        {
+            if (num < 1)
+            {
+                throw new Exception("最小返回数据数量至少为1。");
+            }
+
+            mPageSize = 1;
+            mPageIndex = 1;
+            mUsePaging = true;
+            return this;
+        }
+
         #endregion
 
         private void Reset()
@@ -235,15 +248,15 @@ namespace CodeM.Common.Orm
                     throw new Exception("未设置删除的条件范围。");
                 }
 
-                CommandSQL actionSQL = mCondition.Build(this);
+                CommandSQL where = mCondition.Build(this);
 
                 string sql = string.Concat("DElETE FROM ", this.Table);
-                if (!string.IsNullOrWhiteSpace(actionSQL.SQL))
+                if (!string.IsNullOrWhiteSpace(where.SQL))
                 {
-                    sql += string.Concat(" WHERE ", actionSQL.SQL);
+                    sql += string.Concat(" WHERE ", where.SQL);
                 }
 
-                bool ret = DbUtils.ExecuteNonQuery(this.Path, sql, actionSQL.Params.ToArray()) > 0;
+                bool ret = DbUtils.ExecuteNonQuery(this.Path, sql, where.Params.ToArray()) > 0;
                 return ret;
             }
             finally
@@ -311,19 +324,51 @@ namespace CodeM.Common.Orm
         {
             try
             {
-                CommandSQL actionSQL = mCondition.Build(this);
+                CommandSQL where = mCondition.Build(this);
 
                 string sql = string.Concat("SELECT COUNT(1) FROM ", this.Table);
-                if (!string.IsNullOrWhiteSpace(actionSQL.SQL))
+                if (!string.IsNullOrWhiteSpace(where.SQL))
                 {
-                    sql += string.Concat(" WHERE ", actionSQL.SQL);
+                    sql += string.Concat(" WHERE ", where.SQL);
                 }
 
-                object count = DbUtils.ExecuteScalar(this.Path, sql, actionSQL.Params.ToArray());
+                object count = DbUtils.ExecuteScalar(this.Path, sql, where.Params.ToArray());
                 return (long)count;
             }
             finally
             {
+                Reset();
+            }
+        }
+
+        public bool Exists()
+        {
+            DbDataReader dr = null;
+            try
+            {
+                if (mCondition.IsEmpty())
+                {
+                    throw new Exception("未设置判断的条件范围。");
+                }
+
+                CommandSQL where = mCondition.Build(this);
+
+                string sql = string.Concat("SELECT * FROM ", this.Table);
+                if (!string.IsNullOrWhiteSpace(where.SQL))
+                {
+                    sql += string.Concat(" WHERE ", where.SQL);
+                }
+                sql += "LIMIT 0,1";
+
+                dr = DbUtils.ExecuteDataReader(this.Path, sql, where.Params.ToArray());
+                return dr.HasRows;
+            }
+            finally
+            {
+                if (dr != null && !dr.IsClosed)
+                {
+                    dr.Close();
+                }
                 Reset();
             }
         }

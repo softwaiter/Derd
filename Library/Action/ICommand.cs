@@ -15,7 +15,7 @@ namespace CodeM.Common.Orm
 
         long Count();
 
-        //bool Exists();
+        bool Exists();
 
         //Like
         //NotLike
@@ -34,12 +34,6 @@ namespace CodeM.Common.Orm
         //Lt
         //Lte
         //Bettwen
-
-        //public ICommand PageSize(int pagesize);
-
-        //public ICommand PageIndex(int pageindex);
-
-        //public ICommand Top(int num);
 
         //public ICommand OrderBy(string properyName, bool desc);
     }
