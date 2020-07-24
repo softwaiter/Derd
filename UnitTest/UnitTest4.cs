@@ -29,6 +29,26 @@ namespace UnitTest
             Test3();
             Test4();
             Test5();
+            Test6();
+            Test8();
+            //Test7();
+        }
+
+        public void Test8()
+        {
+            int i = 10000;
+            while (i > 0)
+            {
+                dynamic newuser = ModelObject.New("User");
+                newuser.Name = "wangxm" + i;
+                newuser.Age = 18;
+                newuser.Birthday = new DateTime(1980, 6, 14);
+                newuser.Deposit = 10000000.58;
+                newuser.IsAdmin = true;
+                OrmUtils.Model("User").SetValues(newuser).Save();
+
+                i--;
+            }
         }
 
         [Description("创建User模型的物理表。")]
@@ -66,7 +86,7 @@ namespace UnitTest
             newuser.Name = "huxinyue";
             newuser.Age = 11;
             newuser.Birthday = new DateTime(1987, 4, 26);
-            newuser.Deposit = 9999999999;
+            newuser.Deposit = 99999999;
             newuser.IsAdmin = true;
             bool ret = OrmUtils.Model("User").SetValues(newuser).Save();
             Assert.IsTrue(ret);
@@ -79,8 +99,16 @@ namespace UnitTest
             Assert.AreEqual(result.Count, 1);
         }
 
-        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        [Description("使用Top(1)方法和PageIndex(1).PageSize(1)分别查询，返回结果数量应一致。")]
         public void Test6()
+        {
+            List<ModelObject> result = OrmUtils.Model("user").PageSize(1).PageIndex(1).Query();
+            List<ModelObject> result2 = OrmUtils.Model("user").Top(1).Query();
+            Assert.AreEqual(result.Count, result2.Count);
+        }
+
+        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        public void Test7()
         {
             bool ret = OrmUtils.Model("User").RemoveTable();
             Assert.IsTrue(ret);
