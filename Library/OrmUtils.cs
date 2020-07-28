@@ -34,9 +34,9 @@ namespace CodeM.Common.Orm
             return ModelUtils.GetModel(modelName);
         }
 
-        public static bool ExecSql(string sql, string path = "/")
+        public static int ExecSql(string sql, string path = "/")
         {
-            return DbUtils.ExecuteNonQuery(path.ToLower(), sql) == 0;
+            return DbUtils.ExecuteNonQuery(path.ToLower(), sql);
         }
 
         public static bool CreateTables(string path, bool force = false)

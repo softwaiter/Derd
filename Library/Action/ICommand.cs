@@ -4,6 +4,11 @@ namespace CodeM.Common.Orm
 {
     public interface ICommand
     {
+        bool CreateTable(bool force=false);
+
+        bool RemoveTable();
+
+        bool TruncateTable();
 
         bool Save();
 

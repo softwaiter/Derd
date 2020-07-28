@@ -47,16 +47,16 @@ namespace UnitTest
         public void Test3()
         {
             string sql = "Create Table orm_test(id integer primary key, name varchar(64), age int, address varchar(255))";
-            bool ret = OrmUtils.ExecSql(sql);
-            Assert.IsTrue(ret);
+            int ret = OrmUtils.ExecSql(sql);
+            Assert.IsTrue(ret == 0);
         }
 
         [Description("删除Test3创建的数据表orm_test")]
         public void Test4()
         {
             string sql = "Drop Table orm_test";
-            bool ret = OrmUtils.ExecSql(sql);
-            Assert.IsTrue(ret);
+            int ret = OrmUtils.ExecSql(sql);
+            Assert.IsTrue(ret == 0);
         }
 
     }

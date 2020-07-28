@@ -1,8 +1,10 @@
 ﻿using CodeM.Common.DbHelper;
+using CodeM.Common.Orm.Dialect;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Text;
 
 namespace CodeM.Common.Orm
 {
@@ -195,6 +197,35 @@ namespace CodeM.Common.Orm
             mPageIndex = 1;
         }
 
+        #region ICommand
+        public bool CreateTable(bool force = false)
+        {
+            StringBuilder sb = new StringBuilder(ToString());
+            if (force)
+            {
+                sb.Insert(0, string.Concat("DROP TABLE IF EXISTS ", Table, ";"));
+            }
+            return DbUtils.ExecuteNonQuery(Path.ToLower(), sb.ToString()) == 0;
+        }
+
+        public bool RemoveTable()
+        {
+            string sql = string.Concat("DROP TABLE ", Table);
+            DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+            return true;
+        }
+
+        public bool TruncateTable()
+        {
+            string sql = string.Concat("TRUNCATE TABLE ", Table);
+            if (!Features.IsSupportTruncate(this))
+            {
+                sql = string.Concat("DELETE FROM ", Table);
+            }
+            DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+            return true;
+        }
+
         public bool Save()
         {
             try
@@ -372,5 +403,6 @@ namespace CodeM.Common.Orm
                 Reset();
             }
         }
+        #endregion
     }
 }
