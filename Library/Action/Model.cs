@@ -8,7 +8,7 @@ using System.Text;
 
 namespace CodeM.Common.Orm
 {
-    public partial class Model : ISetValue, IGetValue, IPaging, ICommand
+    public partial class Model : ISetValue, IGetValue, IPaging, ISort, ICommand
     {
         #region ISetValue
         ModelObject mSetValues;
@@ -79,7 +79,7 @@ namespace CodeM.Common.Orm
         }
         #endregion
 
-        #region ICondition
+        #region IFilter
 
         private SubFilter mFilter = new SubFilter();
 
@@ -186,11 +186,46 @@ namespace CodeM.Common.Orm
 
         #endregion
 
+        #region ISort
+        private List<string> mSorts = new List<string>();
+
+        public Model AscendingSort(string name)
+        {
+            Property p = GetProperty(name);
+            if (p == null)
+            {
+                throw new Exception(string.Concat("未找到属性：", name));
+            }
+            mSorts.Add(string.Concat(p.Field, " ASC"));
+            return this;
+        }
+
+        public Model DescendingSort(string name)
+        {
+            Property p = GetProperty(name);
+            if (p == null)
+            {
+                throw new Exception(string.Concat("未找到属性：", name));
+            }
+            mSorts.Add(string.Concat(p.Field, " DESC"));
+            return this;
+        }
+
+        internal string Sort
+        {
+            get
+            {
+                return string.Join(",", mSorts);
+            }
+        }
+        #endregion
+
         private void Reset()
         {
             mSetValues = null;
             mGetValues.Clear();
             mFilter.Reset();
+            mSorts.Clear();
 
             mUsePaging = false;
             mPageSize = 100;
@@ -296,12 +331,21 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public List<ModelObject> Query()
+        public List<dynamic> Query()
         {
             DbDataReader dr = null;
             try
             {
-                List<ModelObject> result = new List<ModelObject>();
+                if (mGetValues.Count == 0)
+                {
+                    for (int i = 0; i < PropertyCount; i++)
+                    {
+                        Property p = GetProperty(i);
+                        mGetValues.Add(p.Name);
+                    }
+                }
+
+                List<dynamic> result = new List<dynamic>();
 
                 CommandSQL cmd = SQLBuilder.BuildQuerySQL(this);
                 dr = DbUtils.ExecuteDataReader(Path, cmd.SQL, cmd.Params.ToArray());

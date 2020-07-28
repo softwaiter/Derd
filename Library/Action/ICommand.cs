@@ -16,7 +16,7 @@ namespace CodeM.Common.Orm
 
         bool Update(bool updateAll = false);
 
-        List<ModelObject> Query();
+        List<dynamic> Query();
 
         long Count();
 

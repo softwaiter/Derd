@@ -115,6 +115,11 @@ namespace CodeM.Common.Orm
                 result.Params.AddRange(where.Params);
             }
 
+            if (!string.IsNullOrEmpty(m.Sort))
+            {
+                result.SQL += string.Concat(" ORDER BY ", m.Sort);
+            }
+
             if (m.IsUsePaging)
             {
                 result.SQL += string.Concat(" LIMIT ", (m.CurrPageIndex - 1) * m.CurrPageSize, ",", m.CurrPageSize);

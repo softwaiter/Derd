@@ -31,6 +31,8 @@ namespace UnitTest
             Test5();
             Test6();
             Test7();
+            Test8();
+            //Test9();
         }
 
         [Description("创建User模型的物理表。")]
@@ -74,23 +76,37 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
-        [Description("按分页查询，每页1条数据，查询第1页，返回记录条数应为1条。")]
+        [Description("对Name属性进行升序排列查询第1条记录，返回数据的Name值应为huxinyue。")]
         public void Test5()
         {
-            List<ModelObject> result = OrmUtils.Model("user").PageSize(1).PageIndex(1).Query();
+            List<dynamic> result = OrmUtils.Model("user").Top(1).AscendingSort("Name").Query();
+            Assert.AreEqual(result[0].Name, "huxinyue");
+        }
+
+        [Description("对Name属性进行升序排列查询第1条记录，返回数据的Name值应为wangxm。")]
+        public void Test6()
+        {
+            List<dynamic> result = OrmUtils.Model("user").Top(1).DescendingSort("Name").Query();
+            Assert.AreEqual(result[0].Name, "wangxm");
+        }
+
+        [Description("按分页查询，每页1条数据，查询第1页，返回记录条数应为1条。")]
+        public void Test7()
+        {
+            List<dynamic> result = OrmUtils.Model("user").PageSize(1).PageIndex(1).Query();
             Assert.AreEqual(result.Count, 1);
         }
 
         [Description("使用Top(1)方法和PageIndex(1).PageSize(1)分别查询，返回结果数量应一致。")]
-        public void Test6()
+        public void Test8()
         {
-            List<ModelObject> result = OrmUtils.Model("user").PageSize(1).PageIndex(1).Query();
-            List<ModelObject> result2 = OrmUtils.Model("user").Top(1).Query();
+            List<dynamic> result = OrmUtils.Model("user").PageSize(1).PageIndex(1).Query();
+            List<dynamic> result2 = OrmUtils.Model("user").Top(1).Query();
             Assert.AreEqual(result.Count, result2.Count);
         }
 
         [Description("删除Test1测试中创建的User模型物理表，应成功。")]
-        public void Test7()
+        public void Test9()
         {
             bool ret = OrmUtils.Model("User").RemoveTable();
             Assert.IsTrue(ret);
