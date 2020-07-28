@@ -14,7 +14,7 @@ namespace CodeM.Common.Orm
         NotEquals = 8
     }
 
-    public class SubCondition : ICondition
+    public class SubFilter : IFilter
     {
         private List<KeyValuePair<ConditionOperator, object>> mConditions = new List<KeyValuePair<ConditionOperator, object>>();
 
@@ -28,26 +28,26 @@ namespace CodeM.Common.Orm
             return mConditions.Count == 0;
         }
 
-        public ICondition And(ICondition subCondition)
+        public IFilter And(IFilter subCondition)
         {
             mConditions.Add(new KeyValuePair<ConditionOperator, object>(ConditionOperator.And, subCondition));
             return this;
         }
 
-        public ICondition Or(ICondition subCondition)
+        public IFilter Or(IFilter subCondition)
         {
             mConditions.Add(new KeyValuePair<ConditionOperator, object>(ConditionOperator.Or, subCondition));
             return this;
         }
 
-        public ICondition Equals(string name, object value)
+        public IFilter Equals(string name, object value)
         {
             mConditions.Add(new KeyValuePair<ConditionOperator, object>(ConditionOperator.Equals,
                 new KeyValuePair<string, object>(name, value)));
             return this;
         }
 
-        public ICondition NotEquals(string name, object value)
+        public IFilter NotEquals(string name, object value)
         {
             mConditions.Add(new KeyValuePair<ConditionOperator, object>(ConditionOperator.NotEquals,
                 new KeyValuePair<string, object>(name, value)));
@@ -70,12 +70,12 @@ namespace CodeM.Common.Orm
                 switch (item.Key)
                 {
                     case ConditionOperator.And:
-                        CommandSQL andActionSQL = ((SubCondition)item.Value).Build(model);
+                        CommandSQL andActionSQL = ((SubFilter)item.Value).Build(model);
                         result.SQL += string.Concat(" AND ", andActionSQL.SQL);
                         result.Params.AddRange(andActionSQL.Params);
                         break;
                     case ConditionOperator.Or:
-                        CommandSQL orActionSQL = ((SubCondition)item.Value).Build(model);
+                        CommandSQL orActionSQL = ((SubFilter)item.Value).Build(model);
                         result.SQL += string.Concat(" OR ", orActionSQL.SQL);
                         result.Params.AddRange(orActionSQL.Params);
                         break;

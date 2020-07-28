@@ -27,10 +27,8 @@ namespace CodeM.Common.Orm
         //In
         //NotIn
         //IsNull
-        //NotIsNull
+        //IsNotNull
 
-
-        //public ICommand NotEquals();
 
         //public ICommand GreaterThan();
 

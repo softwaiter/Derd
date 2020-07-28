@@ -81,37 +81,37 @@ namespace CodeM.Common.Orm
 
         #region ICondition
 
-        private SubCondition mCondition = new SubCondition();
+        private SubFilter mFilter = new SubFilter();
 
-        internal SubCondition Where
+        internal SubFilter Where
         {
             get
             {
-                return mCondition;
+                return mFilter;
             }
         }
 
-        public Model And(ICondition subCondition)
+        public Model And(IFilter subCondition)
         {
-            mCondition.And(subCondition);
+            mFilter.And(subCondition);
             return this;
         }
 
-        public Model Or(ICondition subCondition)
+        public Model Or(IFilter subCondition)
         {
-            mCondition.Or(subCondition);
+            mFilter.Or(subCondition);
             return this;
         }
 
         public Model Equals(string name, object value)
         {
-            mCondition.Equals(name, value);
+            mFilter.Equals(name, value);
             return this;
         }
 
         public Model NotEquals(string name, object value)
         {
-            mCondition.NotEquals(name, value);
+            mFilter.NotEquals(name, value);
             return this;
         }
 
@@ -190,7 +190,7 @@ namespace CodeM.Common.Orm
         {
             mSetValues = null;
             mGetValues.Clear();
-            mCondition.Reset();
+            mFilter.Reset();
 
             mUsePaging = false;
             mPageSize = 100;
@@ -254,7 +254,7 @@ namespace CodeM.Common.Orm
                     throw new Exception("没有任何要更新的内容，请通过SetValue设置内容。");
                 }
 
-                if (mCondition.IsEmpty() && !updateAll)
+                if (mFilter.IsEmpty() && !updateAll)
                 {
                     throw new Exception("未设置更新的条件范围。");
                 }
@@ -274,12 +274,12 @@ namespace CodeM.Common.Orm
         {
             try
             {
-                if (mCondition.IsEmpty() && !deleteAll)
+                if (mFilter.IsEmpty() && !deleteAll)
                 {
                     throw new Exception("未设置删除的条件范围。");
                 }
 
-                CommandSQL where = mCondition.Build(this);
+                CommandSQL where = mFilter.Build(this);
 
                 string sql = string.Concat("DElETE FROM ", this.Table);
                 if (!string.IsNullOrWhiteSpace(where.SQL))
@@ -355,7 +355,7 @@ namespace CodeM.Common.Orm
         {
             try
             {
-                CommandSQL where = mCondition.Build(this);
+                CommandSQL where = mFilter.Build(this);
 
                 string sql = string.Concat("SELECT COUNT(1) FROM ", this.Table);
                 if (!string.IsNullOrWhiteSpace(where.SQL))
@@ -377,12 +377,12 @@ namespace CodeM.Common.Orm
             DbDataReader dr = null;
             try
             {
-                if (mCondition.IsEmpty())
+                if (mFilter.IsEmpty())
                 {
                     throw new Exception("未设置判断的条件范围。");
                 }
 
-                CommandSQL where = mCondition.Build(this);
+                CommandSQL where = mFilter.Build(this);
 
                 string sql = string.Concat("SELECT * FROM ", this.Table);
                 if (!string.IsNullOrWhiteSpace(where.SQL))
