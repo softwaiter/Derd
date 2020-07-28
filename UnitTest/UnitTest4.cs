@@ -30,25 +30,7 @@ namespace UnitTest
             Test4();
             Test5();
             Test6();
-            Test8();
-            //Test7();
-        }
-
-        public void Test8()
-        {
-            int i = 10000;
-            while (i > 0)
-            {
-                dynamic newuser = ModelObject.New("User");
-                newuser.Name = "wangxm" + i;
-                newuser.Age = 18;
-                newuser.Birthday = new DateTime(1980, 6, 14);
-                newuser.Deposit = 10000000.58;
-                newuser.IsAdmin = true;
-                OrmUtils.Model("User").SetValues(newuser).Save();
-
-                i--;
-            }
+            Test7();
         }
 
         [Description("创建User模型的物理表。")]
