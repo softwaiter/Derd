@@ -115,6 +115,18 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        public Model Like(string name, string value)
+        {
+            mFilter.Like(name, value);
+            return this;
+        }
+
+        public Model NotLike(string name, string value)
+        {
+            mFilter.NotLike(name, value);
+            return this;
+        }
+
         public Model IsNull(string name)
         {
             mFilter.IsNull(name);

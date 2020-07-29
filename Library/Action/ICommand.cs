@@ -22,13 +22,8 @@ namespace CodeM.Common.Orm
 
         bool Exists();
 
-        //Like
-        //NotLike
         //In
         //NotIn
-        //IsNull
-        //IsNotNull
-
 
         //public ICommand GreaterThan();
 

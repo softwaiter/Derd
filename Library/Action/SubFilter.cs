@@ -12,9 +12,11 @@ namespace CodeM.Common.Orm
         Or = 2,
         Equals = 4,
         NotEquals = 8,
-        IsNull = 16,
-        IsNotNull = 32,
-        Between = 64
+        Like = 16,
+        NotLike = 32,
+        IsNull = 64,
+        IsNotNull = 128,
+        Between = 256
     }
 
     public class SubFilter : IFilter
@@ -53,6 +55,20 @@ namespace CodeM.Common.Orm
         public IFilter NotEquals(string name, object value)
         {
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
+                new KeyValuePair<string, object>(name, value)));
+            return this;
+        }
+
+        public IFilter Like(string name, string value)
+        {
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Like,
+                new KeyValuePair<string, object>(name, value)));
+            return this;
+        }
+
+        public IFilter NotLike(string name, string value)
+        {
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotLike,
                 new KeyValuePair<string, object>(name, value)));
             return this;
         }
@@ -126,6 +142,18 @@ namespace CodeM.Common.Orm
                             expr.Value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
                         result.SQL += string.Concat(p.Field, "<>?");
+                        break;
+                    case FilterOperator.Like:
+                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                            expr.Value, DbType.String, ParameterDirection.Input);
+                        result.Params.Add(dp);
+                        result.SQL += string.Concat(p.Field, " LIKE ?");
+                        break;
+                    case FilterOperator.NotLike:
+                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                            expr.Value, DbType.String, ParameterDirection.Input);
+                        result.Params.Add(dp);
+                        result.SQL += string.Concat(p.Field, " NOT LIKE ?");
                         break;
                     case FilterOperator.IsNull:
                         result.SQL += string.Concat(p.Field, " IS NULL");
