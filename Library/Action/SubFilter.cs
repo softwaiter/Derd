@@ -12,11 +12,15 @@ namespace CodeM.Common.Orm
         Or = 2,
         Equals = 4,
         NotEquals = 8,
-        Like = 16,
-        NotLike = 32,
-        IsNull = 64,
-        IsNotNull = 128,
-        Between = 256
+        Gt = 16,
+        Gte = 32,
+        Lt = 64,
+        Lte = 128,
+        Like = 256,
+        NotLike = 512,
+        IsNull = 1024,
+        IsNotNull = 2048,
+        Between = 4096
     }
 
     public class SubFilter : IFilter
@@ -33,15 +37,15 @@ namespace CodeM.Common.Orm
             return mFilterItems.Count == 0;
         }
 
-        public IFilter And(IFilter subCondition)
+        public IFilter And(IFilter subFilter)
         {
-            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.And, subCondition));
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.And, subFilter));
             return this;
         }
 
-        public IFilter Or(IFilter subCondition)
+        public IFilter Or(IFilter subFilter)
         {
-            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Or, subCondition));
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Or, subFilter));
             return this;
         }
 
@@ -55,6 +59,34 @@ namespace CodeM.Common.Orm
         public IFilter NotEquals(string name, object value)
         {
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
+                new KeyValuePair<string, object>(name, value)));
+            return this;
+        }
+
+        public IFilter Gt(string name, object value)
+        {
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gt,
+                new KeyValuePair<string, object>(name, value)));
+            return this;
+        }
+
+        public IFilter Gte(string name, object value)
+        {
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gte,
+                new KeyValuePair<string, object>(name, value)));
+            return this;
+        }
+
+        public IFilter Lt(string name, object value)
+        {
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lt,
+                new KeyValuePair<string, object>(name, value)));
+            return this;
+        }
+
+        public IFilter Lte(string name, object value)
+        {
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lte,
                 new KeyValuePair<string, object>(name, value)));
             return this;
         }
@@ -142,6 +174,30 @@ namespace CodeM.Common.Orm
                             expr.Value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
                         result.SQL += string.Concat(p.Field, "<>?");
+                        break;
+                    case FilterOperator.Gt:
+                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                            expr.Value, p.FieldType, ParameterDirection.Input);
+                        result.Params.Add(dp);
+                        result.SQL += string.Concat(p.Field, ">?");
+                        break;
+                    case FilterOperator.Gte:
+                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                            expr.Value, p.FieldType, ParameterDirection.Input);
+                        result.Params.Add(dp);
+                        result.SQL += string.Concat(p.Field, ">=?");
+                        break;
+                    case FilterOperator.Lt:
+                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                            expr.Value, p.FieldType, ParameterDirection.Input);
+                        result.Params.Add(dp);
+                        result.SQL += string.Concat(p.Field, "<?");
+                        break;
+                    case FilterOperator.Lte:
+                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                            expr.Value, p.FieldType, ParameterDirection.Input);
+                        result.Params.Add(dp);
+                        result.SQL += string.Concat(p.Field, "<=?");
                         break;
                     case FilterOperator.Like:
                         dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),

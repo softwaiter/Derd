@@ -26,11 +26,9 @@ namespace CodeM.Common.Orm
         //NotIn
 
         //public ICommand GreaterThan();
-
         //public ICommand GreaterThanOrEquals();
 
         //Lt
         //Lte
-        //Bettwen
     }
 }

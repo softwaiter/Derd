@@ -3,13 +3,21 @@
     public interface IFilter
     {
 
-        IFilter And(IFilter subCondition);
+        IFilter And(IFilter subFilter);
 
-        IFilter Or(IFilter subCondition);
+        IFilter Or(IFilter subFilter);
 
         IFilter Equals(string name, object value);
 
         IFilter NotEquals(string name, object value);
+
+        IFilter Gt(string name, object value);
+
+        IFilter Gte(string name, object value);
+
+        IFilter Lt(string name, object value);
+
+        IFilter Lte(string name, object value);
 
         IFilter Like(string name, string value);
 

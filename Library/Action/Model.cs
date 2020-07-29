@@ -115,6 +115,30 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        public Model Gt(string name, object value)
+        {
+            mFilter.Gt(name, value);
+            return this;
+        }
+
+        public Model Gte(string name, object value)
+        {
+            mFilter.Gte(name, value);
+            return this;
+        }
+
+        public Model Lt(string name, object value)
+        {
+            mFilter.Lt(name, value);
+            return this;
+        }
+
+        public Model Lte(string name, object value)
+        {
+            mFilter.Lte(name, value);
+            return this;
+        }
+
         public Model Like(string name, string value)
         {
             mFilter.Like(name, value);
