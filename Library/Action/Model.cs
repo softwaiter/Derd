@@ -115,6 +115,24 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        public Model IsNull(string name)
+        {
+            mFilter.IsNull(name);
+            return this;
+        }
+
+        public Model IsNotNull(string name)
+        {
+            mFilter.IsNotNull(name);
+            return this;
+        }
+
+        public Model Between(string name, object value, object value2)
+        {
+            mFilter.Between(name, value, value2);
+            return this;
+        }
+
         #endregion
 
         #region IPaging
@@ -364,6 +382,10 @@ namespace CodeM.Common.Orm
                             else if (p.Type == typeof(string))
                             {
                                 obj.TrySetValue(name, dr.GetString(name));
+                            }
+                            else if (p.Type == typeof(bool))
+                            {
+                                obj.TrySetValue(name, dr.GetBoolean(name));
                             }
                             else if (p.Type == typeof(UInt16))
                             {

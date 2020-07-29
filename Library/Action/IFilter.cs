@@ -11,5 +11,11 @@
 
         IFilter NotEquals(string name, object value);
 
+        IFilter IsNull(string name);
+
+        IFilter IsNotNull(string name);
+
+        IFilter Between(string name, object value, object value2);
+
     }
 }

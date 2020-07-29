@@ -37,7 +37,5 @@ namespace CodeM.Common.Orm
         //Lt
         //Lte
         //Bettwen
-
-        //public ICommand OrderBy(string properyName, bool desc);
     }
 }
