@@ -6,7 +6,7 @@ namespace CodeM.Common.Orm
 {
     public class OrmUtils
     {
-        public static string ModelPath { get; set; } = Path.Combine(Environment.CurrentDirectory, "models");
+        public static string ModelPath { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "models");
 
         /// <summary>
         /// 加载模型定义
@@ -39,7 +39,7 @@ namespace CodeM.Common.Orm
             return DbUtils.ExecuteNonQuery(path.ToLower(), sql);
         }
 
-        public static bool CreateTables(string path, bool force = false)
+        public static bool CreateTables(bool force = false)
         {
             try
             {
