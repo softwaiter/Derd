@@ -67,9 +67,8 @@ namespace UnitTest
         [Description("查询用户wangxm的信息，并判断年龄是否为18，应为True。")]
         public void Test3()
         {
-            dynamic result = OrmUtils.Model("user").GetValue("name", "age").Equals("name", "wangxm").Query();
-            bool ret = result[0].age == 18;
-            Assert.IsTrue(ret);
+            List<dynamic> result = OrmUtils.Model("user").GetValue("name", "age").Equals("name", "wangxm").Query();
+            Assert.IsTrue(result[0].age == 18);
         }
 
         [Description("向User模型的物理表写入一条数据，应成功。")]

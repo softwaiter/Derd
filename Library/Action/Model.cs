@@ -415,25 +415,9 @@ namespace CodeM.Common.Orm
                             {
                                 obj.TrySetValue(name, null);
                             }
-                            else if (p.Type == typeof(string))
+                            else
                             {
-                                obj.TrySetValue(name, dr.GetString(name));
-                            }
-                            else if (p.Type == typeof(bool))
-                            {
-                                obj.TrySetValue(name, dr.GetBoolean(name));
-                            }
-                            else if (p.Type == typeof(UInt16))
-                            {
-                                obj.TrySetValue(name, dr.GetInt32(name));
-                            }
-                            else if (p.Type == typeof(int))
-                            {
-                                obj.TrySetValue(name, dr.GetInt32(name));
-                            }
-                            else if (p.Type == typeof(long))
-                            {
-                                obj.TrySetValue(name, dr.GetInt64(name));
+                                obj.TrySetValue(name, dr.GetValue(name));
                             }
                         }
                         result.Add(obj);
