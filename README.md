@@ -612,46 +612,282 @@ if (result.Count > 0)
 
 #### 查询条件设置方法（支持链式调用）
 
-###### public Model And(IFilter subCondition)
+##### public Model And(IFilter subCondition)
 
-######　public Model Or(IFilter subCondition)
+##### public Model Or(IFilter subCondition)
 
-######　public Model Equals(string name, object value)
+##### public Model Equals(string name, object value)
 
-###### public Model NotEquals(string name, object value)
+设置指定属性的等于查询条件。
 
-###### public Model Gt(string name, object value)
+###### 参数
 
-###### public Model Gte(string name, object value)
+name：属性名。
 
-###### public Model Lt(string name, object value)
+value：比较的值。
 
-###### public Model Lte(string name, object value)
+###### 返回
 
-###### public Model Like(string name, string value)
+当前Model模型。
 
-###### public Model NotLike(string name, string value)
+```c#
+OrmUtils.Model("User").Equals("Age", 18).Query();	//查询所有年龄=18的用户
+```
 
-###### public Model IsNull(string name)
 
-###### public Model IsNotNull(string name)
 
-###### public Model Between(string name, object value, object value2)
+##### public Model NotEquals(string name, object value)
+
+设置指定属性的不等于查询条件。
+
+###### 参数
+
+name：属性名。
+
+value：比较的值。
+
+###### 返回
+
+当前Model模型。
+
+
+
+##### public Model Gt(string name, object value)
+
+设置指定属性的大于查询条件。
+
+###### 参数
+
+name：属性名。
+
+value：比较的值。
+
+###### 返回
+
+当前Model模型。
+
+
+
+##### public Model Gte(string name, object value)
+
+设置指定属性的大于等于查询条件。
+
+###### 参数
+
+name：属性名。
+
+value：比较的值。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+OrmUtils.Model("User").Gte("Age", 18).Query();	//查询所有年龄>=18的用户
+```
+
+
+
+##### public Model Lt(string name, object value)
+
+设置指定属性的小于查询条件。
+
+###### 参数
+
+name：属性名。
+
+value：比较的值。
+
+###### 返回
+
+当前Model模型。
+
+
+
+##### public Model Lte(string name, object value)
+
+设置指定属性的小于等于查询条件。
+
+###### 参数
+
+name：属性名。
+
+value：比较的值。
+
+###### 返回
+
+当前Model模型。
+
+
+
+##### public Model Like(string name, string value)
+
+设置指定属性的Like查询条件。
+
+###### 参数
+
+name：属性名。
+
+value：比较的值。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+OrmUtils.Model("User").Like("Name", "wang%").Query();	//查询所有名称以wang开头的用户
+```
+
+
+
+##### public Model NotLike(string name, string value)
+
+设置指定属性的NotLike查询条件。
+
+###### 参数
+
+name：属性名。
+
+value：比较的值。
+
+###### 返回
+
+当前Model模型。
+
+
+
+##### public Model IsNull(string name)
+
+设置指定属性为Null查询条件。
+
+###### 参数
+
+name：属性名。
+
+value：比较的值。
+
+###### 返回
+
+当前Model模型。
+
+
+
+##### public Model IsNotNull(string name)
+
+设置指定属性不为Null查询条件。
+
+###### 参数
+
+name：属性名。
+
+value：比较的值。
+
+###### 返回
+
+当前Model模型。
+
+
+
+##### pblic Model Between(string name, object value, object value2)
+
+设置指定属性介于两个值之间的查询条件。
+
+###### 参数
+
+name：属性名。
+
+value：比较的值。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+OrmUtils.Model("User").Between("Name", 18, 25).Query();	//查询年龄在18到25之间的用户
+```
 
 
 
 #### 分页设置方法（支持链式调用）
 
-###### public Model PageSize(int size)
+##### public Model PageSize(int size)
 
-###### public Model PageIndex(int index)
+设置查询分页的大小，即每页多少条数据，默认100。
 
-###### public Model Top(int num)
+###### 参数
+
+size：每页的数据条数。
+
+###### 返回
+
+当前Model模型。
+
+
+
+##### public Model PageIndex(int index)
+
+设置查询分页的索引，即第几页，默认第1页。
+
+###### 参数
+
+index：查询的分页页码，默认1，页码必须>=1。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+OrmUtils.Model("User").PageSize(20).PageIndex(2).Query();	//按照20条数据每页进行分页查询第2页的数据进行返回
+```
+
+
+
+##### public Model Top(int num)
+
+设置查询符合条件的头部数据。
+
+###### 参数
+
+num：设置返回多少条数据。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+OrmUtils.Model("User").Equals("Age", 18).Top(10).Query();	//查询年龄为18的前10名用户
+```
 
 
 
 #### 排序设置方法（支持链式调用）
 
-###### public Model AscendingSort(string name)
+##### public Model AscendingSort(string name)
 
-###### public Model DescendingSort(string name)
+在查询时，对指定属性按照升序进行排序。
+
+###### 参数
+
+namge：属性名。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+OrmUtils.Model("User").DescendingSort("Age").Query();	//对年龄按照降序进行排序并返回所有查询结果
+```
+
+
+
+##### public Model DescendingSort(string name)
+
+在查询时，对指定属性按照降序进行排序。
+
+###### 参数
+
+namge：属性名。
+
+###### 返回
+
+当前Model模型。
