@@ -154,13 +154,21 @@ namespace CodeM.Common.Orm
                 switch (item.Key)
                 {
                     case FilterOperator.And:
+                        if (!string.IsNullOrWhiteSpace(result.SQL))
+                        {
+                            result.SQL += " AND ";
+                        }
                         CommandSQL andActionSQL = ((SubFilter)item.Value).Build(model);
-                        result.SQL += string.Concat(" AND ", andActionSQL.SQL);
+                        result.SQL += andActionSQL.SQL;
                         result.Params.AddRange(andActionSQL.Params);
                         break;
                     case FilterOperator.Or:
+                        if (!string.IsNullOrWhiteSpace(result.SQL))
+                        {
+                            result.SQL += " OR ";
+                        }
                         CommandSQL orActionSQL = ((SubFilter)item.Value).Build(model);
-                        result.SQL += string.Concat(" OR ", orActionSQL.SQL);
+                        result.SQL += orActionSQL.SQL;
                         result.Params.AddRange(orActionSQL.Params);
                         break;
                     case FilterOperator.Equals:
