@@ -522,6 +522,12 @@ namespace CodeM.Common.Orm
                             p.IsPrimaryKey = bool.Parse(primaryStr);
                         }
 
+                        string defaultStr = nodeInfo.GetAttribute("defaultValue");
+                        if (defaultStr != null)
+                        {
+                            p.DefaultValue = Convert.ChangeType(defaultStr, p.Type);
+                        }
+
                         string joinInsertStr = nodeInfo.GetAttribute("joinInsert");
                         if (joinInsertStr != null)
                         {

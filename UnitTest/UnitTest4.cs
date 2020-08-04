@@ -57,8 +57,6 @@ namespace UnitTest
             dynamic newuser = ModelObject.New("User");
             newuser.Name = "wangxm";
             newuser.Age = 18;
-            newuser.Birthday = new DateTime(1980, 6, 14);
-            newuser.Deposit = 10000000.58;
             newuser.IsAdmin = true;
             bool ret = OrmUtils.Model("User").SetValues(newuser).Save();
             Assert.IsTrue(ret);
