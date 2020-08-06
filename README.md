@@ -3,19 +3,79 @@
 
 ## 一、概述
 
-###### TODO
+​		nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作类库，全名称为CodeM.Common.Orm。netcoreORM模型定义文件基于XML文件格式，模型管理基于目录自动分类；数据库类型支持Sqlite、MySql、Oracle、Sqlserver、Postgresql等，数据库配置文件和模型定义一样基于目录划分，并支持基于目录层级的继承能力；数据操作采用链式方式，简单易用。
 
 
 
 ## 二、快速入门
 
-###### TODO
+### 2.1 安装
+
+#### Package Manager
+
+```shell
+Install-Package CodeM.Common.Orm -Version 1.0.0
+```
+
+
+
+#### .NET CLI
+
+```shell
+dotnet add package CodeM.Common.Orm --version 1.0.0
+```
+
+
+
+#### PackageReference
+
+```xml
+<PackageReference Include="CodeM.Common.Orm" Version="1.0.0" />
+```
+
+
+
+#### Paket CLI
+
+```shell
+paket add CodeM.Common.Orm --version 1.0.0
+```
+
+
+
+### 2.2 数据库依赖
+
+根据数据库连接所配置的数据库类型，需要安装相应的数据库依赖包，具体对应关系如下：
+
+| 数据库库类型 | 依赖包             |
+| ------------ | ------------------ |
+| Sqlite       | System.Data.SQLite |
+| Mysql        | MySql.Data         |
+
+使用时，可根据需要添加其中的一项或多项依赖。
 
 
 
 ## 三、数据库连接
 
-###### TODO
+所有的模型定义按照存储目录划分，模型定义根目录通过OrmUtils.ModelPath属性进行指定，默认为当前程序的根目录下的models子目录。
+
+数据库连接和模型存储目录相对应，模型存储根目录及其下面的子目录都可以通过数据库配置文件设置自己的数据库连接，如果当前目录没有数据库连接配置文件，将继续向上寻找父目录的数据库连接配置文件，直到找到为止；基于此设计逻辑，根目录必须有数据库连接配置文件。
+
+数据库连接配置文件命必须为.connection.xml，格式如下：
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<connection>
+    <dialect>sqlite</dialect>	<!--数据库类型，目前支持sqlite、mysql，最终版本将增加支持oracle、sqlserver、postgresql-->
+    <host>test.db</host>	<!--数据库文件地址或IP-->
+    <port></port>	<!--数据库端口，为空即不设置，按数据库默认端口-->
+    <user></user>	<!--数据库账户名-->
+    <password></password>	<!--数据库账户密码-->
+    <database></database>	<!--数据库名称-->
+    <pool max="100" min="0">true</pool>	<!--数据库连接池设置，max=最大数量，min=最小数量-->
+</connection>
+```
 
 
 
@@ -141,7 +201,7 @@ type属性转换表：
 
 ###### defaultValue
 
-
+字符串，属性默认值，新增模型时如未设置属性值，则使用该值填充。
 
 ###### joinInsert
 
@@ -387,20 +447,6 @@ dog.model.xml内容：
 
 ### 4. 模型方法
 
-#### 模型定义相关方法
-
-public Property GetProperty(string name)
-
-public Property GetPropertyByField(string field)
-
-public Property GetProperty(int index)
-
-public Property GetPrimaryKey(int index)
-
-public string ToString()
-
-
-
 ####  行为操作方法
 
 ##### public bool CreateTable(bool force = false)
@@ -544,7 +590,7 @@ OrmUtils.Model("User").Equals("Name", "wangxm").Exists();	//判断名为为wangx
 
 
 
-#### 属性设置方法
+#### 设置属性值方法
 
 ##### public Model SetValue(string name, object value)
 
@@ -590,7 +636,7 @@ OrmUtils.Model("User").SetValues(newuser).Save();
 
 
 
-#### 设置返回属性方法
+#### 设置查询返回属性方法
 
 ##### public Model GetValue(params string[] names)
 
@@ -610,11 +656,49 @@ if (result.Count > 0)
 
 
 
-#### 查询条件设置方法（支持链式调用）
+#### 设置查询条件方法（支持链式调用）
 
 ##### public Model And(IFilter subCondition)
 
+设置增加一个并条件的子查询，默认情况下，所有设置查询条件的方法都是隐含的并关系，除非使用了Or方法。
+
+###### 参数
+
+subCondition：子查询条件。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+SubFilter subCond = new SubFilter();
+subCond.Gt("Age", 18);
+OrmUtils.Model("User").Equals("Name", "wangxm").And(subCond).Query();	//查询名称为wangxm并且年龄>18的用户
+
+OrmUtils.Model("User").Equals("Name", "wangxm").Gt("Age", 18).Query();	//查询效果和上面相同，这里两个查询条件是隐含的并关系，无需特别指定
+```
+
+
+
 ##### public Model Or(IFilter subCondition)
+
+设置增加一个或条件的子查询。
+
+###### 参数
+
+subCondition：子查询条件。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+SubFilter subCond = new SubFilter();
+subCond.Equals("Name", "huxinyue");
+OrmUtils.Model("User").Equals("Name", "wangxm").Or(subCond).Query();	//查询名称为wangxm或者名称为huxinyue的用户
+```
+
+
 
 ##### public Model Equals(string name, object value)
 
@@ -808,7 +892,7 @@ OrmUtils.Model("User").Between("Name", 18, 25).Query();	//查询年龄在18到25
 
 
 
-#### 分页设置方法（支持链式调用）
+#### 设置分页方法（支持链式调用）
 
 ##### public Model PageSize(int size)
 
@@ -860,7 +944,7 @@ OrmUtils.Model("User").Equals("Age", 18).Top(10).Query();	//查询年龄为18的
 
 
 
-#### 排序设置方法（支持链式调用）
+#### 设置排序方法（支持链式调用）
 
 ##### public Model AscendingSort(string name)
 
