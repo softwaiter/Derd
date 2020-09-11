@@ -207,6 +207,8 @@ namespace CodeM.Common.Orm
                 newP.Owner = m;
                 m.AddProperty(newP);
             }
+            
+            m.Reset();
 
             return m;
         }

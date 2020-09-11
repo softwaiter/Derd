@@ -83,7 +83,7 @@ namespace CodeM.Common.Orm
             return true;
         }
 
-        internal bool TryGetValue(string name, out object result)
+        public bool TryGetValue(string name, out object result)
         {
             if (mValues.ContainsKey(name))
             {
@@ -95,6 +95,11 @@ namespace CodeM.Common.Orm
                 result = p.DefaultValue;
             }
             return result != Undefined.Value;
+        }
+
+        public bool Has(string key)
+        {
+            return mValues.ContainsKey(key);
         }
 
         public static ModelObject New(string modelName)

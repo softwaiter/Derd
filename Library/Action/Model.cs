@@ -315,10 +315,153 @@ namespace CodeM.Common.Orm
             return true;
         }
 
-        public bool Save()
+        private bool _CheckPropertyType(Property p, object value)
+        {
+            Type type = p.Type;
+            if (type == typeof(bool))
+            {
+                bool result;
+                if (!bool.TryParse("" + value, out result))
+                {
+                    throw new Exception("无效的bool数据：" + value);
+                }
+            }
+            else if (type == typeof(byte))
+            {
+                byte result;
+                if (!byte.TryParse("" + value, out result))
+                {
+                    throw new Exception("无效的byte数据：" + value);
+                }
+            }
+            else if (type == typeof(sbyte))
+            {
+                sbyte result;
+                if (!sbyte.TryParse("" + value, out result))
+                {
+                    throw new Exception("无效的sbyte数据：" + value);
+                }
+            }
+            else if (type == typeof(decimal))
+            {
+                decimal result;
+                if (!decimal.TryParse("" + value, out result))
+                {
+                    throw new Exception("无效的decimal数据：" + value);
+                }
+            }
+            else if (type == typeof(double))
+            {
+                double result;
+                if (!double.TryParse("" + value, out result))
+                {
+                    throw new Exception("无效的double数据：" + value);
+                }
+            }
+            else if (type == typeof(Int16))
+            {
+                Int16 result;
+                if (!Int16.TryParse("" + value, out result))
+                {
+                    throw new Exception(p.Name + "属性值类型必须是Int16数据：" + value);
+                }
+            }
+            else if (type == typeof(Int32))
+            {
+                Int32 result;
+                if (!Int32.TryParse("" + value, out result))
+                {
+                    throw new Exception(p.Name + "属性值类型必须是Int32：" + value);
+                }
+            }
+            else if (type == typeof(Int64))
+            {
+                Int64 result;
+                if (!Int64.TryParse("" + value, out result))
+                {
+                    throw new Exception(p.Name + "属性值类型必须是Int64：" + value);
+                }
+            }
+            else if (type == typeof(Single))
+            {
+                Single result;
+                if (!Single.TryParse("" + value, out result))
+                {
+                    throw new Exception(p.Name + "属性值类型必须是Single：" + value);
+                }
+            }
+            else if (type == typeof(UInt16))
+            {
+                UInt16 result;
+                if (!UInt16.TryParse("" + value, out result))
+                {
+                    throw new Exception(p.Name + "属性值类型必须是UInt16：" + value);
+                }
+            }
+            else if (type == typeof(UInt32))
+            {
+                UInt32 result;
+                if (!UInt32.TryParse("" + value, out result))
+                {
+                    throw new Exception(p.Name + "属性值类型必须是UInt32：" + value);
+                }
+            }
+            else if (type == typeof(UInt64))
+            {
+                UInt64 result;
+                if (!UInt64.TryParse("" + value, out result))
+                {
+                    throw new Exception(p.Name + "属性值类型必须是UInt64：" + value);
+                }
+            }
+            else if (type == typeof(DateTime))
+            {
+                DateTime result;
+                if (!DateTime.TryParse("" + value, out result))
+                {
+                    throw new Exception(p.Name + "属性值类型必须是DateTime：" + value);
+                }
+            }
+
+            return true;
+        }
+
+        private void _CheckModelConstraint()
+        {
+            object value;
+            int count = PropertyCount;
+            for (int i = 0; i < count; i++)
+            {
+                Property p = GetProperty(i);
+                mSetValues.TryGetValue(p.Name, out value);
+
+                if (p.IsNotNull && !p.AutoIncrement)
+                {
+                    if (!mSetValues.Contains(p.Name) || 
+                        Undefined.IsUndefined(value) ||
+                        value == null)
+                    {
+                        throw new Exception("属性值不允许为空：" + p.Name);
+                    }
+                }
+
+                if (!Undefined.IsUndefined(value) &&
+                    value != null)
+                {
+                    _CheckPropertyType(p, value);
+                } 
+            }
+        }
+
+        public bool Save(bool validate = false)
         {
             try
             {
+                if (validate)
+                {
+                    _CheckModelConstraint();
+                }
+
                 if (mSetValues == null)
                 {
                     throw new Exception("没有任何要保存的内容，请通过SetValue设置内容。");

@@ -10,7 +10,7 @@ namespace CodeM.Common.Orm
 
         bool TruncateTable();
 
-        bool Save();
+        bool Save(bool validate = false);
 
         bool Delete(bool deleteAll = false);
 
@@ -24,11 +24,5 @@ namespace CodeM.Common.Orm
 
         //In
         //NotIn
-
-        //public ICommand GreaterThan();
-        //public ICommand GreaterThanOrEquals();
-
-        //Lt
-        //Lte
     }
 }
