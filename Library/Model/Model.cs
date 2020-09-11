@@ -163,7 +163,7 @@ namespace CodeM.Common.Orm
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(PropertyCount * 10);
-            sb.Append(string.Concat("CREATE TABLE ", Table, "("));
+            sb.Append(string.Concat("CREATE TABLE IF NOT EXISTS ", Table, "("));
             for (int i = 0; i < PropertyCount; i++)
             {
                 if (i > 0)
@@ -200,10 +200,9 @@ namespace CodeM.Common.Orm
             m.Name = this.Name;
             m.Table = this.Table;
 
-            IEnumerator<KeyValuePair<string, Property>> e = this.mProperties.GetEnumerator();
-            while (e.MoveNext())
+            for (int i = 0; i < PropertyCount; i++)
             {
-                Property newP = (Property)e.Current.Value.Clone();
+                Property newP = (Property)GetProperty(i).Clone();
                 newP.Owner = m;
                 m.AddProperty(newP);
             }

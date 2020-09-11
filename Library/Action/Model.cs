@@ -437,7 +437,7 @@ namespace CodeM.Common.Orm
 
                 if (p.IsNotNull && !p.AutoIncrement)
                 {
-                    if (!mSetValues.Contains(p.Name) || 
+                    if (!mSetValues.Has(p.Name) || 
                         Undefined.IsUndefined(value) ||
                         value == null)
                     {
