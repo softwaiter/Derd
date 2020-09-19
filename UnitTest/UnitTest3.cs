@@ -1,4 +1,5 @@
 ﻿using CodeM.Common.Orm;
+using CodeM.Common.Orm.Serialize;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;

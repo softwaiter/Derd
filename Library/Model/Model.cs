@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CodeM.Common.Orm.Serialize;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
@@ -94,7 +95,7 @@ namespace CodeM.Common.Orm
                 return result;
             }
 
-            throw new Exception(string.Concat("未找到Property：", name));
+            throw new Exception(string.Concat("属性未定义：", name));
         }
 
         public Property GetPropertyByField(string field)
@@ -110,7 +111,7 @@ namespace CodeM.Common.Orm
                 return result;
             }
 
-            throw new Exception(string.Concat("未找到Property：", field));
+            throw new Exception(string.Concat("属性未定义：", field));
         }
 
         public Property GetProperty(int index)

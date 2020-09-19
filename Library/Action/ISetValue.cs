@@ -1,4 +1,6 @@
-﻿namespace CodeM.Common.Orm
+﻿using CodeM.Common.Orm.Serialize;
+
+namespace CodeM.Common.Orm
 {
     public interface ISetValue
     {

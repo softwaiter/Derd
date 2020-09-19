@@ -35,15 +35,8 @@ namespace UnitTest
         [Description("再次创建User模型物理表，因为已存在，所以应该失败")]
         public void Test2()
         {
-            try
-            {
-                bool ret = OrmUtils.Model("User").CreateTable();
-                Assert.Fail("User模型物理表已存在，应该失败。");
-            }
-            catch (Exception exp)
-            {
-                Assert.IsTrue(exp.Message.ToLower().Contains("already exists"));
-            }
+            bool ret = OrmUtils.Model("User").CreateTable();
+            Assert.IsFalse(ret);
         }
 
         [Description("使用Force参数第三次创建User模型物理表，应成功。")]

@@ -1,5 +1,6 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Orm.Serialize;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -27,7 +28,7 @@ namespace CodeM.Common.Orm
             {
                 mSetValues = ModelObject.New(this);
             }
-            mSetValues.TrySetValue(name, value);
+            mSetValues.SetValue(name, value);
             return this;
         }
 
@@ -556,11 +557,11 @@ namespace CodeM.Common.Orm
                             Property p = GetProperty(name);
                             if (dr.IsDBNull(name))
                             {
-                                obj.TrySetValue(name, null);
+                                obj.SetValue(name, null);
                             }
                             else
                             {
-                                obj.TrySetValue(name, dr.GetValue(name));
+                                obj.SetValue(name, dr.GetValue(name));
                             }
                         }
                         result.Add(obj);

@@ -495,9 +495,13 @@ OrmUtils.Model("User").TruncateTable();		//清空模型User的物理表数据
 
 
 
-##### public bool Save()
+##### public bool Save(bool validate = false)
 
 新增保存模型数据到物理表。
+
+###### 参数
+
+validate：保存前对数据根据定义规则进行校验，默认不校验；可选。
 
 ###### 返回
 
