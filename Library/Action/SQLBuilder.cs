@@ -50,17 +50,16 @@ namespace CodeM.Common.Orm
         {
             CommandSQL result = new CommandSQL();
 
-            object value;
             string updateContent = string.Empty;
             for (int i = 0; i < m.PropertyCount; i++)
             {
                 Property p = m.GetProperty(i);
                 if (p.JoinUpdate)
                 {
-                    if (m.Values.TryGetValue(p.Name, out value))
+                    if (m.Values.Has(p.Name))
                     {
                         DbParameter dp = DbUtils.CreateParam(m.Path, Guid.NewGuid().ToString("N"),
-                            value, p.FieldType, ParameterDirection.Input);
+                            m.Values[p.Name], p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
 
                         if (updateContent.Length > 0)

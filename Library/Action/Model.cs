@@ -36,13 +36,12 @@ namespace CodeM.Common.Orm
         {
             if (obj != null)
             {
-                object value;
                 for (int i = 0; i < PropertyCount; i++)
                 {
                     Property p = GetProperty(i);
-                    if (obj.TryGetValue(p.Name, out value))
+                    if (obj.Has(p.Name))
                     {
-                        SetValue(p.Name, value);
+                        SetValue(p.Name, obj[p.Name]);
                     }
                 }
             }
