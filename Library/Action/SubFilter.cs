@@ -25,10 +25,12 @@ namespace CodeM.Common.Orm
 
     public class SubFilter : IFilter
     {
+        private IFilter mParent = null;
         private List<KeyValuePair<FilterOperator, object>> mFilterItems = new List<KeyValuePair<FilterOperator, object>>();
 
         public void Reset()
         {
+            mParent = null;
             mFilterItems.Clear();
         }
 
@@ -37,14 +39,28 @@ namespace CodeM.Common.Orm
             return mFilterItems.Count == 0;
         }
 
+        public IFilter Parent
+        {
+            get
+            {
+                return mParent;
+            }
+            set
+            {
+                mParent = value;
+            }
+        }
+
         public IFilter And(IFilter subFilter)
         {
+            subFilter.Parent = this;
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.And, subFilter));
             return this;
         }
 
         public IFilter Or(IFilter subFilter)
         {
+            subFilter.Parent = this;
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Or, subFilter));
             return this;
         }

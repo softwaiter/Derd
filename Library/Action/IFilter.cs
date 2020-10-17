@@ -3,6 +3,8 @@
     public interface IFilter
     {
 
+        IFilter Parent { get; set; }
+
         IFilter And(IFilter subFilter);
 
         IFilter Or(IFilter subFilter);
