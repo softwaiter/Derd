@@ -506,6 +506,16 @@ namespace CodeM.Common.Orm
                             p.UniqueGroup = uniqueGroupStr.Trim();
                         }
 
+                        string indexGroupStr = nodeInfo.GetAttribute("indexGroup");
+                        if (indexGroupStr != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(indexGroupStr))
+                            {
+                                throw new Exception("indexGroup属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                            p.IndexGroup = indexGroupStr.Trim();
+                        }
+
                         string primaryStr = nodeInfo.GetAttribute("primary");
                         if (primaryStr != null)
                         {

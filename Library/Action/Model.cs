@@ -287,14 +287,23 @@ namespace CodeM.Common.Orm
         }
 
         #region ICommand
-        public bool CreateTable(bool force = false)
+        public bool CreateTable(bool replace = false)
         {
             StringBuilder sb = new StringBuilder(ToString());
-            if (force)
+            if (replace)
             {
                 sb.Insert(0, string.Concat("DROP TABLE IF EXISTS ", Table, ";"));
             }
-            return DbUtils.ExecuteNonQuery(Path.ToLower(), sb.ToString()) == 0;
+            if (DbUtils.ExecuteNonQuery(Path.ToLower(), sb.ToString()) == 0)
+            {
+                string tableIndexSQL = ToString(true);
+                if (!string.IsNullOrWhiteSpace(tableIndexSQL))
+                {
+                    return DbUtils.ExecuteNonQuery(Path.ToLower(), tableIndexSQL) == 0;
+                }
+                return true;
+            }
+            return false;
         }
 
         public bool RemoveTable()

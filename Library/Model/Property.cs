@@ -79,6 +79,11 @@ namespace CodeM.Common.Orm
         public string UniqueGroup { get; set; } = null;
 
         /// <summary>
+        /// 索引设置，值相同的字段形成联合索引
+        /// </summary>
+        public string IndexGroup { get; set; } = null;
+
+        /// <summary>
         /// 属性是否参与插入操作
         /// </summary>
         public bool JoinInsert { get; set; } = true;
@@ -144,6 +149,7 @@ namespace CodeM.Common.Orm
             cloneObj.AutoIncrement = this.AutoIncrement;
             cloneObj.Unsigned = this.Unsigned;
             cloneObj.UniqueGroup = this.UniqueGroup;
+            cloneObj.IndexGroup = this.IndexGroup;
             cloneObj.IsNotNull = this.IsNotNull;
             cloneObj.IsPrimaryKey = this.IsPrimaryKey;
             cloneObj.DefaultValue = this.DefaultValue;

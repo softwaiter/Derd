@@ -16,6 +16,7 @@ namespace CodeM.Common.Orm
         private ConcurrentDictionary<int, string> mPrimaryKeyIndexes = new ConcurrentDictionary<int, string>();
 
         private ConcurrentDictionary<string, string> mUniqueConstraints = new ConcurrentDictionary<string, string>();
+        private ConcurrentDictionary<string, string> mIndexSettings = new ConcurrentDictionary<string, string>();
 
         public string Path { get; set; }
 
@@ -59,6 +60,14 @@ namespace CodeM.Common.Orm
                     });
                 }
 
+                if (!string.IsNullOrWhiteSpace(p.IndexGroup))
+                {
+                    mIndexSettings.AddOrUpdate(p.IndexGroup, p.Field, (key, value) =>
+                    {
+                        return string.Concat(value, ",", p.Field);
+                    });
+                }
+
                 return true;
             }
 
@@ -79,6 +88,13 @@ namespace CodeM.Common.Orm
         {
             string result = null;
             mUniqueConstraints.TryGetValue(uniqueGroup, out result);
+            return result;
+        }
+
+        internal string GetIndexGroupFields(string indexGroup)
+        {
+            string result = null;
+            mIndexSettings.TryGetValue(indexGroup, out result);
             return result;
         }
 
@@ -161,7 +177,7 @@ namespace CodeM.Common.Orm
             return ModelObject.New(this);
         }
 
-        public override string ToString()
+        public string BuildCreateTableSQL()
         {
             StringBuilder sb = new StringBuilder(PropertyCount * 10);
             sb.Append(string.Concat("CREATE TABLE IF NOT EXISTS ", Table, "("));
@@ -192,6 +208,25 @@ namespace CodeM.Common.Orm
 
             sb.Append(");");
             return sb.ToString();
+        }
+
+        public string ToString(bool buildIndexSQL = false)
+        {
+            if (buildIndexSQL)
+            {
+                if (mIndexSettings.Count > 0)
+                {
+                    StringBuilder sb = new StringBuilder((Table.Length + 30) * mIndexSettings.Count);
+                    IEnumerator<KeyValuePair<string, string>> e = mIndexSettings.GetEnumerator();
+                    while (e.MoveNext())
+                    {
+                        sb.Append(string.Concat("CREATE INDEX ", e.Current.Key, " ON ", Table, "(", e.Current.Value, ");"));
+                    }
+                    return sb.ToString();
+                }
+                return string.Empty;
+            }
+            return BuildCreateTableSQL();
         }
 
         public object Clone()
