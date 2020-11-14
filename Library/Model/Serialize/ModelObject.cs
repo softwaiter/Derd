@@ -135,9 +135,10 @@ namespace CodeM.Common.Orm.Serialize
                 try
                 {
                     Property p = mModel.GetProperty(key);
-                    if (!Undefined.IsUndefined(p.DefaultValue))
+                    if (p.DefaultValue != null)
                     {
-                        value = p.DefaultValue;
+                        //TODO value = p.CalcDefaultValue;
+                        value = Convert.ChangeType(p.DefaultValue, p.Type);
                         return true;
                     }
                 }
@@ -196,9 +197,10 @@ namespace CodeM.Common.Orm.Serialize
                 Property p = mModel.GetProperty(key);
                 if (p != null)
                 {
-                    if (!Undefined.IsUndefined(p.DefaultValue))
+                    if (p.DefaultValue != null)
                     {
-                        return p.DefaultValue;
+                        //TODO return p.CalcDefaultValue;
+                        return Convert.ChangeType(p.DefaultValue, p.Type);
                     }
                 }
             }

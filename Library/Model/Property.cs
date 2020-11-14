@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CodeM.Common.Orm
 {
-    public class Property: ICloneable
+    public class Property : ICloneable
     {
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace CodeM.Common.Orm
         /// </summary>
         public bool JoinUpdate { get; set; } = true;
 
-        public object DefaultValue { get; internal set; } = Undefined.Value;
+        public string DefaultValue { get; internal set; } = null;
 
         public override string ToString()
         {

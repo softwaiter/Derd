@@ -155,10 +155,31 @@ namespace CodeM.Common.Orm
                     item.Key != FilterOperator.Or)
                 {
                     expr = (KeyValuePair<string, object>)item.Value;
-                    p = model.GetProperty(expr.Key);
-                    if (p == null)
+
+                    if (!expr.Key.Contains("."))
                     {
-                        throw new Exception(string.Concat("无效的属性：", expr.Key));
+                        p = model.GetProperty(expr.Key);
+                    }
+                    else
+                    {
+                        Model currM = model;
+
+                        string[] subNames = expr.Key.Split(".");
+                        for (int i = 0; i < subNames.Length; i++)
+                        {
+                            string subName = subNames[i];
+                            Property subProp = currM.GetProperty(subName);
+                            Model subM = ModelUtils.GetModel(subProp.TypeValue);
+                            currM = subM;
+
+                            if (i == subNames.Length - 2)
+                            {
+                                p = subM.GetProperty(subNames[i + 1]);
+                                break;
+                            }
+                        }
+
+                        result.ForeignTables.Add(expr.Key);
                     }
 
                     if (!string.IsNullOrEmpty(result.SQL))
@@ -191,55 +212,55 @@ namespace CodeM.Common.Orm
                         dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr.Value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Field, "=?");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "=?");
                         break;
                     case FilterOperator.NotEquals:
                         dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr.Value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Field, "<>?");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "<>?");
                         break;
                     case FilterOperator.Gt:
                         dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr.Value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Field, ">?");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, ">?");
                         break;
                     case FilterOperator.Gte:
                         dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr.Value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Field, ">=?");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, ">=?");
                         break;
                     case FilterOperator.Lt:
                         dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr.Value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Field, "<?");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "<?");
                         break;
                     case FilterOperator.Lte:
                         dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr.Value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Field, "<=?");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "<=?");
                         break;
                     case FilterOperator.Like:
                         dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr.Value, DbType.String, ParameterDirection.Input);
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Field, " LIKE ?");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " LIKE ?");
                         break;
                     case FilterOperator.NotLike:
                         dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             expr.Value, DbType.String, ParameterDirection.Input);
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Field, " NOT LIKE ?");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " NOT LIKE ?");
                         break;
                     case FilterOperator.IsNull:
-                        result.SQL += string.Concat(p.Field, " IS NULL");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " IS NULL");
                         break;
                     case FilterOperator.IsNotNull:
-                        result.SQL += string.Concat(p.Field, " IS NOT NULL");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " IS NOT NULL");
                         break;
                     case FilterOperator.Between:
                         object[] values = (object[])expr.Value;
@@ -249,7 +270,7 @@ namespace CodeM.Common.Orm
                         dp2 = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
                             values[1], p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp2);
-                        result.SQL += string.Concat(p.Field, " BETWEEN ? AND ?");
+                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " BETWEEN ? AND ?");
                         break;
                 }
             }

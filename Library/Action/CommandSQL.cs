@@ -10,5 +10,7 @@ namespace CodeM.Common.Orm
 
         public List<DbParameter> Params { get; set; } = new List<DbParameter>();
 
+        public List<string> ForeignTables { get; } = new List<string>();
+
     }
 }

@@ -1,5 +1,7 @@
 ﻿using CodeM.Common.DbHelper;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text;
@@ -84,30 +86,96 @@ namespace CodeM.Common.Orm
 
         internal static CommandSQL BuildQuerySQL(Model m)
         {
-            //TODO Join
-
             CommandSQL result = new CommandSQL();
 
-            StringBuilder sb = new StringBuilder();
+            List<string> queryFields = new List<string>();
             if (m.ReturnValues.Count > 0)
             {
-                foreach (string name in m.ReturnValues)
-                {
-                    Property p = m.GetProperty(name);
-                    if (sb.Length > 0)
-                    {
-                        sb.Append(",");
-                    }
-                    sb.Append(string.Concat(p.Field, " AS ", name));
-                }
+                queryFields.AddRange(m.ReturnValues);
             }
             else
             {
-                sb.Append("*");
+                for (int i = 0; i < m.PropertyCount; i++)
+                {
+                    queryFields.Add(m.GetProperty(i).Name);
+                }
             }
-            result.SQL = string.Concat("SELECT ", sb, " FROM ", m.Table);
+
+            List<string> foreignTables = new List<string>();
+            StringBuilder sbFields = new StringBuilder();
+            foreach (string name in queryFields)
+            {
+                if (!name.Contains("."))    //直接属性
+                {
+                    Property p = m.GetProperty(name);
+                    if (sbFields.Length > 0)
+                    {
+                        sbFields.Append(",");
+                    }
+                    sbFields.Append(string.Concat(m.Table, ".", p.Field, " AS ", name));
+                }
+                else    //Model属性引用
+                {
+                    foreignTables.Add(name);
+
+                    Model currM = m;
+                    string[] subNames = name.Split(".");
+                    for (int i = 0; i < subNames.Length; i++)
+                    {
+                        Property subProp = currM.GetProperty(subNames[i]);
+                        currM = ModelUtils.GetModel(subProp.TypeValue);
+
+                        if (i == subNames.Length - 2)
+                        {
+                            if (sbFields.Length > 0)
+                            {
+                                sbFields.Append(",");
+                            }
+
+                            Property lastProp = currM.GetProperty(subNames[i + 1]);
+                            string fieldName = name.Replace(".", "_");
+                            sbFields.Append(string.Concat(currM.Table, ".", lastProp.Field, " AS ", fieldName));
+
+                            break;
+                        }
+                    }
+                }
+            }
 
             CommandSQL where = m.Where.Build(m);
+
+            StringBuilder sbJoins = new StringBuilder();
+            foreignTables.AddRange(where.ForeignTables);
+            foreignTables.AddRange(m.ForeignSortNames);
+            Hashtable processedName = new Hashtable();
+            foreach (string foreignTableName in foreignTables)
+            {
+                if (processedName.ContainsKey(foreignTableName.ToLower().Trim()))
+                {
+                    continue;
+                }
+
+                Model currM = m;
+                string[] subNames = foreignTableName.Split(".");
+                for (int i = 0; i < subNames.Length; i++)
+                {
+                    Property subProp = currM.GetProperty(subNames[i]);
+                    Model subM = ModelUtils.GetModel(subProp.TypeValue);
+                    sbJoins.Append(string.Concat(" LEFT JOIN ", subM.Table, " ON ",
+                        currM.Table, ".", subProp.Field, "=", subM.Table, ".", subM.GetPrimaryKey(0).Field));
+                    currM = subM;
+
+                    if (i == subNames.Length - 2)
+                    {
+                        break;
+                    }
+                }
+                
+                processedName.Add(foreignTableName.ToLower().Trim(), true);
+            }
+
+            result.SQL = string.Concat("SELECT ", sbFields, " FROM ", m.Table, sbJoins);
+            
             if (!string.IsNullOrEmpty(where.SQL))
             {
                 result.SQL += string.Concat(" WHERE ", where.SQL);

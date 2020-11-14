@@ -353,6 +353,10 @@ namespace CodeM.Common.Orm
                             {
                                 throw new Exception("type属性非法。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
+                            else if (type == typeof(Model))
+                            {
+                                p.TypeValue = typeStr;
+                            }
                         }
                         else
                         {
@@ -535,7 +539,7 @@ namespace CodeM.Common.Orm
                         string defaultStr = nodeInfo.GetAttribute("defaultValue");
                         if (defaultStr != null)
                         {
-                            p.DefaultValue = Convert.ChangeType(defaultStr, p.Type);
+                            p.DefaultValue = defaultStr.Trim();
                         }
 
                         string joinInsertStr = nodeInfo.GetAttribute("joinInsert");

@@ -27,7 +27,7 @@ namespace UnitTest
             Test4();
             Test5();
             Test6();
-            //Test7();
+            Test7();
         }
 
         [Description("创建User模型的物理表。")]

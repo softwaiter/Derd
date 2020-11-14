@@ -66,10 +66,35 @@ namespace CodeM.Common.Orm
             {
                 if (mGetValues.IndexOf(name) < 0)
                 {
-                    Property p = GetProperty(name);
-                    if (p == null)
+                    if (!name.Contains("."))
                     {
-                        throw new Exception(string.Concat("未找到属性：", name));
+                        Property p = GetProperty(name);
+                        if (p == null)
+                        {
+                            throw new Exception(string.Concat("未找到属性：", name));
+                        }
+                    }
+                    else
+                    {
+                        string[] typeItems = name.Split(".");
+                        Model currM = this;
+                        for (int i = 0; i < typeItems.Length; i++)
+                        {
+                            Property p = currM.GetProperty(typeItems[i]);
+                            if (p == null)
+                            {
+                                throw new Exception(string.Concat("未找到属性：", name));
+                            }
+
+                            if (i < typeItems.Length - 1)
+                            {
+                                currM = ModelUtils.GetModel(p.TypeValue);
+                                if (currM == null)
+                                {
+                                    throw new Exception(string.Concat("非法的Model引用：", p.TypeValue));
+                                }
+                            }
+                        }
                     }
 
                     mGetValues.Add(name);
@@ -242,27 +267,82 @@ namespace CodeM.Common.Orm
 
         #region ISort
         private List<string> mSorts = new List<string>();
+        private List<string> mForeignSortNames = new List<string>();
 
         public Model AscendingSort(string name)
         {
-            Property p = GetProperty(name);
-            if (p == null)
+            if (!name.Contains("."))
             {
-                throw new Exception(string.Concat("未找到属性：", name));
+                Property p = GetProperty(name);
+                if (p == null)
+                {
+                    throw new Exception(string.Concat("未找到属性：", name));
+                }
+                mSorts.Add(string.Concat(p.Owner.Table, ".", p.Field, " ASC"));
             }
-            mSorts.Add(string.Concat(p.Field, " ASC"));
+            else
+            {
+                Model currM = this;
+                string[] subNames = name.Split(".");
+                for (int i = 0; i < subNames.Length; i++)
+                {
+                    Property subProp = currM.GetProperty(subNames[0]);
+                    Model subM = ModelUtils.GetModel(subProp.TypeValue);
+                    currM = subM;
+
+                    if (i == subNames.Length - 2)
+                    {
+                        Property lastProp = subM.GetProperty(subNames[i + 1]);
+                        mSorts.Add(string.Concat(subM.Table, ".", lastProp.Field, " ASC"));
+                        break;
+                    }
+                }
+
+                mForeignSortNames.Add(name);
+            }
             return this;
         }
 
         public Model DescendingSort(string name)
         {
-            Property p = GetProperty(name);
-            if (p == null)
+            if (!name.Contains("."))
             {
-                throw new Exception(string.Concat("未找到属性：", name));
+                Property p = GetProperty(name);
+                if (p == null)
+                {
+                    throw new Exception(string.Concat("未找到属性：", name));
+                }
+                mSorts.Add(string.Concat(p.Owner.Table, ".", p.Field, " DESC"));
             }
-            mSorts.Add(string.Concat(p.Field, " DESC"));
+            else
+            {
+                Model currM = this;
+                string[] subNames = name.Split(".");
+                for (int i = 0; i < subNames.Length; i++)
+                {
+                    Property subProp = currM.GetProperty(subNames[0]);
+                    Model subM = ModelUtils.GetModel(subProp.TypeValue);
+                    currM = subM;
+
+                    if (i == subNames.Length - 2)
+                    {
+                        Property lastProp = subM.GetProperty(subNames[i + 1]);
+                        mSorts.Add(string.Concat(subM.Table, ".", lastProp.Field, " DESC"));
+                        break;
+                    }
+                }
+
+                mForeignSortNames.Add(name);
+            }
             return this;
+        }
+
+        internal List<string> ForeignSortNames 
+        {
+            get
+            {
+                return mForeignSortNames;
+            }
         }
 
         internal string Sort
@@ -280,6 +360,7 @@ namespace CodeM.Common.Orm
             mGetValues.Clear();
             mFilter.Reset();
             mSorts.Clear();
+            mForeignSortNames.Clear();
 
             mUsePaging = false;
             mPageSize = 100;
@@ -447,15 +528,13 @@ namespace CodeM.Common.Orm
                 if (p.IsNotNull && !p.AutoIncrement)
                 {
                     if (!mSetValues.Has(p.Name) || 
-                        Undefined.IsUndefined(value) ||
                         value == null)
                     {
                         throw new Exception("属性值不允许为空：" + p.Name);
                     }
                 }
 
-                if (!Undefined.IsUndefined(value) &&
-                    value != null)
+                if (value != null)
                 {
                     _CheckPropertyType(p, value);
                 } 
@@ -562,14 +641,50 @@ namespace CodeM.Common.Orm
                         ModelObject obj = ModelObject.New(this);
                         foreach (string name in mGetValues)
                         {
-                            Property p = GetProperty(name);
-                            if (dr.IsDBNull(name))
+                            if (!name.Contains("."))
                             {
-                                obj.SetValue(name, null);
+                                Property p = GetProperty(name);
+                                if (dr.IsDBNull(name))
+                                {
+                                    obj.SetValue(name, null);
+                                }
+                                else
+                                {
+                                    obj.SetValue(name, dr.GetValue(name));
+                                }
                             }
                             else
                             {
-                                obj.SetValue(name, dr.GetValue(name));
+                                Model currM = this;
+                                ModelObject currObj = obj;
+                                string[] subNames = name.Split(".");
+                                for (int i = 0; i < subNames.Length; i++)
+                                {
+                                    string subName = subNames[i];
+                                    Property subProp = currM.GetProperty(subName);
+                                    Model subM = ModelUtils.GetModel(subProp.TypeValue);
+                                    ModelObject subObj = ModelObject.New(subM);
+                                    currObj.SetValue(subName, subObj);
+                                    currM = subM;
+                                    currObj = subObj;
+
+                                    if (i == subNames.Length - 2)
+                                    {
+                                        string lastName = subNames[subNames.Length - 1];
+                                        Property lastProp = currM.GetProperty(lastName);
+
+                                        string fieldName = name.Replace(".", "_");
+                                        if (dr.IsDBNull(fieldName))
+                                        {
+                                            currObj.SetValue(lastName, null);
+                                        }
+                                        else
+                                        {
+                                            currObj.SetValue(lastName, dr.GetValue(fieldName));
+                                        }
+                                        break;
+                                    }
+                                }
                             }
                         }
                         result.Add(obj);
