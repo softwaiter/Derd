@@ -14,7 +14,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.0.1
+Install-Package CodeM.Common.Orm -Version 1.0.4
 ```
 
 
@@ -22,7 +22,7 @@ Install-Package CodeM.Common.Orm -Version 1.0.1
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.0.1
+dotnet add package CodeM.Common.Orm --version 1.0.4
 ```
 
 
@@ -30,7 +30,7 @@ dotnet add package CodeM.Common.Orm --version 1.0.1
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.0.1" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.0.4" />
 ```
 
 
@@ -38,7 +38,7 @@ dotnet add package CodeM.Common.Orm --version 1.0.1
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.0.1
+paket add CodeM.Common.Orm --version 1.0.4
 ```
 
 
@@ -87,6 +87,20 @@ paket add CodeM.Common.Orm --version 1.0.1
 
 模型中可定义任意多个属性。具体格式如下：
 
+Org模型定义
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<model name="Org" table="t_org">
+    <property name="Id" field="f_id" notNull="True" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
+    <property name="Name" field="f_name" length="32" notNull="true" uniqueGroup="uc_name" joinInsert="true" joinUpdate="true" desc="机构名称" />
+</model>
+```
+
+
+
+User模型定义
+
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <model name="User" table="t_user">
@@ -94,6 +108,7 @@ paket add CodeM.Common.Orm --version 1.0.1
     <property name="Name" field="f_name" length="32" notNull="true" uniqueGroup="uc_name" joinInsert="true" joinUpdate="true" desc="名称" />
     <property name="Age" field="f_age" type="UInt16" unsigned="true" joinInsert="true" joinUpdate="true" desc="年龄" />
     <property name="Birthday" type="DateTime" field="f_birthday" fieldType="Date" desc="出生日期" />
+    <property name="OrgId" field="f_org_id" type="Org" fieldType="Int32" desc="所属机构" />
     <property name="Deposit" field="f_deposit" type="Decimal" precision="2" desc="银行存款" />
     <property name="IsAdmin" field="f_is_admin" type="Boolean" desc="是否超级管理员" />
 </model>
@@ -139,6 +154,8 @@ paket add CodeM.Common.Orm --version 1.0.1
 | Double   | 64位，双精度浮点数，精度 15 - 16 位，取值±5.0 × 10<sup>-324</sup> ~ ±1.7 × 10<sup>308</sup> |
 | Decimal  | 128位，高精度浮点数，精度 28 - 29 位，取值±1.0 × 10<sup>-28</sup> ~ ±7.9 × 10<sup>28</sup> |
 | DateTime | 日期时间类型                                                 |
+
+注：type属性值可以是其他模型，生成主从模型映射；如OrgId属性。
 
 ###### fieldType
 
@@ -658,6 +675,18 @@ if (result.Count > 0)
 }
 ```
 
+注：返回属性可以使用主从模型属性，返回格式按照模型自动嵌套，如或去用户所属机构的名称：
+
+```c#
+List<dynamic> result = OrmUtils.Model("User").GetValue("Name", "OrgId.Name").Query();
+if (result.Count > 0)
+{
+    Console.WriteLine("所属机构名称：{0}", result[0].OrgId.Name);
+}
+```
+
+
+
 
 
 #### 设置查询条件方法（支持链式调用）
@@ -720,6 +749,12 @@ value：比较的值。
 
 ```c#
 OrmUtils.Model("User").Equals("Age", 18).Query();	//查询所有年龄=18的用户
+```
+
+注：查询属性名可以使用主从模型属性，如查询所属机构名称为XX科技的用户：
+
+```c#
+OrmUtils.Model("User").Equals("OrgId.Name", "XX科技").Query();
 ```
 
 
@@ -964,6 +999,12 @@ namge：属性名。
 
 ```c#
 OrmUtils.Model("User").DescendingSort("Age").Query();	//对年龄按照降序进行排序并返回所有查询结果
+```
+
+注：可以使用主从模型属性进行排序，如按照所属机构名称对用户进行排序：
+
+```c#
+OrmUtils.Model("User").DescendingSort("OrgId.Name").Query();
 ```
 
 
