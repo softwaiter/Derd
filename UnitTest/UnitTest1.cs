@@ -8,16 +8,17 @@ namespace UnitTest
     [TestClass]
     public class UnitTest1
     {
-        public UnitTest1()
-        {
-        }
-
         [TestInitialize]
         public void Init()
         {
             string modelPath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\models");
             OrmUtils.ModelPath = modelPath;
             OrmUtils.Load();
+
+            string sql = "Drop Table  IF EXISTS orm_test";
+            OrmUtils.ExecSql(sql);
+
+            OrmUtils.RemoveTables();
         }
 
         [TestMethod]
@@ -54,7 +55,7 @@ namespace UnitTest
         [Description("删除Test3创建的数据表orm_test")]
         public void Test4()
         {
-            string sql = "Drop Table orm_test";
+            string sql = "Drop Table  orm_test";
             int ret = OrmUtils.ExecSql(sql);
             Assert.IsTrue(ret == 0);
         }

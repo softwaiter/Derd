@@ -389,7 +389,7 @@ namespace CodeM.Common.Orm
 
         public bool RemoveTable()
         {
-            string sql = string.Concat("DROP TABLE ", Table);
+            string sql = string.Concat("DROP TABLE IF EXISTS ", Table);
             DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
             return true;
         }

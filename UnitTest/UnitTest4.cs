@@ -18,6 +18,8 @@ namespace UnitTest
             string modelPath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\models");
             OrmUtils.ModelPath = modelPath;
             OrmUtils.Load();
+
+            OrmUtils.RemoveTables();
         }
 
         [TestMethod]
