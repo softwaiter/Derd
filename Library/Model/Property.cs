@@ -1,6 +1,8 @@
 ﻿using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Orm.Processor;
 using System;
 using System.Data;
+using System.Reflection;
 using System.Text;
 
 namespace CodeM.Common.Orm
@@ -94,6 +96,26 @@ namespace CodeM.Common.Orm
         public bool JoinUpdate { get; set; } = true;
 
         public string DefaultValue { get; internal set; } = null;
+
+        public object CalcDefaultValue(dynamic obj)
+        {
+            if (DefaultValue != null)
+            {
+                if (!string.IsNullOrWhiteSpace(DefaultValue))
+                {
+                    string propDefaultValue = DefaultValue.Trim();
+                    if (propDefaultValue.StartsWith("{{") && 
+                        propDefaultValue.EndsWith("}}"))
+                    {
+                        string processorName = propDefaultValue.Substring(
+                            2, propDefaultValue.Length - 4).Trim();
+                        return Executor.Call(processorName, Owner, obj);
+                    }
+                }
+                return Convert.ChangeType(DefaultValue, Type);
+            }
+            return null;
+        }
 
         public override string ToString()
         {

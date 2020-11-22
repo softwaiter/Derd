@@ -7,4 +7,6 @@
     <property name="OrgId" field="f_org_id" type="Org" fieldType="Int32" desc="所属机构" />
     <property name="Deposit" field="f_deposit" type="Decimal" precision="2" desc="银行存款" defaultValue="12345" />
     <property name="IsAdmin" field="f_is_admin" indexGroup="idx_age" type="Boolean" desc="是否超级管理员" defaultValue="false" />
+    <property name="CreateTime" type="DateTime" field="f_createtime" defaultValue="{{CurrentDateTime}}" joinUpdate="false" desc="创建时间" />
+    <property name="UpdateTime" type="DateTime" field="f_updatetime" defaultValue="{{CurrentDateTime}}" desc="更新时间" />
 </model>

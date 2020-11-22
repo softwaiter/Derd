@@ -1,4 +1,5 @@
 ﻿using CodeM.Common.DbHelper;
+using CodeM.Common.Orm.Processor;
 using System;
 using System.IO;
 
@@ -7,6 +8,16 @@ namespace CodeM.Common.Orm
     public class OrmUtils
     {
         public static string ModelPath { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "models");
+
+        /// <summary>
+        /// 注册属性Processor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="classname"></param>
+        public static void RegisterProcessor(string name, string classname)
+        {
+            Executor.Register(name, classname);
+        }
 
         /// <summary>
         /// 加载模型定义

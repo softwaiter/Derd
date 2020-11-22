@@ -1,4 +1,5 @@
 ﻿using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Orm.Processor;
 using CodeM.Common.Tools.Xml;
 using System;
 using System.Collections.Concurrent;
@@ -17,6 +18,9 @@ namespace CodeM.Common.Orm
 
         internal static void Load(string modelPath, bool increment = false)
         {
+            //初始化属性Processor
+            Executor.Init();
+
             ConnectionUtils.ClearConnections();
 
             if (!increment)
@@ -276,8 +280,6 @@ namespace CodeM.Common.Orm
 
         internal static Model ParseModel(string modelFilePath, string parent)
         {
-            //TODO defaultValue、type=Model
-
             Model model = new Model();
             model.Path = parent.ToLower();
 

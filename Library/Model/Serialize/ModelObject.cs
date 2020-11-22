@@ -137,8 +137,7 @@ namespace CodeM.Common.Orm.Serialize
                     Property p = mModel.GetProperty(key);
                     if (p.DefaultValue != null)
                     {
-                        //TODO value = p.CalcDefaultValue;
-                        value = Convert.ChangeType(p.DefaultValue, p.Type);
+                        value = p.CalcDefaultValue(this);
                         return true;
                     }
                 }
@@ -199,8 +198,7 @@ namespace CodeM.Common.Orm.Serialize
                 {
                     if (p.DefaultValue != null)
                     {
-                        //TODO return p.CalcDefaultValue;
-                        return Convert.ChangeType(p.DefaultValue, p.Type);
+                        return p.CalcDefaultValue(this);
                     }
                 }
             }
