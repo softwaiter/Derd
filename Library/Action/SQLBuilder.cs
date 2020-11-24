@@ -150,7 +150,8 @@ namespace CodeM.Common.Orm
             Hashtable processedName = new Hashtable();
             foreach (string foreignTableName in foreignTables)
             {
-                if (processedName.ContainsKey(foreignTableName.ToLower().Trim()))
+                string key = foreignTableName.Substring(0, foreignTableName.LastIndexOf(".")).Trim().ToLower();
+                if (processedName.ContainsKey(key))
                 {
                     continue;
                 }
@@ -171,7 +172,7 @@ namespace CodeM.Common.Orm
                     }
                 }
                 
-                processedName.Add(foreignTableName.ToLower().Trim(), true);
+                processedName.Add(key, true);
             }
 
             result.SQL = string.Concat("SELECT ", sbFields, " FROM ", m.Table, sbJoins);
