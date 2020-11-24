@@ -63,7 +63,7 @@ namespace UnitTest
 
         public void Test4()
         {
-            List<dynamic> userList = OrmUtils.Model("User").Equals("Name", "wangxm").GetValue("Name", "OrgId.Name").Query();
+            List<dynamic> userList = OrmUtils.Model("User").Equals("Name", "wangxm").GetValue("Name", "   OrgId.Name").Query();
             Assert.AreEqual("XX科技", userList[0].OrgId.Name);
         }
 

@@ -64,26 +64,27 @@ namespace CodeM.Common.Orm
         {
             foreach (string name in names)
             {
-                if (mGetValues.IndexOf(name) < 0)
+                string compactName = name.Trim();
+                if (mGetValues.IndexOf(compactName) < 0)
                 {
-                    if (!name.Contains("."))
+                    if (!compactName.Contains("."))
                     {
-                        Property p = GetProperty(name);
+                        Property p = GetProperty(compactName);
                         if (p == null)
                         {
-                            throw new Exception(string.Concat("未找到属性：", name));
+                            throw new Exception(string.Concat("未找到属性：", compactName));
                         }
                     }
                     else
                     {
-                        string[] typeItems = name.Split(".");
+                        string[] typeItems = compactName.Split(".");
                         Model currM = this;
                         for (int i = 0; i < typeItems.Length; i++)
                         {
                             Property p = currM.GetProperty(typeItems[i]);
                             if (p == null)
                             {
-                                throw new Exception(string.Concat("未找到属性：", name));
+                                throw new Exception(string.Concat("未找到属性：", compactName));
                             }
 
                             if (i < typeItems.Length - 1)
@@ -97,7 +98,7 @@ namespace CodeM.Common.Orm
                         }
                     }
 
-                    mGetValues.Add(name);
+                    mGetValues.Add(compactName);
                 }
             }
             return this;

@@ -14,7 +14,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.0.5
+Install-Package CodeM.Common.Orm -Version 1.0.6
 ```
 
 
@@ -22,7 +22,7 @@ Install-Package CodeM.Common.Orm -Version 1.0.5
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.0.5
+dotnet add package CodeM.Common.Orm --version 1.0.6
 ```
 
 
@@ -30,7 +30,7 @@ dotnet add package CodeM.Common.Orm --version 1.0.5
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.0.5" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.0.6" />
 ```
 
 
@@ -38,7 +38,7 @@ dotnet add package CodeM.Common.Orm --version 1.0.5
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.0.5
+paket add CodeM.Common.Orm --version 1.0.6
 ```
 
 
@@ -220,6 +220,8 @@ type属性转换表：
 
 字符串，属性默认值，新增模型时如未设置属性值，则使用该值填充。
 
+默认值支持Processor写法，Processor具体用法参照下方的Processor说明。
+
 ###### joinInsert
 
 布尔型，指示属性是否参与模型的插入操作，默认True；可选。
@@ -230,7 +232,13 @@ type属性转换表：
 
 
 
-## 五、API使用
+## 五、Processor说明
+
+//TODO
+
+
+
+## 六、API使用
 
 ### 1. OrmUtils类
 
@@ -247,6 +255,22 @@ OrmUtils类是所有功能的入口，OrmUtils属于静态类，所有属性和�
 
 
 ### 3. OrmUtils类方法
+
+##### public static void RegisterProcessor(string name, string classname);
+
+注册用户自定义的Processor。
+
+###### 参数
+
+name：Processor名称，保证唯一性。
+
+classname：Processor实现类，必须是实现了IExecute接口的类。
+
+```c#
+OrmUtils.RegisterProcessor("CurrentDateTime", "CodeM.Common.Orm.Processor.Impl.CurrentDateTime");
+```
+
+
 
 ##### public static void Load();
 
@@ -378,7 +402,7 @@ Model user = OrmUtils.Model("User");
 
 
 
-## 六、模型用法
+## 七、模型用法
 
 ### 1. 模型的存储位置
 
