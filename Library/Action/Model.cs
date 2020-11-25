@@ -371,39 +371,62 @@ namespace CodeM.Common.Orm
         #region ICommand
         public bool CreateTable(bool replace = false)
         {
-            StringBuilder sb = new StringBuilder(ToString());
-            if (replace)
+            try
             {
-                sb.Insert(0, string.Concat("DROP TABLE IF EXISTS ", Table, ";"));
-            }
-            if (DbUtils.ExecuteNonQuery(Path.ToLower(), sb.ToString()) == 0)
-            {
+                StringBuilder sb = new StringBuilder(ToString());
+                if (replace)
+                {
+                    sb.Insert(0, string.Concat("DROP TABLE IF EXISTS ", Table, ";"));
+                }
+
+                DbUtils.ExecuteNonQuery(Path.ToLower(), sb.ToString());
+
                 string tableIndexSQL = ToString(true);
                 if (!string.IsNullOrWhiteSpace(tableIndexSQL))
                 {
-                    return DbUtils.ExecuteNonQuery(Path.ToLower(), tableIndexSQL) == 0;
+                    DbUtils.ExecuteNonQuery(Path.ToLower(), tableIndexSQL);
                 }
                 return true;
+            }
+            catch
+            {
+                ;
             }
             return false;
         }
 
         public bool RemoveTable()
         {
-            string sql = string.Concat("DROP TABLE IF EXISTS ", Table);
-            DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
-            return true;
+            try
+            {
+                string sql = string.Concat("DROP TABLE IF EXISTS ", Table);
+                DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+                return true;
+            }
+            catch
+            {
+                ;
+            }
+            return false;
         }
 
         public bool TruncateTable()
         {
-            string sql = string.Concat("TRUNCATE TABLE ", Table);
-            if (!Features.IsSupportTruncate(this))
+            try
             {
-                sql = string.Concat("DELETE FROM ", Table);
+                string sql = string.Concat("TRUNCATE TABLE ", Table);
+                if (!Features.IsSupportTruncate(this))
+                {
+                    sql = string.Concat("DELETE FROM ", Table);
+                }
+                DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+                return true;
             }
-            DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
-            return true;
+            catch
+            {
+                ;
+            }
+            return false;
         }
 
         private bool _CheckPropertyType(Property p, object value)

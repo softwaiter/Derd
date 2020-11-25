@@ -95,11 +95,11 @@ namespace CodeM.Common.Orm
         public bool JoinUpdate { get; set; } = true;
 
         /// <summary>
-        /// 存储前先处理Processor，在模型保存前会先调用该处理器对属性值进行处理
+        /// 存储前处理Processor，在模型保存前会先调用该处理器对属性值进行处理
         /// </summary>
-        public string BeforeSaveProcessor { get; internal set; } = null;
+        internal string BeforeSaveProcessor { get; set; } = null;
 
-        public object DoBeforeSaveProcessor(dynamic obj)
+        internal object DoBeforeSaveProcessor(dynamic obj)
         {
             if (!string.IsNullOrWhiteSpace(BeforeSaveProcessor))
             {

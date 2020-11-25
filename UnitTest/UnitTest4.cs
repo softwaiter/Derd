@@ -4,7 +4,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
 namespace UnitTest
 {
@@ -25,8 +24,6 @@ namespace UnitTest
         [TestMethod]
         public void Test()
         {
-            Thread.Sleep(1000 * 3);
-
             Test1();
             Test2();
             Test3();
