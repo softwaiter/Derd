@@ -61,6 +61,7 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
+        [Description("查询名称为wangxm的")]
         public void Test4()
         {
             List<dynamic> userList = OrmUtils.Model("User").Equals("Name", "wangxm").GetValue("Name", "OrgId.Id", "OrgId.Name").Query();

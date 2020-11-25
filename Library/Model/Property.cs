@@ -97,20 +97,42 @@ namespace CodeM.Common.Orm
 
         public string DefaultValue { get; internal set; } = null;
 
+        private int mDefaultValueIsProcessor = 0;
+        public bool DefaultValueIsProcessor
+        {
+            get 
+            {
+                if (mDefaultValueIsProcessor == 0)
+                {
+                    if (DefaultValue != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(DefaultValue))
+                        {
+                            string propDefaultValue = DefaultValue.Trim();
+                            if (propDefaultValue.Length > 4 &&
+                                propDefaultValue.StartsWith("{{") &&
+                                propDefaultValue.EndsWith("}}"))
+                            {
+                                mDefaultValueIsProcessor = 1;
+                            }
+                        }
+                    }
+                    mDefaultValueIsProcessor = -1;
+                }
+                return mDefaultValueIsProcessor > 0;
+            }
+        }
+
         public object CalcDefaultValue(dynamic obj)
         {
             if (DefaultValue != null)
             {
-                if (!string.IsNullOrWhiteSpace(DefaultValue))
+                if (DefaultValueIsProcessor)
                 {
                     string propDefaultValue = DefaultValue.Trim();
-                    if (propDefaultValue.StartsWith("{{") && 
-                        propDefaultValue.EndsWith("}}"))
-                    {
-                        string processorName = propDefaultValue.Substring(
-                            2, propDefaultValue.Length - 4).Trim();
-                        return Executor.Call(processorName, Owner, obj);
-                    }
+                    string processorName = propDefaultValue.Substring(
+                        2, propDefaultValue.Length - 4).Trim();
+                    return Executor.Call(processorName, Owner, Name, obj);
                 }
                 return Convert.ChangeType(DefaultValue, Type);
             }
