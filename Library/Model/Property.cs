@@ -100,10 +100,12 @@ namespace CodeM.Common.Orm
         private int mDefaultValueIsProcessor = 0;
         public bool DefaultValueIsProcessor
         {
-            get 
+            get
             {
                 if (mDefaultValueIsProcessor == 0)
                 {
+                    mDefaultValueIsProcessor = -1;
+
                     if (DefaultValue != null)
                     {
                         if (!string.IsNullOrWhiteSpace(DefaultValue))
@@ -117,9 +119,12 @@ namespace CodeM.Common.Orm
                             }
                         }
                     }
-                    mDefaultValueIsProcessor = -1;
                 }
                 return mDefaultValueIsProcessor > 0;
+            }
+            internal set
+            {
+                mDefaultValueIsProcessor = value ? 1 : -1;
             }
         }
 
@@ -197,6 +202,7 @@ namespace CodeM.Common.Orm
             cloneObj.IsNotNull = this.IsNotNull;
             cloneObj.IsPrimaryKey = this.IsPrimaryKey;
             cloneObj.DefaultValue = this.DefaultValue;
+            cloneObj.DefaultValueIsProcessor = this.DefaultValueIsProcessor;
             cloneObj.JoinInsert = this.JoinInsert;
             cloneObj.JoinUpdate = this.JoinUpdate;
             return cloneObj;
