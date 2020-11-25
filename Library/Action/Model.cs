@@ -542,6 +542,15 @@ namespace CodeM.Common.Orm
             }
         }
 
+        private void _CalcBeforeSaveProperties()
+        {
+            foreach (Property p in mBeforeSavePropeties)
+            {
+                object value = p.DoBeforeSaveProcessor(mSetValues);
+                SetValue(p.Name, value);
+            }
+        }
+
         public bool Save(bool validate = false)
         {
             try
@@ -555,6 +564,8 @@ namespace CodeM.Common.Orm
                 {
                     throw new Exception("没有任何要保存的内容，请通过SetValue设置内容。");
                 }
+
+                _CalcBeforeSaveProperties();
 
                 CommandSQL cmd = SQLBuilder.BuildInsertSQL(this);
                 bool ret = DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) == 1;
@@ -579,6 +590,8 @@ namespace CodeM.Common.Orm
                 {
                     throw new Exception("未设置更新的条件范围。");
                 }
+
+                _CalcBeforeSaveProperties();
 
                 CommandSQL cmd = SQLBuilder.BuildUpdateSQL(this);
                 bool ret = DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) > 0;

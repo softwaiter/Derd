@@ -2,7 +2,6 @@
 using CodeM.Common.Orm.Processor;
 using System;
 using System.Data;
-using System.Reflection;
 using System.Text;
 
 namespace CodeM.Common.Orm
@@ -95,6 +94,23 @@ namespace CodeM.Common.Orm
         /// </summary>
         public bool JoinUpdate { get; set; } = true;
 
+        /// <summary>
+        /// 存储前先处理Processor，在模型保存前会先调用该处理器对属性值进行处理
+        /// </summary>
+        public string BeforeSaveProcessor { get; internal set; } = null;
+
+        public object DoBeforeSaveProcessor(dynamic obj)
+        {
+            if (!string.IsNullOrWhiteSpace(BeforeSaveProcessor))
+            {
+                return Executor.Call(BeforeSaveProcessor, Owner, Name, obj);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 属性默认值，新建模型时，若属性未赋值，将使用该值填充
+        /// </summary>
         public string DefaultValue { get; internal set; } = null;
 
         private int mDefaultValueIsProcessor = 0;
@@ -201,6 +217,7 @@ namespace CodeM.Common.Orm
             cloneObj.IndexGroup = this.IndexGroup;
             cloneObj.IsNotNull = this.IsNotNull;
             cloneObj.IsPrimaryKey = this.IsPrimaryKey;
+            cloneObj.BeforeSaveProcessor = this.BeforeSaveProcessor;
             cloneObj.DefaultValue = this.DefaultValue;
             cloneObj.DefaultValueIsProcessor = this.DefaultValueIsProcessor;
             cloneObj.JoinInsert = this.JoinInsert;

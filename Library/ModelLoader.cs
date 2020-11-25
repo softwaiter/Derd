@@ -544,6 +544,22 @@ namespace CodeM.Common.Orm
                             p.DefaultValue = defaultStr.Trim();
                         }
 
+                        string beforeStr = nodeInfo.GetAttribute("beforeSave");
+                        if (beforeStr != null)
+                        {
+                            beforeStr = beforeStr.Trim();
+                            if (beforeStr.Length > 4 &&
+                                beforeStr.StartsWith("{{") &&
+                                beforeStr.EndsWith("}}"))
+                            {
+                                p.BeforeSaveProcessor = beforeStr.Substring(2, beforeStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("beforeSave属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
                         string joinInsertStr = nodeInfo.GetAttribute("joinInsert");
                         if (joinInsertStr != null)
                         {
