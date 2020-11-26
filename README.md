@@ -222,6 +222,18 @@ type属性转换表：
 
 默认值支持Processor写法，Processor具体用法参照下方的Processor说明。
 
+###### beforeSave
+
+字符串，属性保存前处理器，可选。
+
+该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
+
+###### afterQuery
+
+字符串，属性查询后处理器，可选。
+
+该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
+
 ###### joinInsert
 
 布尔型，指示属性是否参与模型的插入操作，默认True；可选。
@@ -234,7 +246,94 @@ type属性转换表：
 
 ## 五、Processor说明
 
-//TODO
+Processor是一种处理方法，该处理方法根据自己内在的处理逻辑计算处理并返回处理结果；根据不同的应用场景对返回值进行相应的使用。
+
+Processor包含一些内置的系统Processor，也允许用户自定义进行扩展。
+
+
+
+所有Processor都必须实现 IProcessor接口，接口定义如下：
+
+```c#
+namespace CodeM.Common.Orm
+{
+    public interface IProcessor
+    {
+        object Execute(Model model, string prop, dynamic obj);
+    }
+}
+```
+
+该接口只有一个Execute方法，方法需要3个输入参数：
+
+model: 当前Model定义对象
+
+prop: 当前属性的名称
+
+obj: 当前Model的数据实例
+
+
+
+具体的Processor只需要实现IProcessor的Execute方法即可，如取得当前时间的CurrentDateTime处理器：
+
+```c#
+using System;
+
+namespace CodeM.Common.Orm.Processors
+{
+    public class CurrentDateTime: IProcessor
+    {
+        public object Execute(Model model, string prop, dynamic obj)
+        {
+            return DateTime.Now;
+        }
+    }
+}
+```
+
+Execute需要一个object类型的返回值，根据属性类型不同而不同；一旦处理器发现Model定义或属性当前值不符合处理器的处理规则，无法进行处理和继续后续操作时，可以返回Undefined.Value，后续操作将忽略该Processor的存在。
+
+
+
+有了Processor实现类，还必须进行注册才可以正常使用，注册使用RegisterProcessor方法，在API使用部分有详细说明：
+
+```
+OrmUtils.RegisterProcessor("CurrentDateTime", "CodeM.Common.Orm.Processors.CurrentDateTime");
+```
+
+
+
+此时，ORM中已经有了一个获取当前日期时间的Processor，名称为CurrentDateTime，所有处理器在模型定义中进行使用时都需要用双大括号包起来，如{{CurrentDateTime}}。
+
+
+
+在Model定义中，有3个属性可以使用Processor写法，分别是defaultValue、beforeSave和afterQuery，3个属性中执行逻辑各自不同。
+
+defaultValue: 当在defaultValue中使用Processor时，该值只在Model新建时起作用。在Model新建保存时，会对未设置属性值得属性用Processor处理器进行计算，如果计算结果为Undefined.Value，则放弃处理；否则，用计算结果为属性进行赋值，然后进行保存。
+
+beforeSave: 在Model进行新建保存或修改保存前，调用当前设置的Processor处理器进行计算，如果计算结果为Undefined.Value，则放弃处理；否则，用计算结果为属性进行赋值，然后进行保存。
+
+afterQuery: afterQuery是在查询数据之后，调用当前设置的Processor处理器进行计算，如果计算结果为Undefined.Value，则放弃处理；否则，用计算结果为属性进行赋值，然后进行返回。
+
+举例说明，有如下Model定义：
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<model name="User" table="t_user">
+    <property name="Id" field="f_id" notNull="True" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
+    <property name="Name" field="f_name" length="32" notNull="true" uniqueGroup="uc_name" joinInsert="true" joinUpdate="true" desc="名称" />
+    <property name="Age" field="f_age" type="UInt16" unsigned="true" indexGroup="idx_age" joinInsert="true" joinUpdate="true" desc="年龄" />
+    <property name="Deposit" field="f_deposit" type="Decimal" precision="2" beforeSave="{{EncryptDeposit}}" afterQuery="{{DecryptDeposit}}" desc="银行存款" defaultValue="12345" />
+    <property name="CreateTime" type="DateTime" field="f_createtime" defaultValue="{{CurrentDateTime}}" joinUpdate="false" desc="创建时间" />
+    <property name="UpdateTime" type="DateTime" field="f_updatetime" beforeSave="{{CurrentDateTime}}" desc="更新时间" />
+</model>
+```
+
+Deposit属性设置了beforeSave值为{{EncryptDeposit}}对值进行加密操作，设置了afterQuery值为{{DecryptDeposit}}对返回值进行解密操作。
+
+CreateTime属性设置defaultValue值为{{CurrentDateTime}}，在新建时会对CreateTime赋值为当前时间，而后续的修改操作CreateTime不会变化。
+
+UpdateTime属性设置了beforeSave值为{{CurrentDateTime}}，因此在新建和修改时，系统都会对UpdateTime进行赋值操作，UpdateTime会及时更新为当前操作时间。
 
 
 

@@ -1,6 +1,6 @@
-﻿namespace CodeM.Common.Orm.Processor
+﻿namespace CodeM.Common.Orm
 {
-    interface IExecute
+    public interface IProcessor
     {
         object Execute(Model model, string prop, dynamic obj);
     }

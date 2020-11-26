@@ -14,6 +14,9 @@ namespace UnitTest
         [TestInitialize]
         public void Init()
         {
+            OrmUtils.RegisterProcessor("EncryptDeposit", "UnitTest.Processors.EncryptDeposit");
+            OrmUtils.RegisterProcessor("DecryptDeposit", "UnitTest.Processors.DecryptDeposit");
+
             string modelPath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\models");
             OrmUtils.ModelPath = modelPath;
             OrmUtils.Load();
@@ -29,6 +32,7 @@ namespace UnitTest
             Test3();
             Test4();
             Test5();
+            Test6();
         }
 
         [Description("创建模型的物理表。")]
@@ -73,8 +77,15 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
-        [Description("修改用户wangxm的年龄为20，UpdateTime应更新，此时大于CreateTime。")]
+        [Description("查询用户wangxm的Deposit属性，应为99999999。")]
         public void Test5()
+        {
+            List<dynamic> result = OrmUtils.Model("User").Equals("Name", "wangxm").Top(1).Query();
+            Assert.AreEqual(result[0].Deposit, 99999999);
+        }
+
+        [Description("修改用户wangxm的年龄为20，beforeSave处理的作用，UpdateTime应更新，此时大于CreateTime。")]
+        public void Test6()
         {
             Thread.Sleep(3000);
 

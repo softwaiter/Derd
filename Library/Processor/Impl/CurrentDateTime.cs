@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace CodeM.Common.Orm.Processor.Impl
+namespace CodeM.Common.Orm.Processors
 {
-    public class CurrentDateTime: IExecute
+    public class CurrentDateTime: IProcessor
     {
         public object Execute(Model model, string prop, dynamic obj)
         {

@@ -1,5 +1,4 @@
 ﻿using CodeM.Common.Orm.Dialect;
-using CodeM.Common.Orm.Processor;
 using CodeM.Common.Tools.Xml;
 using System;
 using System.Collections.Concurrent;
@@ -19,7 +18,7 @@ namespace CodeM.Common.Orm
         internal static void Load(string modelPath, bool increment = false)
         {
             //初始化属性Processor
-            Executor.Init();
+            Processor.Init();
 
             ConnectionUtils.ClearConnections();
 
@@ -544,19 +543,35 @@ namespace CodeM.Common.Orm
                             p.DefaultValue = defaultStr.Trim();
                         }
 
-                        string beforeStr = nodeInfo.GetAttribute("beforeSave");
-                        if (beforeStr != null)
+                        string beforeProcStr = nodeInfo.GetAttribute("beforeSave");
+                        if (beforeProcStr != null)
                         {
-                            beforeStr = beforeStr.Trim();
-                            if (beforeStr.Length > 4 &&
-                                beforeStr.StartsWith("{{") &&
-                                beforeStr.EndsWith("}}"))
+                            beforeProcStr = beforeProcStr.Trim();
+                            if (beforeProcStr.Length > 4 &&
+                                beforeProcStr.StartsWith("{{") &&
+                                beforeProcStr.EndsWith("}}"))
                             {
-                                p.BeforeSaveProcessor = beforeStr.Substring(2, beforeStr.Length - 4);
+                                p.BeforeSaveProcessor = beforeProcStr.Substring(2, beforeProcStr.Length - 4);
                             }
                             else
                             {
                                 throw new Exception("beforeSave属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string afterProcStr = nodeInfo.GetAttribute("afterQuery");
+                        if (afterProcStr != null)
+                        {
+                            afterProcStr = afterProcStr.Trim();
+                            if (afterProcStr.Length > 4 &&
+                                afterProcStr.StartsWith("{{") &&
+                                afterProcStr.EndsWith("}}"))
+                            {
+                                p.AfterQueryProcessor = afterProcStr.Substring(2, afterProcStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("afterQuery属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
                         }
 

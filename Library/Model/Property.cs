@@ -1,5 +1,4 @@
 ﻿using CodeM.Common.Orm.Dialect;
-using CodeM.Common.Orm.Processor;
 using System;
 using System.Data;
 using System.Text;
@@ -103,7 +102,21 @@ namespace CodeM.Common.Orm
         {
             if (!string.IsNullOrWhiteSpace(BeforeSaveProcessor))
             {
-                return Executor.Call(BeforeSaveProcessor, Owner, Name, obj);
+                return Processor.Call(BeforeSaveProcessor, Owner, Name, obj);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 查询后处理Processor，在数据从数据库查询返回后调用该处理器对属性值进行处理
+        /// </summary>
+        internal string AfterQueryProcessor { get; set; } = null;
+
+        internal object DoAfterQueryProcessor(dynamic obj)
+        {
+            if (!string.IsNullOrWhiteSpace(AfterQueryProcessor))
+            {
+                return Processor.Call(AfterQueryProcessor, Owner, Name, obj);
             }
             return null;
         }
@@ -153,7 +166,12 @@ namespace CodeM.Common.Orm
                     string propDefaultValue = DefaultValue.Trim();
                     string processorName = propDefaultValue.Substring(
                         2, propDefaultValue.Length - 4).Trim();
-                    return Executor.Call(processorName, Owner, Name, obj);
+                    object value = Processor.Call(processorName, Owner, Name, obj);
+                    if (!Undefined.IsUndefinedValue(value))
+                    {
+                        return value;
+                    }
+                    return null;
                 }
                 return Convert.ChangeType(DefaultValue, Type);
             }
@@ -218,6 +236,7 @@ namespace CodeM.Common.Orm
             cloneObj.IsNotNull = this.IsNotNull;
             cloneObj.IsPrimaryKey = this.IsPrimaryKey;
             cloneObj.BeforeSaveProcessor = this.BeforeSaveProcessor;
+            cloneObj.AfterQueryProcessor = this.AfterQueryProcessor;
             cloneObj.DefaultValue = this.DefaultValue;
             cloneObj.DefaultValueIsProcessor = this.DefaultValueIsProcessor;
             cloneObj.JoinInsert = this.JoinInsert;

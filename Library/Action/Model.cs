@@ -570,7 +570,10 @@ namespace CodeM.Common.Orm
             foreach (Property p in mBeforeSavePropeties)
             {
                 object value = p.DoBeforeSaveProcessor(mSetValues);
-                SetValue(p.Name, value);
+                if (!Undefined.IsUndefinedValue(value))
+                {
+                    SetValue(p.Name, value);
+                }
             }
         }
 
@@ -689,6 +692,15 @@ namespace CodeM.Common.Orm
                                 {
                                     obj.SetValue(name, dr.GetValue(name));
                                 }
+
+                                if (!string.IsNullOrWhiteSpace(p.AfterQueryProcessor))
+                                {
+                                    object value = Processor.Call(p.AfterQueryProcessor, this, name, obj);
+                                    if (!Undefined.IsUndefinedValue(value))
+                                    {
+                                        obj.SetValue(name, value);
+                                    }
+                                }
                             }
                             else
                             {
@@ -719,6 +731,16 @@ namespace CodeM.Common.Orm
                                         {
                                             currObj.SetValue(lastName, dr.GetValue(fieldName));
                                         }
+
+                                        if (!string.IsNullOrWhiteSpace(lastProp.AfterQueryProcessor))
+                                        {
+                                            object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName, currObj);
+                                            if (!Undefined.IsUndefinedValue(value))
+                                            {
+                                                currObj.SetValue(lastName, value);
+                                            }
+                                        }
+
                                         break;
                                     }
                                 }

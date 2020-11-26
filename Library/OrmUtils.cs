@@ -1,5 +1,4 @@
 ﻿using CodeM.Common.DbHelper;
-using CodeM.Common.Orm.Processor;
 using System;
 using System.IO;
 
@@ -16,7 +15,7 @@ namespace CodeM.Common.Orm
         /// <param name="classname"></param>
         public static void RegisterProcessor(string name, string classname)
         {
-            Executor.Register(name, classname);
+            Processor.Register(name, classname);
         }
 
         /// <summary>

@@ -13,6 +13,9 @@ namespace UnitTest
         [TestInitialize]
         public void Init()
         {
+            OrmUtils.RegisterProcessor("EncryptDeposit", "UnitTest.Processors.EncryptDeposit");
+            OrmUtils.RegisterProcessor("DecryptDeposit", "UnitTest.Processors.DecryptDeposit");
+
             string modelPath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\models");
             OrmUtils.ModelPath = modelPath;
             OrmUtils.Load();
