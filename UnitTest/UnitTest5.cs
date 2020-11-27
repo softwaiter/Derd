@@ -64,11 +64,11 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
-        [Description("查询名称为wangxm的")]
+        [Description("查询名称为wangxm的所属机构Id和名称，应为1和XX科技")]
         public void Test4()
         {
             List<dynamic> userList = OrmUtils.Model("User").Equals("Name", "wangxm").GetValue("Name", "OrgId.Id", "OrgId.Name").Query();
-            Assert.AreEqual("XX科技", userList[0].OrgId.Name);
+            Assert.AreEqual("1-XX科技", userList[0].OrgId.Id + "-" + userList[0].OrgId.Name);
         }
 
         [Description("向机构表插入一条数据。")]

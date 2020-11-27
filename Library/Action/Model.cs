@@ -712,8 +712,16 @@ namespace CodeM.Common.Orm
                                     string subName = subNames[i];
                                     Property subProp = currM.GetProperty(subName);
                                     Model subM = ModelUtils.GetModel(subProp.TypeValue);
-                                    ModelObject subObj = ModelObject.New(subM);
-                                    currObj.SetValue(subName, subObj);
+                                    ModelObject subObj;
+                                    if (!currObj.Has(subName))
+                                    {
+                                        subObj = ModelObject.New(subM);
+                                        currObj.SetValue(subName, subObj);
+                                    }
+                                    else
+                                    {
+                                        subObj = currObj.GetValue(subName) as ModelObject;
+                                    }
                                     currM = subM;
                                     currObj = subObj;
 
