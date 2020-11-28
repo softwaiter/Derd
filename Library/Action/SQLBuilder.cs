@@ -84,6 +84,41 @@ namespace CodeM.Common.Orm
             return result;
         }
 
+        internal static string BuildJoinTableSQL(Model m, List<string> foreignTables)
+        {
+            StringBuilder sbJoins = new StringBuilder();
+
+            Hashtable processedName = new Hashtable();
+            foreach (string foreignTableName in foreignTables)
+            {
+                string key = foreignTableName.Substring(0, foreignTableName.LastIndexOf(".")).Trim().ToLower();
+                if (processedName.ContainsKey(key))
+                {
+                    continue;
+                }
+
+                Model currM = m;
+                string[] subNames = foreignTableName.Split(".");
+                for (int i = 0; i < subNames.Length; i++)
+                {
+                    Property subProp = currM.GetProperty(subNames[i]);
+                    Model subM = ModelUtils.GetModel(subProp.TypeValue);
+                    sbJoins.Append(string.Concat(" LEFT JOIN ", subM.Table, " ON ",
+                        currM.Table, ".", subProp.Field, "=", subM.Table, ".", subM.GetPrimaryKey(0).Field));
+                    currM = subM;
+
+                    if (i == subNames.Length - 2)
+                    {
+                        break;
+                    }
+                }
+
+                processedName.Add(key, true);
+            }
+
+            return sbJoins.ToString();
+        }
+
         internal static CommandSQL BuildQuerySQL(Model m)
         {
             CommandSQL result = new CommandSQL();
@@ -144,39 +179,11 @@ namespace CodeM.Common.Orm
 
             CommandSQL where = m.Where.Build(m);
 
-            StringBuilder sbJoins = new StringBuilder();
             foreignTables.AddRange(where.ForeignTables);
             foreignTables.AddRange(m.ForeignSortNames);
-            Hashtable processedName = new Hashtable();
-            foreach (string foreignTableName in foreignTables)
-            {
-                string key = foreignTableName.Substring(0, foreignTableName.LastIndexOf(".")).Trim().ToLower();
-                if (processedName.ContainsKey(key))
-                {
-                    continue;
-                }
-
-                Model currM = m;
-                string[] subNames = foreignTableName.Split(".");
-                for (int i = 0; i < subNames.Length; i++)
-                {
-                    Property subProp = currM.GetProperty(subNames[i]);
-                    Model subM = ModelUtils.GetModel(subProp.TypeValue);
-                    sbJoins.Append(string.Concat(" LEFT JOIN ", subM.Table, " ON ",
-                        currM.Table, ".", subProp.Field, "=", subM.Table, ".", subM.GetPrimaryKey(0).Field));
-                    currM = subM;
-
-                    if (i == subNames.Length - 2)
-                    {
-                        break;
-                    }
-                }
-                
-                processedName.Add(key, true);
-            }
-
-            result.SQL = string.Concat("SELECT ", sbFields, " FROM ", m.Table, sbJoins);
+            string joinSql = BuildJoinTableSQL(m, foreignTables);
             
+            result.SQL = string.Concat("SELECT ", sbFields, " FROM ", m.Table, joinSql);
             if (!string.IsNullOrEmpty(where.SQL))
             {
                 result.SQL += string.Concat(" WHERE ", where.SQL);

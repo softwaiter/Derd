@@ -2,6 +2,7 @@
 using CodeM.Common.Orm.Dialect;
 using CodeM.Common.Orm.Serialize;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -777,7 +778,8 @@ namespace CodeM.Common.Orm
             {
                 CommandSQL where = mFilter.Build(this);
 
-                string sql = string.Concat("SELECT COUNT(1) FROM ", this.Table);
+                string joinSql = SQLBuilder.BuildJoinTableSQL(this, where.ForeignTables);
+                string sql = string.Concat("SELECT COUNT(1) FROM ", this.Table, joinSql);
                 if (!string.IsNullOrWhiteSpace(where.SQL))
                 {
                     sql += string.Concat(" WHERE ", where.SQL);
@@ -804,7 +806,8 @@ namespace CodeM.Common.Orm
 
                 CommandSQL where = mFilter.Build(this);
 
-                string sql = string.Concat("SELECT * FROM ", this.Table);
+                string joinSql = SQLBuilder.BuildJoinTableSQL(this, where.ForeignTables);
+                string sql = string.Concat("SELECT * FROM ", this.Table, joinSql);
                 if (!string.IsNullOrWhiteSpace(where.SQL))
                 {
                     sql += string.Concat(" WHERE ", where.SQL);

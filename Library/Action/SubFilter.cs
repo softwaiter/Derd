@@ -198,6 +198,7 @@ namespace CodeM.Common.Orm
                         CommandSQL andActionSQL = ((SubFilter)item.Value).Build(model);
                         result.SQL += andActionSQL.SQL;
                         result.Params.AddRange(andActionSQL.Params);
+                        result.ForeignTables.AddRange(andActionSQL.ForeignTables);
                         break;
                     case FilterOperator.Or:
                         if (!string.IsNullOrWhiteSpace(result.SQL))
@@ -207,6 +208,7 @@ namespace CodeM.Common.Orm
                         CommandSQL orActionSQL = ((SubFilter)item.Value).Build(model);
                         result.SQL += orActionSQL.SQL;
                         result.Params.AddRange(orActionSQL.Params);
+                        result.ForeignTables.AddRange(orActionSQL.ForeignTables);
                         break;
                     case FilterOperator.Equals:
                         dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
