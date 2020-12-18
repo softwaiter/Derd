@@ -582,14 +582,14 @@ namespace CodeM.Common.Orm
         {
             try
             {
-                if (validate)
-                {
-                    _CheckModelConstraint();
-                }
-
                 if (mSetValues == null)
                 {
                     throw new Exception("没有任何要保存的内容，请通过SetValue设置内容。");
+                }
+
+                if (validate)
+                {
+                    _CheckModelConstraint();
                 }
 
                 _CalcBeforeSaveProperties();
