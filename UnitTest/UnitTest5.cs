@@ -48,6 +48,7 @@ namespace UnitTest
         public void Test2()
         {
             dynamic neworg = ModelObject.New("Org");
+            neworg.Code = "XXTech";
             neworg.Name = "XX科技";
             bool ret = OrmUtils.Model("Org").SetValues(neworg).Save();
             Assert.IsTrue(ret);
@@ -75,6 +76,7 @@ namespace UnitTest
         public void Test5()
         {
             dynamic neworg = ModelObject.New("Org");
+            neworg.Code = "YYTech";
             neworg.Name = "YY科技";
             bool ret = OrmUtils.Model("Org").SetValues(neworg).Save();
             Assert.IsTrue(ret);
