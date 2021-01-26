@@ -373,6 +373,23 @@ namespace CodeM.Common.Orm
                         }
                         p.Type = type;
 
+                        string joinPropStr = nodeInfo.GetAttribute("joinProp");
+                        if (joinPropStr != null)
+                        {
+                            if (p.Type == typeof(Model))
+                            {
+                                if (string.IsNullOrWhiteSpace(joinPropStr))
+                                {
+                                    throw new Exception("joinProp属性不能为空。" + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+                                p.JoinProp = joinPropStr;
+                            }
+                            else
+                            {
+                                throw new Exception("joinProp属性只在type属性为Model类型时有效。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
                         string fieldTypeStr = nodeInfo.GetAttribute("fieldType");
                         if (fieldTypeStr != null)
                         {

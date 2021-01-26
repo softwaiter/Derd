@@ -29,6 +29,11 @@ namespace CodeM.Common.Orm
         public string TypeValue { get; set; }
 
         /// <summary>
+        /// Type属性值为Model时，和当前属性相关联的对应Model的属性，不设置的话为对应Model的第1个主键
+        /// </summary>
+        public string JoinProp { get; set; }
+
+        /// <summary>
         /// 属性对应的数据库字段名称
         /// </summary>
         public string Field { get; set; }
@@ -224,6 +229,7 @@ namespace CodeM.Common.Orm
             cloneObj.Name = this.Name;
             cloneObj.Type = this.Type;
             cloneObj.TypeValue = this.TypeValue;
+            cloneObj.JoinProp = this.JoinProp;
             cloneObj.Field = this.Field;
             cloneObj.FieldType = this.FieldType;
             cloneObj.Description = this.Description;
