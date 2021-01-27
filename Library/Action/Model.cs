@@ -679,7 +679,7 @@ namespace CodeM.Common.Orm
                 {
                     while (dr.Read())
                     {
-                        ModelObject obj = ModelObject.New(this);
+                        ModelObject obj = ModelObject.New(this, false);
                         foreach (string name in mGetValues)
                         {
                             if (!name.Contains("."))
@@ -716,7 +716,7 @@ namespace CodeM.Common.Orm
                                     ModelObject subObj;
                                     if (!currObj.Has(subName))
                                     {
-                                        subObj = ModelObject.New(subM);
+                                        subObj = ModelObject.New(subM, false);
                                         currObj.SetValue(subName, subObj);
                                     }
                                     else

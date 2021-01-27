@@ -202,7 +202,7 @@ namespace CodeM.Common.Orm.Dialect
 
                     return result;
                 }
-                throw new NotSupportedException(key != null ? key.ToString() : "");
+                throw new NotSupportedException(string.Concat("不支持的字段类型 ", key));
             }
             throw new NotSupportedException(config);
         }

@@ -60,7 +60,7 @@ namespace UnitTest
             List<dynamic> orgList = OrmUtils.Model("Org").Equals("Name", "XX科技").Query();
             dynamic newuser = ModelObject.New("User");
             newuser.Name = "wangxm";
-            newuser.OrgId = orgList[0].Id;
+            newuser.OrgCode = orgList[0].Code;
             bool ret = OrmUtils.Model("User").SetValues(newuser).Save();
             Assert.IsTrue(ret);
         }
@@ -68,8 +68,8 @@ namespace UnitTest
         [Description("查询名称为wangxm的所属机构Id和名称，应为1和XX科技")]
         public void Test4()
         {
-            List<dynamic> userList = OrmUtils.Model("User").Equals("Name", "wangxm").GetValue("Name", "OrgId.Id", "OrgId.Name").Query();
-            Assert.AreEqual("1-XX科技", userList[0].OrgId.Id + "-" + userList[0].OrgId.Name);
+            List<dynamic> userList = OrmUtils.Model("User").Equals("Name", "wangxm").GetValue("Name", "OrgCode.Id", "OrgCode.Name").Query();
+            Assert.AreEqual("1-XX科技", userList[0].OrgCode.Id + "-" + userList[0].OrgCode.Name);
         }
 
         [Description("向机构表插入一条数据。")]
@@ -88,7 +88,7 @@ namespace UnitTest
             List<dynamic> orgList = OrmUtils.Model("Org").Equals("Name", "YY科技").Query();
             dynamic newuser = ModelObject.New("User");
             newuser.Name = "huxy";
-            newuser.OrgId = orgList[0].Id;
+            newuser.OrgCode = orgList[0].Code;
             bool ret = OrmUtils.Model("User").SetValues(newuser).Save();
             Assert.IsTrue(ret);
         }
@@ -96,21 +96,21 @@ namespace UnitTest
         [Description("查询所属机构为YY科技的第一条用户的名称，应为huxy。")]
         public void Test7()
         {
-            List<dynamic> userList = OrmUtils.Model("User").Equals("OrgId.Name", "YY科技").GetValue("Name").Top(1).Query();
+            List<dynamic> userList = OrmUtils.Model("User").Equals("OrgCode.Name", "YY科技").GetValue("Name").Top(1).Query();
             Assert.AreEqual("huxy", userList[0].Name);
         }
 
         [Description("根据用户所属机构名称进行升序排序，第一条用户名应为wangxm。")]
         public void Test8()
         {
-            List<dynamic> userList = OrmUtils.Model("User").GetValue("Name").AscendingSort("OrgId.Name").Top(1).Query();
+            List<dynamic> userList = OrmUtils.Model("User").GetValue("Name").AscendingSort("OrgCode.Name").Top(1).Query();
             Assert.AreEqual("wangxm", userList[0].Name);
         }
 
         [Description("根据用户所属机构名称进行降序排序，第一条用户名应为huxy。")]
         public void Test9()
         {
-            List<dynamic> userList = OrmUtils.Model("User").GetValue("Name").DescendingSort("OrgId.Name").Top(1).Query();
+            List<dynamic> userList = OrmUtils.Model("User").GetValue("Name").DescendingSort("OrgCode.Name").Top(1).Query();
             Assert.AreEqual("huxy", userList[0].Name);
         }
     }

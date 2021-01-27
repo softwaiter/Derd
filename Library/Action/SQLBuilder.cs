@@ -103,8 +103,13 @@ namespace CodeM.Common.Orm
                 {
                     Property subProp = currM.GetProperty(subNames[i]);
                     Model subM = ModelUtils.GetModel(subProp.TypeValue);
+                    string joinField = subM.GetPrimaryKey(0).Field;
+                    if (!string.IsNullOrWhiteSpace(subProp.JoinProp))
+                    {
+                        joinField = subM.GetProperty(subProp.JoinProp).Field;
+                    }
                     sbJoins.Append(string.Concat(" LEFT JOIN ", subM.Table, " ON ",
-                        currM.Table, ".", subProp.Field, "=", subM.Table, ".", subM.GetPrimaryKey(0).Field));
+                        currM.Table, ".", subProp.Field, "=", subM.Table, ".", joinField));
                     currM = subM;
 
                     if (i == subNames.Length - 2)

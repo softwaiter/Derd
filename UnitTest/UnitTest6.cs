@@ -71,7 +71,7 @@ namespace UnitTest
             dynamic newuser = ModelObject.New("User");
             newuser.Name = "wangxm";
             newuser.Age = 18;
-            newuser.OrgId = result[0].Id;
+            newuser.OrgCode = result[0].Code;
             newuser.Deposit = 99999999;
             newuser.IsAdmin = true;
             bool ret = OrmUtils.Model("User").SetValues(newuser).Save();

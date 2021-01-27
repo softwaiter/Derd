@@ -382,7 +382,7 @@ namespace CodeM.Common.Orm
                                 {
                                     throw new Exception("joinProp属性不能为空。" + modelFilePath + " - Line " + nodeInfo.Line);
                                 }
-                                p.JoinProp = joinPropStr;
+                                p.JoinProp = joinPropStr.Trim();
                             }
                             else
                             {
