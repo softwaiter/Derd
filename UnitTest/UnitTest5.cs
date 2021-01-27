@@ -40,7 +40,7 @@ namespace UnitTest
         [Description("创建模型的物理表。")]
         public void Test1()
         {
-            bool ret = OrmUtils.CreateTables(true);
+            bool ret = OrmUtils.TryCreateTables(true);
             Assert.IsTrue(ret);
         }
 

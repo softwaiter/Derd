@@ -187,7 +187,7 @@ namespace CodeM.Common.Orm
         public string BuildCreateTableSQL()
         {
             StringBuilder sb = new StringBuilder(PropertyCount * 10);
-            sb.Append(string.Concat("CREATE TABLE IF NOT EXISTS ", Table, "("));
+            sb.Append(string.Concat("CREATE TABLE ", Table, "("));
             for (int i = 0; i < PropertyCount; i++)
             {
                 if (i > 0)
