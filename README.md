@@ -14,7 +14,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.0.11
+Install-Package CodeM.Common.Orm -Version 1.0.14
 ```
 
 
@@ -22,7 +22,7 @@ Install-Package CodeM.Common.Orm -Version 1.0.11
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.0.11
+dotnet add package CodeM.Common.Orm --version 1.0.14
 ```
 
 
@@ -30,7 +30,7 @@ dotnet add package CodeM.Common.Orm --version 1.0.11
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.0.11" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.0.14" />
 ```
 
 
@@ -38,7 +38,7 @@ dotnet add package CodeM.Common.Orm --version 1.0.11
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.0.11
+paket add CodeM.Common.Orm --version 1.0.14
 ```
 
 
@@ -53,6 +53,8 @@ paket add CodeM.Common.Orm --version 1.0.11
 | Mysql        | MySql.Data         |
 
 使用时，可根据需要添加其中的一项或多项依赖。
+
+*注：其他未列出的实现了微软数据提供者接口的数据库理论上应支持，尚未实际验证。
 
 
 
@@ -155,7 +157,11 @@ User模型定义
 | Decimal  | 128位，高精度浮点数，精度 28 - 29 位，取值±1.0 × 10<sup>-28</sup> ~ ±7.9 × 10<sup>28</sup> |
 | DateTime | 日期时间类型                                                 |
 
-注：type属性值可以是其他模型，生成主从模型映射；如OrgId属性。
+注：type属性值可以是其他模型，生成主从模型映射；如OrgCode属性。
+
+###### joinProp
+
+字符串，当type属性为其他关联模型时，此属性用于指定关联模型的关联属性名，默认为空；为空时使用关联模型的第1个主键属性作为关联属性。
 
 ###### fieldType
 
@@ -181,8 +187,6 @@ type属性转换表：
 | Double   | Double |
 | Decimal  | Decimal |
 | DateTime | DateTime |
-
-
 
 ###### length
 
@@ -439,7 +443,25 @@ if (count == 1)
 
 ##### public static bool CreateTables(bool force = false);
 
-根据模型定义生成对应的数据库物理表。
+根据模型定义生成对应的所有数据库物理表。
+
+###### 参数
+
+force：是否覆盖已有物理表，重新创建，默认False。
+
+###### 返回
+
+无，异常时直接抛出异常并中断。
+
+```c#
+OrmUtils.CreateTables();
+```
+
+
+
+##### public static bool TryCreateTables(bool force = false);
+
+尝试根据模型定义生成对应的所有数据库物理表。
 
 ###### 参数
 
@@ -450,18 +472,18 @@ force：是否覆盖已有物理表，重新创建，默认False。
 创建成功返回True；否则，返回False。
 
 ```c#
-OrmUtils.CreateTables();
+OrmUtils.TryCreateTables();
 ```
 
 
 
-##### public static bool RemoveTables();
+##### public static void RemoveTables();
 
 将模型定义对应的物理表和数据全部删除。
 
 ###### 返回
 
-删除成功返回True；否则，返回False。
+无，异常时直接抛出异常并中断。
 
 ```c#
 OrmUtils.RemoveTables();
@@ -469,16 +491,44 @@ OrmUtils.RemoveTables();
 
 
 
+##### public static bool TryRemoveTables();
+
+尝试将模型定义对应的物理表和数据全部删除。
+
+###### 返回
+
+删除成功返回True；否则，返回False。
+
+```c#
+OrmUtils.TryRemoveTables();
+```
+
+
+
+##### public static void TruncateTables();
+
+清空所有物理表数据，同时重置自增ID。
+
+###### 返回
+
+无，异常时直接抛出异常并中断。
+
+```c#
+OrmUtils.TruncateTables();
+```
+
+
+
 ##### public static bool TruncateTables();
 
-清空物理表数据，同时重置自增ID。
+尝试清空所有物理表数据，同时重置自增ID。
 
 ###### 返回
 
 清空成功返回True；否则，返回False。
 
 ```c#
-OrmUtils.TruncateTables();
+OrmUtils.TryTruncateTables();
 ```
 
 
@@ -589,9 +639,27 @@ dog.model.xml内容：
 
 ####  行为操作方法
 
-##### public bool CreateTable(bool force = false)
+##### public void CreateTable(bool force = false)
 
 创建模型的物理表
+
+###### 参数
+
+force：是否覆盖已有物理表，重新创建，默认False。
+
+###### 返回
+
+无，异常时直接抛出异常并中断。
+
+```c#
+OrmUtils.Model("User").CreateTable();	//创建模型User的物理表
+```
+
+
+
+##### public bool TryCreateTable(bool force = false)
+
+尝试创建模型的物理表
 
 ###### 参数
 
@@ -602,18 +670,18 @@ force：是否覆盖已有物理表，重新创建，默认False。
 成功返回True；否则返回False。
 
 ```c#
-OrmUtils.Model("User").CreateTable();	//创建模型User的物理表
+OrmUtils.Model("User").TryCreateTable();	//创建模型User的物理表
 ```
 
 
 
-##### public bool RemoveTable()
+##### public void RemoveTable()
 
 删除模型对应的物理表和数据。
 
 ###### 返回
 
-成功返回True；否则返回False。
+无，异常时直接抛出异常并中断。
 
 ```c#
 OrmUtils.Model("User").RemoveTable();	//删除模型User的物理表
@@ -621,16 +689,44 @@ OrmUtils.Model("User").RemoveTable();	//删除模型User的物理表
 
 
 
-##### public bool TruncateTable()
+##### public bool TryRemoveTable()
 
-清空模型对应的物理表数据，同时重置自增ID。
+尝试删除模型对应的物理表和数据。
 
 ###### 返回
 
 成功返回True；否则返回False。
 
 ```c#
+OrmUtils.Model("User").TryRemoveTable();	//删除模型User的物理表
+```
+
+
+
+##### public void TruncateTable()
+
+清空模型对应的物理表数据，同时重置自增ID。
+
+###### 返回
+
+无，异常时直接抛出异常并中断。
+
+```c#
 OrmUtils.Model("User").TruncateTable();		//清空模型User的物理表数据
+```
+
+
+
+##### public bool TryTruncateTable()
+
+尝试清空模型对应的物理表数据，同时重置自增ID。
+
+###### 返回
+
+成功返回True；否则返回False。
+
+```c#
+OrmUtils.Model("User").TryTruncateTable();		//清空模型User的物理表数据
 ```
 
 
