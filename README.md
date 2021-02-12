@@ -94,8 +94,11 @@ Org模型定义
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <model name="Org" table="t_org">
-    <property name="Id" field="f_id" notNull="True" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
+    <property name="Id" field="f_id" notNull="true" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
+    <property name="Code" field="f_code" notNull="true" length="32" uniqueGroup="uc_code" desc="机构编码" />
     <property name="Name" field="f_name" length="32" notNull="true" uniqueGroup="uc_name" joinInsert="true" joinUpdate="true" desc="机构名称" />
+    <property name="CreateTime" type="DateTime" field="f_createtime" defaultValue="{{CurrentDateTime}}" joinUpdate="false" desc="创建时间" />
+    <property name="UpdateTime" type="DateTime" field="f_updatetime" defaultValue="{{CurrentDateTime}}" desc="更新时间" />
 </model>
 ```
 
@@ -108,13 +111,14 @@ User模型定义
 <model name="User" table="t_user">
     <property name="Id" field="f_id" notNull="True" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
     <property name="Name" field="f_name" length="32" notNull="true" uniqueGroup="uc_name" joinInsert="true" joinUpdate="true" desc="名称" />
-    <property name="Age" field="f_age" type="UInt16" unsigned="true" joinInsert="true" joinUpdate="true" desc="年龄" />
-    <property name="Birthday" type="DateTime" field="f_birthday" fieldType="Date" desc="出生日期" />
-    <property name="OrgId" field="f_org_id" type="Org" fieldType="Int32" desc="所属机构" />
-    <property name="Deposit" field="f_deposit" type="Decimal" precision="2" desc="银行存款" />
-    <property name="IsAdmin" field="f_is_admin" type="Boolean" desc="是否超级管理员" />
+    <property name="Age" field="f_age" type="UInt16" unsigned="true" indexGroup="idx_age" joinInsert="true" joinUpdate="true" desc="年龄" />
+    <property name="Birthday" type="DateTime" field="f_birthday" fieldType="Date" desc="出生日期" defaultValue="1980/01/01" />
+    <property name="Org" field="f_org_code" type="Org" joinProp="Code" desc="所属机构" />
+    <property name="Deposit" field="f_deposit" type="Decimal" precision="2" beforeSave="{{EncryptDeposit}}" afterQuery="{{DecryptDeposit}}" desc="银行存款" defaultValue="12345" />
+    <property name="IsAdmin" field="f_is_admin" indexGroup="idx_age" type="Boolean" desc="是否超级管理员" defaultValue="false" />
+    <property name="CreateTime" type="DateTime" field="f_createtime" defaultValue="{{CurrentDateTime}}" joinUpdate="false" desc="创建时间" />
+    <property name="UpdateTime" type="DateTime" field="f_updatetime" beforeSave="{{CurrentDateTime}}" desc="更新时间" />
 </model>
-
 ```
 
 ### 1. model属性：
@@ -395,6 +399,59 @@ OrmUtils.Refresh();
 
 
 
+##### public static int GetTransaction()
+
+获取模型根目录绑定数据连接的一个事务
+
+###### 返回
+
+事务对象的整型标识代码。
+
+
+
+##### public static int GetTransaction(string path, IsolationLevel level=IsolationLevel.Unspecified)
+获取指定模型目录绑定数据的一个事务，事务优先级为用户指定类型
+
+###### 参数
+
+path：模型目录。
+
+level：事务优先级。
+
+###### 返回
+
+事务对象的整型标识代码。
+
+
+
+##### public static bool CommitTransaction(int code)
+
+提交指定标识代码对应的事务。
+
+###### 参数
+
+code：事务标识代码。
+
+###### 返回
+
+提交结果，成功返回true；否则，返回false。
+
+
+
+##### public static bool RollbackTransaction(int code)
+
+回滚指定标识代码对应的事务。
+
+###### 参数
+
+code：事务标识代码。
+
+###### 返回
+
+提交结果，成功返回true；否则，返回false。
+
+
+
 ##### public static bool IsDefind(string modelName);
 
 判断指定的模型是否已定义。
@@ -438,6 +495,22 @@ if (count == 1)
     Console.WriteLine("用户wangxm已存在。");
 }
 ```
+
+
+
+##### public static int ExecSql(string sql, int transCode)
+
+直接执行SQL语句；功能同上，不同之处是在事务中执行。
+
+###### 参数
+
+sql：要执行的sql语句。
+
+transCode：指定事务的标识代码。
+
+###### 返回
+
+执行sql语句影响的数据条数。
 
 
 
@@ -749,6 +822,22 @@ OrmUtils.Model("User").SetValue("Name", "wangxm").SetValue("Age", 18).Save();	//
 
 
 
+##### public bool Save(int? transCode, bool validate = false)
+
+新增保存模型数据到物理表，功能同上；不同之处是在指定事务中执行。
+
+###### 参数
+
+transCode：指定事务标识代码。
+
+validate：保存前对数据根据定义规则进行校验，默认不校验；可选。
+
+###### 返回
+
+成功返回True；否则返回False。
+
+
+
 ##### public bool Update(bool updateAll = false)
 
 更新模型数据到物理表。
@@ -764,6 +853,22 @@ updateAll：是否更新物理表中的所有数据，默认为False，必须通
 ```c#
 OrmUtils.Model("User").SetValue("Age", 20).Equals("Name", "wangxm").Update();	//修改用户wangxm的年龄为20
 ```
+
+
+
+##### public bool Update(int? transCode, bool updateAll = false)
+
+更新模型数据到物理表，功能同上；不同之处是在指定事务中执行。
+
+###### 参数
+
+transCode：指定事务标识代码。
+
+updateAll：是否更新物理表中的所有数据，默认为False，必须通过查询条件设置方法限定更新范围，如果确实需要更新所有数据，可以设置成True，慎用。
+
+###### 返回
+
+成功返回True；否则返回False。
 
 
 
@@ -785,9 +890,29 @@ OrmUtils.Model("User").Equals("Name", "wangxm").Delete();	//删除用户wangxm
 
 
 
-##### public List<dynamic> Query()
+##### public bool Delete(int? transCode, bool deleteAll = false)
 
-查询并返回模型物理表中的数据。
+删除物理表中的模型数据，功能同上；不同之处是在指定事务中执行。
+
+###### 参数
+
+transCode：指定事务标识代码。
+
+deleteAll：是否删除物理表中的所有数据，默认为False，必须通过查询条件设置方法限定删除范围，如果确实需要删除所有数据，可以设置成True，慎用。
+
+###### 返回
+
+成功返回True；否则返回False。
+
+
+
+##### public List<dynamic> Query(int? transCode=null)
+
+查询并返回模型物理表中的数据，如果指定事务标识代码，则在事务中执行；否则，使用模型默认数据连接执行。
+
+###### 参数
+
+transCode：指定事务标识代码。
 
 ###### 返回
 
@@ -801,9 +926,13 @@ Console.WriteLine(userWxm.Age);
 
 
 
-##### public long Count()
+##### public long Count(int? transCode=null)
 
-计算物理表中的数据条数并返回。
+计算物理表中的数据条数并返回，如果指定事务标识代码，则在事务中执行；否则，使用模型默认数据连接执行。
+
+###### 参数
+
+transCode：指定事务标识代码。
 
 ###### 返回
 
@@ -816,9 +945,13 @@ OrmUtils.Model("User").Equals("Age", 20).Count();	//计算所有年龄为20的�
 
 
 
-##### public bool Exists()
+##### public bool Exists(int? transCode=null)
 
-判断物理表中的数据是否存在。
+判断物理表中的数据是否存在，如果指定事务标识代码，则在事务中执行；否则，使用模型默认数据连接执行。
+
+###### 参数
+
+transCode：指定事务标识代码。
 
 ###### 返回
 
