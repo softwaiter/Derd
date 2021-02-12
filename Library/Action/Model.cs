@@ -369,23 +369,28 @@ namespace CodeM.Common.Orm
         }
 
         #region ICommand
-        public bool CreateTable(bool replace = false)
+        public void CreateTable(bool replace = false)
+        {
+            StringBuilder sb = new StringBuilder(ToString());
+            if (replace)
+            {
+                sb.Insert(0, string.Concat("DROP TABLE IF EXISTS ", Table, ";"));
+            }
+
+            DbUtils.ExecuteNonQuery(Path.ToLower(), sb.ToString());
+
+            string tableIndexSQL = ToString(true);
+            if (!string.IsNullOrWhiteSpace(tableIndexSQL))
+            {
+                DbUtils.ExecuteNonQuery(Path.ToLower(), tableIndexSQL);
+            }
+        }
+
+        public bool TryCreateTable(bool replace = false)
         {
             try
             {
-                StringBuilder sb = new StringBuilder(ToString());
-                if (replace)
-                {
-                    sb.Insert(0, string.Concat("DROP TABLE IF EXISTS ", Table, ";"));
-                }
-
-                DbUtils.ExecuteNonQuery(Path.ToLower(), sb.ToString());
-
-                string tableIndexSQL = ToString(true);
-                if (!string.IsNullOrWhiteSpace(tableIndexSQL))
-                {
-                    DbUtils.ExecuteNonQuery(Path.ToLower(), tableIndexSQL);
-                }
+                CreateTable(replace);
                 return true;
             }
             catch
@@ -395,12 +400,17 @@ namespace CodeM.Common.Orm
             return false;
         }
 
-        public bool RemoveTable()
+        public void RemoveTable()
+        {
+            string sql = string.Concat("DROP TABLE IF EXISTS ", Table);
+            DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+        }
+
+        public bool TryRemoveTable()
         {
             try
             {
-                string sql = string.Concat("DROP TABLE IF EXISTS ", Table);
-                DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+                RemoveTable();
                 return true;
             }
             catch
@@ -410,16 +420,21 @@ namespace CodeM.Common.Orm
             return false;
         }
 
-        public bool TruncateTable()
+        public void TruncateTable()
+        {
+            string sql = string.Concat("TRUNCATE TABLE ", Table);
+            if (!Features.IsSupportTruncate(this))
+            {
+                sql = string.Concat("DELETE FROM ", Table);
+            }
+            DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+        }
+
+        public bool TryTruncateTable()
         {
             try
             {
-                string sql = string.Concat("TRUNCATE TABLE ", Table);
-                if (!Features.IsSupportTruncate(this))
-                {
-                    sql = string.Concat("DELETE FROM ", Table);
-                }
-                DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+                TruncateTable();
                 return true;
             }
             catch
@@ -596,14 +611,14 @@ namespace CodeM.Common.Orm
 
             try
             {
-                if (validate)
-                {
-                    _CheckModelConstraint();
-                }
-
                 if (mSetValues == null)
                 {
                     throw new Exception("没有任何要保存的内容，请通过SetValue设置内容。");
+                }
+
+                if (validate)
+                {
+                    _CheckModelConstraint();
                 }
 
                 _CalcBeforeSaveProperties();
@@ -758,7 +773,7 @@ namespace CodeM.Common.Orm
                 {
                     while (dr.Read())
                     {
-                        ModelObject obj = ModelObject.New(this);
+                        ModelObject obj = ModelObject.New(this, false);
                         foreach (string name in mGetValues)
                         {
                             if (!name.Contains("."))
@@ -795,7 +810,7 @@ namespace CodeM.Common.Orm
                                     ModelObject subObj;
                                     if (!currObj.Has(subName))
                                     {
-                                        subObj = ModelObject.New(subM);
+                                        subObj = ModelObject.New(subM, false);
                                         currObj.SetValue(subName, subObj);
                                     }
                                     else

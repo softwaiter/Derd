@@ -38,7 +38,7 @@ namespace UnitTest
         [Description("创建模型的物理表。")]
         public void Test1()
         {
-            bool ret = OrmUtils.CreateTables(true);
+            bool ret = OrmUtils.TryCreateTables(true);
             Assert.IsTrue(ret);
         }
 
@@ -46,6 +46,7 @@ namespace UnitTest
         public void Test2()
         {
             dynamic neworg = ModelObject.New("Org");
+            neworg.Code = "XXTech";
             neworg.Name = "XX科技";
             bool ret = OrmUtils.Model("Org").SetValues(neworg).Save();
             Assert.IsTrue(ret);
@@ -70,7 +71,7 @@ namespace UnitTest
             dynamic newuser = ModelObject.New("User");
             newuser.Name = "wangxm";
             newuser.Age = 18;
-            newuser.OrgId = result[0].Id;
+            newuser.Org = result[0].Code;
             newuser.Deposit = 99999999;
             newuser.IsAdmin = true;
             bool ret = OrmUtils.Model("User").SetValues(newuser).Save();

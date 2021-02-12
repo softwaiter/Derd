@@ -4,11 +4,17 @@ namespace CodeM.Common.Orm
 {
     public interface ICommand
     {
-        bool CreateTable(bool force=false);
+        void CreateTable(bool force=false);
 
-        bool RemoveTable();
+        bool TryCreateTable(bool force = false);
 
-        bool TruncateTable();
+        void RemoveTable();
+
+        bool TryRemoveTable();
+
+        void TruncateTable();
+
+        bool TryTruncateTable();
 
         bool Save(bool validate = false);
 

@@ -116,7 +116,7 @@ namespace CodeM.Common.Orm
             return -1;
         }
 
-        public static bool CreateTables(bool force = false)
+        public static void CreateTables(bool force = false)
         {
             int count = ModelUtils.ModelCount;
             for (int i = 0; i < count; i++)
@@ -124,10 +124,21 @@ namespace CodeM.Common.Orm
                 Model m = ModelUtils.Get(i);
                 m.CreateTable(force);
             }
-            return true;
         }
 
-        public static bool RemoveTables()
+        public static bool TryCreateTables(bool force = false)
+        {
+            bool bRet = true;
+            int count = ModelUtils.ModelCount;
+            for (int i = 0; i < count; i++)
+            {
+                Model m = ModelUtils.Get(i);
+                bRet = m.TryCreateTable(force) ? bRet : false;
+            }
+            return bRet;
+        }
+
+        public static void RemoveTables()
         {
             int count = ModelUtils.ModelCount;
             for (int i = 0; i < count; i++)
@@ -135,10 +146,21 @@ namespace CodeM.Common.Orm
                 Model m = ModelUtils.Get(i);
                 m.RemoveTable();
             }
-            return true;
         }
 
-        public static bool TruncateTables()
+        public static bool TryRemoveTables()
+        {
+            bool bRet = true;
+            int count = ModelUtils.ModelCount;
+            for (int i = 0; i < count; i++)
+            {
+                Model m = ModelUtils.Get(i);
+                bRet = m.TryRemoveTable() ? bRet : false;
+            }
+            return bRet;
+        }
+
+        public static void TruncateTables()
         {
             int count = ModelUtils.ModelCount;
             for (int i = 0; i < count; i++)
@@ -146,7 +168,18 @@ namespace CodeM.Common.Orm
                 Model m = ModelUtils.Get(i);
                 m.TruncateTable();
             }
-            return true;
+        }
+
+        public static bool TryTruncateTables()
+        {
+            bool bRet = true;
+            int count = ModelUtils.ModelCount;
+            for (int i = 0; i < count; i++)
+            {
+                Model m = ModelUtils.Get(i);
+                bRet = m.TryTruncateTable() ? bRet : false;
+            }
+            return bRet;
         }
 
     }

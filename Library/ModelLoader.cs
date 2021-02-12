@@ -11,9 +11,22 @@ namespace CodeM.Common.Orm
 {
     internal class ModelLoader
     {
+        internal class DelayCheckPropertySetting
+        {
+            public string Position { get; set; }
+
+            public bool FieldTypeNotSet { get; set; } = false;
+
+            public bool LengthNotSet { get; set; } = false;
+        }
 
         #region 遍历Model目录，逐个解析Model定义
         internal static ConcurrentDictionary<string, DateTime> sModelFileUpdateTimes = new ConcurrentDictionary<string, DateTime>();
+
+        /// <summary>
+        /// 存储模型解析过程中需要延后校验的属性定义
+        /// </summary>
+        internal static ConcurrentDictionary<Property, DelayCheckPropertySetting> sDelayCheckProperties = new ConcurrentDictionary<Property, DelayCheckPropertySetting>();
 
         internal static void Load(string modelPath, bool increment = false)
         {
@@ -28,11 +41,60 @@ namespace CodeM.Common.Orm
                 sModelFileUpdateTimes.Clear();
             }
 
+            //遍历加载解析模型定义
             DirectoryInfo di = new DirectoryInfo(modelPath);
             EnumDirectory(di, "/", increment);
 
+            //处理模型解析过程中需要延后校验的属性定义
+            ProcessDelayCheckProperties();
+
             //注册数据源
             ConnectionUtils.RegisterAllConnections();
+        }
+
+        private static void ProcessDelayCheckProperties()
+        {
+            IEnumerator<KeyValuePair<Property, DelayCheckPropertySetting>> e = sDelayCheckProperties.GetEnumerator();
+            while (e.MoveNext())
+            {
+                Property p = e.Current.Key;
+                DelayCheckPropertySetting dcps = e.Current.Value;
+                if (p.Type == typeof(Model))
+                {
+                    Model m = ModelUtils.GetModel(p.TypeValue);
+                    if (m == null)
+                    {
+                        throw new Exception(string.Concat("Model定义“", p.TypeValue,"”不存在。", dcps.Position));
+                    }
+
+                    Property joinP = null;
+                    if (!string.IsNullOrWhiteSpace(p.JoinProp))
+                    {
+                        try
+                        {
+                            joinP = m.GetProperty(p.JoinProp);
+                        }
+                        catch
+                        {
+                            throw new Exception(string.Concat("关联模型“", p.TypeValue, "”中不存在属性“", p.JoinProp, "”的定义。", dcps.Position));
+                        }
+                    }
+
+                    if (joinP == null)
+                    {
+                        joinP = m.GetPrimaryKey(0);
+                    }
+
+                    if (dcps.FieldTypeNotSet)
+                    {
+                        p.FieldType = joinP.FieldType;
+                    }
+                    if (dcps.LengthNotSet)
+                    {
+                        p.Length = joinP.Length;
+                    }
+                }
+            }
         }
 
         private static void EnumDirectory(DirectoryInfo di, string parent, bool increment)
@@ -319,6 +381,7 @@ namespace CodeM.Common.Orm
                     if (!nodeInfo.IsEndNode)
                     {
                         Property p = new Property();
+                        DelayCheckPropertySetting dcps = null;
 
                         string name = nodeInfo.GetAttribute("name");
                         if (name == null)
@@ -357,6 +420,9 @@ namespace CodeM.Common.Orm
                             else if (type == typeof(Model))
                             {
                                 p.TypeValue = typeStr;
+
+                                dcps = new DelayCheckPropertySetting();
+                                dcps.Position = modelFilePath + " - Line " + nodeInfo.Line;
                             }
                         }
                         else
@@ -373,6 +439,23 @@ namespace CodeM.Common.Orm
                         }
                         p.Type = type;
 
+                        string joinPropStr = nodeInfo.GetAttribute("joinProp");
+                        if (joinPropStr != null)
+                        {
+                            if (p.Type == typeof(Model))
+                            {
+                                if (string.IsNullOrWhiteSpace(joinPropStr))
+                                {
+                                    throw new Exception("joinProp属性不能为空。" + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+                                p.JoinProp = joinPropStr.Trim();
+                            }
+                            else
+                            {
+                                throw new Exception("joinProp属性只在type属性为Model类型时有效。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
                         string fieldTypeStr = nodeInfo.GetAttribute("fieldType");
                         if (fieldTypeStr != null)
                         {
@@ -388,6 +471,10 @@ namespace CodeM.Common.Orm
                         else
                         {
                             p.FieldType = Type2DbType(type);
+                            if (p.Type == typeof(Model))
+                            {
+                                dcps.FieldTypeNotSet = true;
+                            }
                         }
 
                         string lengthStr = nodeInfo.GetAttribute("length");
@@ -408,6 +495,10 @@ namespace CodeM.Common.Orm
                         else
                         {
                             p.Length = FieldUtils.GetFieldLength(model, p.FieldType);
+                            if (p.Type == typeof(Model))
+                            {
+                                dcps.LengthNotSet = true;
+                            }
                         }
 
                         string precisionStr = nodeInfo.GetAttribute("precision");
@@ -608,6 +699,11 @@ namespace CodeM.Common.Orm
                         }
 
                         model.AddProperty(p);
+
+                        if (dcps != null)
+                        {
+                            sDelayCheckProperties.TryAdd(p, dcps);
+                        }
                     }
                 }
 

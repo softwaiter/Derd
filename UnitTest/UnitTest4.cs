@@ -50,7 +50,7 @@ namespace UnitTest
         [Description("创建User模型的物理表。")]
         public void Test1()
         {
-            bool ret = OrmUtils.Model("User").CreateTable(true);
+            bool ret = OrmUtils.Model("User").TryCreateTable(true);
             Assert.IsTrue(ret);
         }
 
@@ -179,7 +179,7 @@ namespace UnitTest
         [Description("删除Test1测试中创建的User模型物理表，应成功。")]
         public void Test18()
         {
-            bool ret = OrmUtils.Model("User").RemoveTable();
+            bool ret = OrmUtils.Model("User").TryRemoveTable();
             Assert.IsTrue(ret);
         }
 

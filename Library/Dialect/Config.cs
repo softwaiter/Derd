@@ -101,6 +101,9 @@ namespace CodeM.Common.Orm.Dialect
             }},
             { DbType.Time, new Hashtable() {
                 { "default", 0 }
+            }},
+            { DbType.Object, new Hashtable() {
+                { "default", 0 }
             }}
         });
 
@@ -159,13 +162,14 @@ namespace CodeM.Common.Orm.Dialect
             { DbType.DateTime, new Hashtable() {
                 { "default", "datetime" }
             }},
-            { DbType.Date, new Hashtable()
-            {
+            { DbType.Date, new Hashtable() {
                 { "default", "date" }
             }},
-            { DbType.Time, new Hashtable()
-            {
+            { DbType.Time, new Hashtable() {
                 { "default", "time" }
+            }},
+            { DbType.Object, new Hashtable() {
+                { "default", "blob" }
             }}
         });
 
@@ -202,9 +206,9 @@ namespace CodeM.Common.Orm.Dialect
 
                     return result;
                 }
-                throw new NotSupportedException(key != null ? key.ToString() : "");
+                throw new NotSupportedException(string.Concat(config, "配置中未找到指定项 ", key, "。"));
             }
-            throw new NotSupportedException(config);
+            throw new NotSupportedException(string.Concat(config, "配置项不存在。"));
         }
 
         internal static T GetConfigValue<T>(string config, Model model, object key)

@@ -34,14 +34,14 @@ namespace UnitTest
         [Description("创建Organization模型的物理表。")]
         public void Test1()
         {
-            bool ret = OrmUtils.Model("Org").CreateTable(true);
+            bool ret = OrmUtils.Model("Org").TryCreateTable(true);
             Assert.IsTrue(ret);
         }
 
         [Description("创建User模型的物理表。")]
         public void Test2()
         {
-            bool ret = OrmUtils.Model("User").CreateTable(true);
+            bool ret = OrmUtils.Model("User").TryCreateTable(true);
             Assert.IsTrue(ret);
         }
 
@@ -49,6 +49,7 @@ namespace UnitTest
         public void Test3()
         {
             dynamic neworg = OrmUtils.Model("Org").NewObject();
+            neworg.Code = "Trans_Org";
             neworg.Name = "事务测试-机构01";
 
             dynamic newuser = OrmUtils.Model("User").NewObject();
@@ -74,6 +75,7 @@ namespace UnitTest
         public void Test4()
         {
             dynamic neworg = OrmUtils.Model("Org").NewObject();
+            neworg.Code = "Trans_Org";
             neworg.Name = "事务测试-机构01";
 
             dynamic newuser = OrmUtils.Model("User").NewObject();
@@ -86,7 +88,7 @@ namespace UnitTest
                 OrmUtils.Model("User").SetValues(newuser).Save(trans);
                 OrmUtils.CommitTransaction(trans);
             }
-            catch (Exception exp)
+            catch
             {
                 OrmUtils.RollbackTransaction(trans);
             }

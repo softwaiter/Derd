@@ -11,10 +11,12 @@ namespace CodeM.Common.Orm.Serialize
     public class ModelObject : ICollection<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>, IEnumerable, IDictionary<string, object>, IDynamicMetaObjectProvider
     {
         private Model mModel;
+        private bool mCheckValue;
 
-        private ModelObject(Model m)
+        private ModelObject(Model m, bool checkValue=true)
         {
             mModel = m;
+            mCheckValue = checkValue;
         }
 
         public static ModelObject New(string modelName)
@@ -26,6 +28,16 @@ namespace CodeM.Common.Orm.Serialize
         public static ModelObject New(Model model)
         {
             return new ModelObject(model);
+        }
+        internal static ModelObject New(string modelName, bool checkValue)
+        {
+            Model model = ModelUtils.GetModel(modelName);
+            return New(model, checkValue);
+        }
+
+        internal static ModelObject New(Model model, bool checkValue)
+        {
+            return new ModelObject(model, checkValue);
         }
 
         private void _CheckProperyValue(string name, object value)
@@ -172,7 +184,10 @@ namespace CodeM.Common.Orm.Serialize
 
         public object SetValue(string key, object value)
         {
-            _CheckProperyValue(key, value);
+            if (mCheckValue)
+            {
+                _CheckProperyValue(key, value);
+            }
 
             if (ContainsKey(key))
             {
