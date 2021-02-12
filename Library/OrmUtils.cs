@@ -1,5 +1,8 @@
 ﻿using CodeM.Common.DbHelper;
 using System;
+using System.Collections.Concurrent;
+using System.Data;
+using System.Data.Common;
 using System.IO;
 
 namespace CodeM.Common.Orm
@@ -34,6 +37,60 @@ namespace CodeM.Common.Orm
             ModelLoader.Load(ModelPath, true);
         }
 
+        #region transaction
+        private static ConcurrentDictionary<int, DbTransaction> sTransactions = new ConcurrentDictionary<int, DbTransaction>();
+
+        internal static DbTransaction GetTransaction(int code)
+        {
+            DbTransaction trans = null;
+            sTransactions.TryGetValue(code, out trans);
+            return trans;
+        }
+
+        public static int GetTransaction()
+        {
+            DbTransaction trans = DbUtils.GetTransaction("/");
+            sTransactions.AddOrUpdate(trans.GetHashCode(), trans, (key, value) =>
+            {
+                return trans;
+            });
+            return trans.GetHashCode();
+        }
+
+        public static int GetTransaction(string path, 
+            IsolationLevel level=IsolationLevel.Unspecified)
+        {
+            DbTransaction trans = DbUtils.GetTransaction(path.ToLower(), level);
+            sTransactions.AddOrUpdate(trans.GetHashCode(), trans, (key, value) =>
+            {
+                return trans;
+            });
+            return trans.GetHashCode();
+        }
+
+        public static bool CommitTransaction(int code)
+        {
+            DbTransaction trans;
+            if (sTransactions.TryGetValue(code, out trans))
+            {
+                DbUtils.CommitTransaction(trans);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool RollbackTransaction(int code)
+        {
+            DbTransaction trans;
+            if (sTransactions.TryGetValue(code, out trans))
+            {
+                DbUtils.RollbackTransaction(trans);
+                return true;
+            }
+            return false;
+        }
+        #endregion
+
         public static bool IsDefind(string modelName)
         {
             return ModelUtils.IsDefined(modelName);
@@ -47,6 +104,16 @@ namespace CodeM.Common.Orm
         public static int ExecSql(string sql, string path = "/")
         {
             return DbUtils.ExecuteNonQuery(path.ToLower(), sql);
+        }
+
+        public static int ExecSql(string sql, int transCode)
+        {
+            DbTransaction trans;
+            if (sTransactions.TryGetValue(transCode, out trans))
+            {
+                return DbUtils.ExecuteNonQuery(trans, sql);
+            }
+            return -1;
         }
 
         public static bool CreateTables(bool force = false)

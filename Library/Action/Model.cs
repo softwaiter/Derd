@@ -2,7 +2,6 @@
 using CodeM.Common.Orm.Dialect;
 using CodeM.Common.Orm.Serialize;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -580,6 +579,21 @@ namespace CodeM.Common.Orm
 
         public bool Save(bool validate = false)
         {
+            return Save(null, validate);
+        }
+
+        public bool Save(int? transCode, bool validate = false)
+        {
+            DbTransaction trans = null;
+            if (transCode != null)
+            {
+                trans = OrmUtils.GetTransaction(transCode.Value);
+                if (trans == null)
+                {
+                    throw new Exception(string.Format("未找到指定事务：{0}", transCode));
+                }
+            }
+
             try
             {
                 if (validate)
@@ -595,8 +609,14 @@ namespace CodeM.Common.Orm
                 _CalcBeforeSaveProperties();
 
                 CommandSQL cmd = SQLBuilder.BuildInsertSQL(this);
-                bool ret = DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) == 1;
-                return ret;
+                if (trans == null)
+                {
+                    return DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) == 1;
+                }
+                else
+                {
+                    return DbUtils.ExecuteNonQuery(trans, cmd.SQL, cmd.Params.ToArray()) == 1;
+                }
             }
             finally
             {
@@ -606,6 +626,21 @@ namespace CodeM.Common.Orm
 
         public bool Update(bool updateAll = false)
         {
+            return Update(null, updateAll);
+        }
+
+        public bool Update(int? transCode, bool updateAll = false)
+        {
+            DbTransaction trans = null;
+            if (transCode != null)
+            {
+                trans = OrmUtils.GetTransaction(transCode.Value);
+                if (trans == null)
+                {
+                    throw new Exception(string.Format("未找到指定事务：{0}", transCode));
+                }
+            }
+
             try
             {
                 if (mSetValues == null)
@@ -621,9 +656,14 @@ namespace CodeM.Common.Orm
                 _CalcBeforeSaveProperties();
 
                 CommandSQL cmd = SQLBuilder.BuildUpdateSQL(this);
-                bool ret = DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) > 0;
-
-                return ret;
+                if (trans == null)
+                {
+                    return DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) > 0;
+                }
+                else
+                {
+                    return DbUtils.ExecuteNonQuery(trans, cmd.SQL, cmd.Params.ToArray()) > 0;
+                }
             }
             finally
             {
@@ -633,6 +673,21 @@ namespace CodeM.Common.Orm
 
         public bool Delete(bool deleteAll = false)
         {
+            return Delete(null, deleteAll);
+        }
+
+        public bool Delete(int? transCode, bool deleteAll = false)
+        {
+            DbTransaction trans = null;
+            if (transCode != null)
+            {
+                trans = OrmUtils.GetTransaction(transCode.Value);
+                if (trans == null)
+                {
+                    throw new Exception(string.Format("未找到指定事务：{0}", transCode));
+                }
+            }
+
             try
             {
                 if (mFilter.IsEmpty() && !deleteAll)
@@ -648,8 +703,14 @@ namespace CodeM.Common.Orm
                     sql += string.Concat(" WHERE ", where.SQL);
                 }
 
-                bool ret = DbUtils.ExecuteNonQuery(this.Path, sql, where.Params.ToArray()) > 0;
-                return ret;
+                if (trans == null)
+                {
+                    return DbUtils.ExecuteNonQuery(this.Path, sql, where.Params.ToArray()) > 0;
+                }
+                else
+                {
+                    return DbUtils.ExecuteNonQuery(trans, sql, where.Params.ToArray()) > 0;
+                }
             }
             finally
             {
@@ -657,8 +718,18 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public List<dynamic> Query()
+        public List<dynamic> Query(int? transCode = null)
         {
+            DbTransaction trans = null;
+            if (transCode != null)
+            {
+                trans = OrmUtils.GetTransaction(transCode.Value);
+                if (trans == null)
+                {
+                    throw new Exception(string.Format("未找到指定事务：{0}", transCode));
+                }
+            }
+
             DbDataReader dr = null;
             try
             {
@@ -674,7 +745,15 @@ namespace CodeM.Common.Orm
                 List<dynamic> result = new List<dynamic>();
 
                 CommandSQL cmd = SQLBuilder.BuildQuerySQL(this);
-                dr = DbUtils.ExecuteDataReader(Path, cmd.SQL, cmd.Params.ToArray());
+                if (trans == null)
+                {
+                    dr = DbUtils.ExecuteDataReader(Path, cmd.SQL, cmd.Params.ToArray());
+                }
+                else
+                {
+                    dr = DbUtils.ExecuteDataReader(trans, cmd.SQL, cmd.Params.ToArray());
+                }
+
                 if (dr != null)
                 {
                     while (dr.Read())
@@ -772,8 +851,18 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public long Count()
+        public long Count(int? transCode = null)
         {
+            DbTransaction trans = null;
+            if (transCode != null)
+            {
+                trans = OrmUtils.GetTransaction(transCode.Value);
+                if (trans == null)
+                {
+                    throw new Exception(string.Format("未找到指定事务：{0}", transCode));
+                }
+            }
+
             try
             {
                 CommandSQL where = mFilter.Build(this);
@@ -785,7 +874,16 @@ namespace CodeM.Common.Orm
                     sql += string.Concat(" WHERE ", where.SQL);
                 }
 
-                object count = DbUtils.ExecuteScalar(this.Path, sql, where.Params.ToArray());
+                object count;
+                if (trans == null)
+                {
+                    count = DbUtils.ExecuteScalar(this.Path, sql, where.Params.ToArray());
+                }
+                else
+                {
+                    count = DbUtils.ExecuteScalar(trans, sql, where.Params.ToArray());
+                }
+
                 return (long)count;
             }
             finally
@@ -794,8 +892,18 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public bool Exists()
+        public bool Exists(int? transCode = null)
         {
+            DbTransaction trans = null;
+            if (transCode != null)
+            {
+                trans = OrmUtils.GetTransaction(transCode.Value);
+                if (trans == null)
+                {
+                    throw new Exception(string.Format("未找到指定事务：{0}", transCode));
+                }
+            }
+
             DbDataReader dr = null;
             try
             {
@@ -814,7 +922,14 @@ namespace CodeM.Common.Orm
                 }
                 sql += "LIMIT 0,1";
 
-                dr = DbUtils.ExecuteDataReader(this.Path, sql, where.Params.ToArray());
+                if (trans == null)
+                {
+                    dr = DbUtils.ExecuteDataReader(this.Path, sql, where.Params.ToArray());
+                }
+                else
+                {
+                    dr = DbUtils.ExecuteDataReader(trans, sql, where.Params.ToArray());
+                }
                 return dr.HasRows;
             }
             finally

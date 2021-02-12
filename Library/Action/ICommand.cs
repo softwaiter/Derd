@@ -12,15 +12,21 @@ namespace CodeM.Common.Orm
 
         bool Save(bool validate = false);
 
+        bool Save(int? transCode, bool validate = false);
+
         bool Delete(bool deleteAll = false);
+
+        bool Delete(int? transCode, bool deleteAll = false);
 
         bool Update(bool updateAll = false);
 
-        List<dynamic> Query();
+        bool Update(int? transCode, bool updateAll = false);
 
-        long Count();
+        List<dynamic> Query(int? transCode);
 
-        bool Exists();
+        long Count(int? transCode);
+
+        bool Exists(int? transCode);
 
         //In
         //NotIn
