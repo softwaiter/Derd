@@ -444,6 +444,11 @@ namespace CodeM.Common.Orm
             return false;
         }
 
+        public int GetTransaction()
+        {
+            return OrmUtils.GetTransaction(this.Path);
+        }
+
         private bool _CheckPropertyType(Property p, object value)
         {
             Type type = p.Type;

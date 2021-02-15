@@ -16,6 +16,8 @@ namespace CodeM.Common.Orm
 
         bool TryTruncateTable();
 
+        int GetTransaction();
+
         bool Save(bool validate = false);
 
         bool Save(int? transCode, bool validate = false);
