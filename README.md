@@ -14,7 +14,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.0.14
+Install-Package CodeM.Common.Orm -Version 1.1.1
 ```
 
 
@@ -22,7 +22,7 @@ Install-Package CodeM.Common.Orm -Version 1.0.14
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.0.14
+dotnet add package CodeM.Common.Orm --version 1.1.1
 ```
 
 
@@ -30,7 +30,7 @@ dotnet add package CodeM.Common.Orm --version 1.0.14
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.0.14" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.1.1" />
 ```
 
 
@@ -38,7 +38,7 @@ dotnet add package CodeM.Common.Orm --version 1.0.14
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.0.14
+paket add CodeM.Common.Orm --version 1.1.1
 ```
 
 
@@ -712,6 +712,16 @@ dog.model.xml内容：
 
 ####  行为操作方法
 
+##### public static int GetTransaction()
+
+获取模型所在目录绑定的数据连接的一个事务
+
+###### 返回
+
+事务对象的整型标识代码。
+
+
+
 ##### public void CreateTable(bool force = false)
 
 创建模型的物理表
@@ -1280,6 +1290,42 @@ value：比较的值。
 ```c#
 OrmUtils.Model("User").Between("Name", 18, 25).Query();	//查询年龄在18到25之间的用户
 ```
+
+
+
+##### public Model In(string name, params object[] values)
+
+设置指定属性在指定值之间的查询条件
+
+###### 参数
+
+name：属性名
+
+values：指定值，数组类型，可指定任意多个值。
+
+###### 返回
+
+当前Model模型
+
+```c#
+OrmUtils.Model("User").In("Name", "User1", "User5", "User32").Query();	//查询用户名为User1、User5、User32的数据
+```
+
+
+
+##### public Model NotIn(string name, params object[] values)
+
+设置指定属性不在指定值之间的查询条件
+
+###### 参数
+
+name：属性名
+
+values：指定值，数组类型，可指定任意多个值。
+
+###### 返回
+
+当前Model模型
 
 
 
