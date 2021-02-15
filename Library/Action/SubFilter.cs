@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Text;
 
 namespace CodeM.Common.Orm
 {
@@ -20,7 +21,9 @@ namespace CodeM.Common.Orm
         NotLike = 512,
         IsNull = 1024,
         IsNotNull = 2048,
-        Between = 4096
+        Between = 4096,
+        In = 8192,
+        NotIn = 16384
     }
 
     public class SubFilter : IFilter
@@ -139,6 +142,36 @@ namespace CodeM.Common.Orm
         {
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Between,
                 new KeyValuePair<string, object>(name, new object[] { value, value2 })));
+            return this;
+        }
+
+        public IFilter In(string name, params object[] values)
+        {
+            if (values.Length == 1)
+            {
+                mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
+                    new KeyValuePair<string, object>(name, values[0])));
+            }
+            else if (values.Length > 1)
+            {
+                mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.In,
+                    new KeyValuePair<string, object>(name, values)));
+            }
+            return this;
+        }
+
+        public IFilter NotIn(string name, params object[] values)
+        {
+            if (values.Length == 1)
+            {
+                mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
+                    new KeyValuePair<string, object>(name, values[0])));
+            }
+            else if (values.Length > 1)
+            {
+                mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotIn,
+                    new KeyValuePair<string, object>(name, values)));
+            }
             return this;
         }
 
@@ -273,6 +306,42 @@ namespace CodeM.Common.Orm
                             values[1], p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp2);
                         result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " BETWEEN ? AND ?");
+                        break;
+                    case FilterOperator.In:
+                        StringBuilder sbInSQL = new StringBuilder(string.Concat(p.Owner.Table, ".", p.Field, " IN("));
+                        object[] items = (object[])expr.Value;
+                        for (int i = 0; i < items.Length; i++)
+                        {
+                            if (i > 0)
+                            {
+                                sbInSQL.Append(",");
+                            }
+
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                items[i], p.FieldType, ParameterDirection.Input);
+                            result.Params.Add(dp);
+                            sbInSQL.Append("?");
+                        }
+                        sbInSQL.Append(")");
+                        result.SQL += sbInSQL.ToString();
+                        break;
+                    case FilterOperator.NotIn:
+                        StringBuilder sbNotInSQL = new StringBuilder(string.Concat(p.Owner.Table, ".", p.Field, " NOT IN("));
+                        object[] notItems = (object[])expr.Value;
+                        for (int i = 0; i < notItems.Length; i++)
+                        {
+                            if (i > 0)
+                            {
+                                sbNotInSQL.Append(",");
+                            }
+
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                notItems[i], p.FieldType, ParameterDirection.Input);
+                            result.Params.Add(dp);
+                            sbNotInSQL.Append("?");
+                        }
+                        sbNotInSQL.Append(")");
+                        result.SQL += sbNotInSQL.ToString();
                         break;
                 }
             }

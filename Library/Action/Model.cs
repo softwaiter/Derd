@@ -195,6 +195,18 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        public Model In(string name, params object[] values)
+        {
+            mFilter.In(name, values);
+            return this;
+        }
+
+        public Model NotIn(string name, params object[] values)
+        {
+            mFilter.NotIn(name, values);
+            return this;
+        }
+
         #endregion
 
         #region IPaging

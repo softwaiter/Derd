@@ -31,5 +31,8 @@
 
         IFilter Between(string name, object value, object value2);
 
+        IFilter In(string name, params object[] values);
+
+        IFilter NotIn(string name, params object[] values);
     }
 }

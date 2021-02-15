@@ -35,8 +35,5 @@ namespace CodeM.Common.Orm
         long Count(int? transCode);
 
         bool Exists(int? transCode);
-
-        //In
-        //NotIn
     }
 }
