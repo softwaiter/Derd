@@ -103,9 +103,17 @@ namespace CodeM.Common.Orm
         /// </summary>
         internal string BeforeSaveProcessor { get; set; } = null;
 
+        public bool NeedCalcBeforeSave
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(BeforeSaveProcessor);
+            }
+        }
+
         internal object DoBeforeSaveProcessor(dynamic obj)
         {
-            if (!string.IsNullOrWhiteSpace(BeforeSaveProcessor))
+            if (NeedCalcBeforeSave)
             {
                 return Processor.Call(BeforeSaveProcessor, Owner, Name, obj);
             }
@@ -117,9 +125,17 @@ namespace CodeM.Common.Orm
         /// </summary>
         internal string AfterQueryProcessor { get; set; } = null;
 
+        public bool NeedCalcAfterQuery
+        {
+            get
+            {
+                return !string.IsNullOrWhiteSpace(AfterQueryProcessor);
+            }
+        }
+
         internal object DoAfterQueryProcessor(dynamic obj)
         {
-            if (!string.IsNullOrWhiteSpace(AfterQueryProcessor))
+            if (NeedCalcAfterQuery)
             {
                 return Processor.Call(AfterQueryProcessor, Owner, Name, obj);
             }
