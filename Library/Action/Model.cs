@@ -581,7 +581,9 @@ namespace CodeM.Common.Orm
                 Property p = GetProperty(i);
                 mSetValues.TryGetValue(p.Name, out value);
 
-                if (p.IsNotNull && !p.AutoIncrement)
+                if (p.IsNotNull && !p.AutoIncrement &&
+                    string.IsNullOrWhiteSpace(p.DefaultValue) &&
+                    !p.NeedCalcBeforeSave)
                 {
                     if (!mSetValues.Has(p.Name) || 
                         value == null)

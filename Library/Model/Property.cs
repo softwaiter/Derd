@@ -155,18 +155,14 @@ namespace CodeM.Common.Orm
                 if (mDefaultValueIsProcessor == 0)
                 {
                     mDefaultValueIsProcessor = -1;
-
-                    if (DefaultValue != null)
+                    if (!string.IsNullOrWhiteSpace(DefaultValue))
                     {
-                        if (!string.IsNullOrWhiteSpace(DefaultValue))
+                        string propDefaultValue = DefaultValue.Trim();
+                        if (propDefaultValue.Length > 4 &&
+                            propDefaultValue.StartsWith("{{") &&
+                            propDefaultValue.EndsWith("}}"))
                         {
-                            string propDefaultValue = DefaultValue.Trim();
-                            if (propDefaultValue.Length > 4 &&
-                                propDefaultValue.StartsWith("{{") &&
-                                propDefaultValue.EndsWith("}}"))
-                            {
-                                mDefaultValueIsProcessor = 1;
-                            }
+                            mDefaultValueIsProcessor = 1;
                         }
                     }
                 }
