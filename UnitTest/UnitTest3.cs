@@ -2,6 +2,7 @@
 using CodeM.Common.Orm.Serialize;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace UnitTest
@@ -33,6 +34,7 @@ namespace UnitTest
             Test5();
             Test6();
             Test7();
+            Test8();
         }
 
         [Description("创建User模型的物理表。")]
@@ -76,8 +78,15 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
-        [Description("向User模型的物理表写入一条合法新数据，应成功。")]
+        [Description("查询Deposit为99999999的用户，应返回1条数据。")]
         public void Test5()
+        {
+            List<dynamic> result = OrmUtils.Model("User").Equals("Deposit", 99999999).Query();
+            Assert.AreEqual(result.Count, 1);
+        }
+
+        [Description("向User模型的物理表写入一条合法新数据，应成功。")]
+        public void Test6()
         {
             dynamic newuser = ModelObject.New("User");
             newuser.Name = "jishuwen";
@@ -91,13 +100,13 @@ namespace UnitTest
         }
 
         [Description("查看User模型物理表记录条数，应为2。")]
-        public void Test6()
+        public void Test7()
         {
             Assert.IsTrue(OrmUtils.Model("User").Count() == 2);
         }
 
         [Description("删除Test1测试中创建的User模型物理表，应成功。")]
-        public void Test7()
+        public void Test8()
         {
             bool ret = OrmUtils.Model("User").TryRemoveTable();
             Assert.IsTrue(ret);

@@ -1,4 +1,5 @@
 ﻿using CodeM.Common.DbHelper;
+using CodeM.Common.Tools.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -179,11 +180,16 @@ namespace CodeM.Common.Orm
         {
             CommandSQL result = new CommandSQL();
 
+            Json2Dynamic j2d = new Json2Dynamic();
+
             KeyValuePair<string, object> expr = new KeyValuePair<string, object>();
+            Model currM;
             Property p = null;
             DbParameter dp, dp2;
             foreach (KeyValuePair<FilterOperator, object> item in mFilterItems)
             {
+                currM = model;
+
                 if (item.Key != FilterOperator.And &&
                     item.Key != FilterOperator.Or)
                 {
@@ -195,8 +201,6 @@ namespace CodeM.Common.Orm
                     }
                     else
                     {
-                        Model currM = model;
-
                         string[] subNames = expr.Key.Split(".");
                         for (int i = 0; i < subNames.Length; i++)
                         {
@@ -244,50 +248,130 @@ namespace CodeM.Common.Orm
                         result.ForeignTables.AddRange(orActionSQL.ForeignTables);
                         break;
                     case FilterOperator.Equals:
-                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
-                            expr.Value, p.FieldType, ParameterDirection.Input);
+                        if (!p.NeedCalcBeforeSave)
+                        {
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                expr.Value, p.FieldType, ParameterDirection.Input);
+                        }
+                        else
+                        {
+                            dynamic inputObj = currM.NewObject();
+                            inputObj[p.Name] = expr.Value;
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                        }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "=?");
                         break;
                     case FilterOperator.NotEquals:
-                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
-                            expr.Value, p.FieldType, ParameterDirection.Input);
+                        if (!p.NeedCalcBeforeSave)
+                        {
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                expr.Value, p.FieldType, ParameterDirection.Input);
+                        }
+                        else
+                        {
+                            dynamic inputObj = currM.NewObject();
+                            inputObj[p.Name] = expr.Value;
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                        }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "<>?");
                         break;
                     case FilterOperator.Gt:
-                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
-                            expr.Value, p.FieldType, ParameterDirection.Input);
+                        if (!p.NeedCalcBeforeSave)
+                        {
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                expr.Value, p.FieldType, ParameterDirection.Input);
+                        }
+                        else
+                        {
+                            dynamic inputObj = currM.NewObject();
+                            inputObj[p.Name] = expr.Value;
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                        }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(p.Owner.Table, ".", p.Field, ">?");
                         break;
                     case FilterOperator.Gte:
-                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
-                            expr.Value, p.FieldType, ParameterDirection.Input);
+                        if (!p.NeedCalcBeforeSave)
+                        {
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                expr.Value, p.FieldType, ParameterDirection.Input);
+                        }
+                        else
+                        {
+                            dynamic inputObj = currM.NewObject();
+                            inputObj[p.Name] = expr.Value;
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                        }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(p.Owner.Table, ".", p.Field, ">=?");
                         break;
                     case FilterOperator.Lt:
-                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
-                            expr.Value, p.FieldType, ParameterDirection.Input);
+                        if (!p.NeedCalcBeforeSave)
+                        {
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                expr.Value, p.FieldType, ParameterDirection.Input);
+                        }
+                        else
+                        {
+                            dynamic inputObj = currM.NewObject();
+                            inputObj[p.Name] = expr.Value;
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                        }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "<?");
                         break;
                     case FilterOperator.Lte:
-                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
-                            expr.Value, p.FieldType, ParameterDirection.Input);
+                        if (!p.NeedCalcBeforeSave)
+                        {
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                expr.Value, p.FieldType, ParameterDirection.Input);
+                        }
+                        else
+                        {
+                            dynamic inputObj = currM.NewObject();
+                            inputObj[p.Name] = expr.Value;
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                        }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "<=?");
                         break;
                     case FilterOperator.Like:
-                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
-                            expr.Value, DbType.String, ParameterDirection.Input);
+                        if (!p.NeedCalcBeforeSave)
+                        {
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                expr.Value, DbType.String, ParameterDirection.Input);
+                        }
+                        else
+                        {
+                            dynamic inputObj = currM.NewObject();
+                            inputObj[p.Name] = expr.Value;
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                p.DoBeforeSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
+                        }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " LIKE ?");
                         break;
                     case FilterOperator.NotLike:
-                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
-                            expr.Value, DbType.String, ParameterDirection.Input);
+                        if (!p.NeedCalcBeforeSave)
+                        {
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                expr.Value, DbType.String, ParameterDirection.Input);
+                        }
+                        else
+                        {
+                            dynamic inputObj = currM.NewObject();
+                            inputObj[p.Name] = expr.Value;
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                p.DoBeforeSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
+                        }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " NOT LIKE ?");
                         break;
@@ -299,11 +383,26 @@ namespace CodeM.Common.Orm
                         break;
                     case FilterOperator.Between:
                         object[] values = (object[])expr.Value;
-                        dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
-                            values[0], p.FieldType, ParameterDirection.Input);
+                        if (!p.NeedCalcBeforeSave)
+                        {
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                values[0], p.FieldType, ParameterDirection.Input);
+                            dp2 = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                values[1], p.FieldType, ParameterDirection.Input);
+                        }
+                        else
+                        {
+                            dynamic inputObj = currM.NewObject();
+                            inputObj[p.Name] = values[0];
+                            dp = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+
+                            dynamic inputObj2 = currM.NewObject();
+                            inputObj2[p.Name] = values[1];
+                            dp2 = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
+                                p.DoBeforeSaveProcessor(inputObj2), p.FieldType, ParameterDirection.Input);
+                        }
                         result.Params.Add(dp);
-                        dp2 = DbUtils.CreateParam(model.Path, Guid.NewGuid().ToString("N"),
-                            values[1], p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp2);
                         result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " BETWEEN ? AND ?");
                         break;
