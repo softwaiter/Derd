@@ -405,7 +405,7 @@ namespace CodeM.Common.Orm
                         }
                         else
                         {
-                            p.Field = p.Name;
+                            p.Field = string.Concat("f_", p.Name.ToLower());
                         }
 
                         Type type = typeof(string);
