@@ -5,6 +5,30 @@
 
 ​		nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作类库，全名称为CodeM.Common.Orm。netcoreORM模型定义文件基于XML文件格式，模型管理基于目录自动分类；数据库类型支持Sqlite、MySql、Oracle、Sqlserver、Postgresql等，数据库配置文件和模型定义一样基于目录划分，并支持基于目录层级的继承能力；数据操作采用链式方式，简单易用。
 
+#### 特点列表：
+
+* XML格式定义模型
+
+* 索引约束定义
+
+* 关联外键定义
+
+* 数据库事务支持
+
+* 查询方法支持链式操作
+
+* 保存前字段值自定义加工，支持动态函数处理器
+
+* 查询后字段值自定义处理，支持动态函数处理器
+
+* 新建数据保存时属性是否参与保存可设置
+
+* 更新数据保存时属性是否参与保存可设置
+
+* 默认值设置支持自定义，支持动态函数处理器
+
+* 查询返回dynamic动态对象，默认关联模型定义属性
+
 
 
 ## 二、快速入门
@@ -14,7 +38,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.1.1
+Install-Package CodeM.Common.Orm -Version 1.1.3
 ```
 
 
@@ -22,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.1.1
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.1.1
+dotnet add package CodeM.Common.Orm --version 1.1.3
 ```
 
 
@@ -30,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.1
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.1.1" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.1.3" />
 ```
 
 
@@ -38,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.1
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.1.1
+paket add CodeM.Common.Orm --version 1.1.3
 ```
 
 
