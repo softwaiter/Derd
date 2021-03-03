@@ -38,7 +38,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.1.3
+Install-Package CodeM.Common.Orm -Version 1.1.5
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.1.3
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.1.3
+dotnet add package CodeM.Common.Orm --version 1.1.5
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.3
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.1.3" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.1.5" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.3
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.1.3
+paket add CodeM.Common.Orm --version 1.1.5
 ```
 
 
