@@ -752,6 +752,55 @@ namespace CodeM.Common.Orm
             }
         }
 
+        private void SetPropertyValueFromDB(ModelObject obj, Property prop, string propName, DbDataReader dr, string fieldName = null)
+        {
+            if (fieldName == null)
+            {
+                fieldName = propName;
+            }
+
+            if (prop.Type == typeof(string))
+            {
+                obj.SetValue(propName, dr.GetString(fieldName));
+            }
+            else if (prop.Type == typeof(Int16))
+            {
+                obj.SetValue(propName, dr.GetInt16(fieldName));
+            }
+            else if (prop.Type == typeof(Int32))
+            {
+                obj.SetValue(propName, dr.GetInt32(fieldName));
+            }
+            else if (prop.Type == typeof(Int64))
+            {
+                obj.SetValue(propName, dr.GetInt64(fieldName));
+            }
+            else if (prop.Type == typeof(float))
+            {
+                obj.SetValue(propName, dr.GetFloat(fieldName));
+            }
+            else if (prop.Type == typeof(decimal))
+            {
+                obj.SetValue(propName, dr.GetDecimal(fieldName));
+            }
+            else if (prop.Type == typeof(double))
+            {
+                obj.SetValue(propName, dr.GetDouble(fieldName));
+            }
+            else if (prop.Type == typeof(bool))
+            {
+                obj.SetValue(propName, dr.GetBoolean(fieldName));
+            }
+            else if (prop.Type == typeof(DateTime))
+            {
+                obj.SetValue(propName, dr.GetDateTime(fieldName));
+            }
+            else
+            {
+                obj.SetValue(propName, Convert.ChangeType(dr.GetValue(fieldName), prop.Type));
+            }
+        }
+
         public List<dynamic> Query(int? transCode = null)
         {
             DbTransaction trans = null;
@@ -804,7 +853,7 @@ namespace CodeM.Common.Orm
                                 }
                                 else
                                 {
-                                    obj.SetValue(name, dr.GetValue(name));
+                                    SetPropertyValueFromDB(obj, p, name, dr);
                                 }
 
                                 if (!string.IsNullOrWhiteSpace(p.AfterQueryProcessor))
@@ -812,7 +861,14 @@ namespace CodeM.Common.Orm
                                     object value = Processor.Call(p.AfterQueryProcessor, this, name, obj);
                                     if (!Undefined.IsUndefinedValue(value))
                                     {
-                                        obj.SetValue(name, value);
+                                        if (value != null)
+                                        {
+                                            obj.SetValue(name, Convert.ChangeType(value, p.Type));
+                                        }
+                                        else
+                                        {
+                                            obj.SetValue(name, null);
+                                        }
                                     }
                                 }
                             }
@@ -851,7 +907,7 @@ namespace CodeM.Common.Orm
                                         }
                                         else
                                         {
-                                            currObj.SetValue(lastName, dr.GetValue(fieldName));
+                                            SetPropertyValueFromDB(currObj, lastProp, lastName, dr, fieldName); 
                                         }
 
                                         if (!string.IsNullOrWhiteSpace(lastProp.AfterQueryProcessor))
@@ -859,7 +915,14 @@ namespace CodeM.Common.Orm
                                             object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName, currObj);
                                             if (!Undefined.IsUndefinedValue(value))
                                             {
-                                                currObj.SetValue(lastName, value);
+                                                if (value != null)
+                                                {
+                                                    currObj.SetValue(lastName, Convert.ChangeType(value, lastProp.Type));
+                                                }
+                                                else
+                                                {
+                                                    currObj.SetValue(lastName, null);
+                                                }
                                             }
                                         }
 
