@@ -24,6 +24,11 @@ namespace CodeM.Common.Orm
         public Type Type { get; set; }
 
         /// <summary>
+        /// 真实属性类型，通常和Type属性相同，Type属性为Model时不同
+        /// </summary>
+        public Type RealType { get; set; }
+
+        /// <summary>
         /// Type属性值为Model时，Model的具体类型名称。如：/User
         /// </summary>
         public string TypeValue { get; set; }
@@ -240,6 +245,7 @@ namespace CodeM.Common.Orm
             Property cloneObj = new Property();
             cloneObj.Name = this.Name;
             cloneObj.Type = this.Type;
+            cloneObj.RealType = this.RealType;
             cloneObj.TypeValue = this.TypeValue;
             cloneObj.JoinProp = this.JoinProp;
             cloneObj.Field = this.Field;

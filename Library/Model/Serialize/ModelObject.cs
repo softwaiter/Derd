@@ -49,7 +49,7 @@ namespace CodeM.Common.Orm.Serialize
                 throw new Exception(string.Concat("属性值不能为空：", name));
             }
 
-            if (p.Type == typeof(string) && value != null && p.Length > 0)
+            if (p.RealType == typeof(string) && value != null && p.Length > 0)
             {
                 if (value.ToString().Length > p.Length)
                 {

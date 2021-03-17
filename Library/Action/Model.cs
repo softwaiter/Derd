@@ -463,7 +463,7 @@ namespace CodeM.Common.Orm
 
         private bool _CheckPropertyType(Property p, object value)
         {
-            Type type = p.Type;
+            Type type = p.RealType;
             if (type == typeof(bool))
             {
                 bool result;
@@ -759,45 +759,45 @@ namespace CodeM.Common.Orm
                 fieldName = propName;
             }
 
-            if (prop.Type == typeof(string))
+            if (prop.RealType == typeof(string))
             {
                 obj.SetValue(propName, dr.GetString(fieldName));
             }
-            else if (prop.Type == typeof(Int16))
+            else if (prop.RealType == typeof(Int16))
             {
                 obj.SetValue(propName, dr.GetInt16(fieldName));
             }
-            else if (prop.Type == typeof(Int32))
+            else if (prop.RealType == typeof(Int32))
             {
                 obj.SetValue(propName, dr.GetInt32(fieldName));
             }
-            else if (prop.Type == typeof(Int64))
+            else if (prop.RealType == typeof(Int64))
             {
                 obj.SetValue(propName, dr.GetInt64(fieldName));
             }
-            else if (prop.Type == typeof(float))
+            else if (prop.RealType == typeof(float))
             {
                 obj.SetValue(propName, dr.GetFloat(fieldName));
             }
-            else if (prop.Type == typeof(decimal))
+            else if (prop.RealType == typeof(decimal))
             {
                 obj.SetValue(propName, dr.GetDecimal(fieldName));
             }
-            else if (prop.Type == typeof(double))
+            else if (prop.RealType == typeof(double))
             {
                 obj.SetValue(propName, dr.GetDouble(fieldName));
             }
-            else if (prop.Type == typeof(bool))
+            else if (prop.RealType == typeof(bool))
             {
                 obj.SetValue(propName, dr.GetBoolean(fieldName));
             }
-            else if (prop.Type == typeof(DateTime))
+            else if (prop.RealType == typeof(DateTime))
             {
                 obj.SetValue(propName, dr.GetDateTime(fieldName));
             }
             else
             {
-                obj.SetValue(propName, Convert.ChangeType(dr.GetValue(fieldName), prop.Type));
+                obj.SetValue(propName, Convert.ChangeType(dr.GetValue(fieldName), prop.RealType));
             }
         }
 
@@ -863,7 +863,7 @@ namespace CodeM.Common.Orm
                                     {
                                         if (value != null)
                                         {
-                                            obj.SetValue(name, Convert.ChangeType(value, p.Type));
+                                            obj.SetValue(name, Convert.ChangeType(value, p.RealType));
                                         }
                                         else
                                         {
@@ -917,7 +917,7 @@ namespace CodeM.Common.Orm
                                             {
                                                 if (value != null)
                                                 {
-                                                    currObj.SetValue(lastName, Convert.ChangeType(value, lastProp.Type));
+                                                    currObj.SetValue(lastName, Convert.ChangeType(value, lastProp.RealType));
                                                 }
                                                 else
                                                 {

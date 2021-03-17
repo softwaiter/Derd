@@ -85,6 +85,9 @@ namespace CodeM.Common.Orm
                         joinP = m.GetPrimaryKey(0);
                     }
 
+                    //TODO 多级关联属性这里会有问题，如果是多级关联，此时joinP的类型可能还是Model
+                    p.RealType = joinP.Type;
+
                     if (dcps.FieldTypeNotSet)
                     {
                         p.FieldType = joinP.FieldType;
@@ -157,6 +160,7 @@ namespace CodeM.Common.Orm
                 Property p = new Property();
                 p.Name = "Id";
                 p.Type = typeof(Int32);
+                p.RealType = p.Type;
                 p.Field = "Id";
                 p.FieldType = DbType.Int32;
                 p.IsPrimaryKey = true;
@@ -271,6 +275,73 @@ namespace CodeM.Common.Orm
             {
                 return typeof(Model);
             }
+        }
+
+        private static Type DbType2Type(DbType type)
+        {
+            if (type == DbType.String ||
+                type == DbType.AnsiString ||
+                type == DbType.AnsiStringFixedLength ||
+                type == DbType.StringFixedLength)
+            {
+                return typeof(string);
+            }
+            else if (type == DbType.Boolean)
+            {
+                return typeof(bool);
+            }
+            else if (type == DbType.Byte)
+            {
+                return typeof(byte);
+            }
+            else if (type == DbType.SByte)
+            {
+                return typeof(sbyte);
+            }
+            else if (type == DbType.Decimal)
+            {
+                return typeof(decimal);
+            }
+            else if (type == DbType.Double)
+            {
+                return typeof(double);
+            }
+            else if (type == DbType.Int16)
+            {
+                return typeof(Int16);
+            }
+            else if (type == DbType.Int32)
+            {
+                return typeof(Int32);
+            }
+            else if (type == DbType.Int64)
+            {
+                return typeof(Int64);
+            }
+            else if (type == DbType.Single)
+            {
+                return typeof(Single);
+            }
+            else if (type == DbType.UInt16)
+            {
+                return typeof(UInt16);
+            }
+            else if (type == DbType.UInt32)
+            {
+                return typeof(UInt32);
+            }
+            else if (type == DbType.UInt64)
+            {
+                return typeof(UInt64);
+            }
+            else if (type == DbType.Date ||
+                type == DbType.DateTime ||
+                type == DbType.DateTime2 ||
+                type == DbType.DateTimeOffset)
+            {
+                return typeof(DateTime);
+            }
+            return typeof(Object);
         }
 
         /// <summary>
@@ -438,6 +509,7 @@ namespace CodeM.Common.Orm
                             }
                         }
                         p.Type = type;
+                        p.RealType = type;
 
                         string joinPropStr = nodeInfo.GetAttribute("joinProp");
                         if (joinPropStr != null)
@@ -462,6 +534,7 @@ namespace CodeM.Common.Orm
                             try
                             {
                                 p.FieldType = Enum.Parse<DbType>(fieldTypeStr, true);
+                                p.RealType = DbType2Type(p.FieldType);
                             }
                             catch
                             {

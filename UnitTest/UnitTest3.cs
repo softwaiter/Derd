@@ -35,6 +35,7 @@ namespace UnitTest
             Test6();
             Test7();
             Test8();
+            Test9();
         }
 
         [Description("创建User模型的物理表。")]
@@ -110,6 +111,13 @@ namespace UnitTest
         {
             bool ret = OrmUtils.Model("User").TryRemoveTable();
             Assert.IsTrue(ret);
+        }
+
+        [Description("User模型属性Org真实数据类型应为String，应成功。")]
+        public void Test9()
+        {
+            Property p = OrmUtils.Model("User").GetProperty("Org");
+            Assert.AreEqual<Type>(p.RealType, typeof(string));
         }
 
     }
