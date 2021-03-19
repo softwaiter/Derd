@@ -1,4 +1,5 @@
 ﻿using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Tools;
 using CodeM.Common.Tools.Xml;
 using System;
 using System.Collections.Concurrent;
@@ -176,8 +177,6 @@ namespace CodeM.Common.Orm
 
         #endregion
 
-        private static Regex reNaturalInt = new Regex("^[0-9]+$");
-        private static Regex rePositiveInt = new Regex("^[1-9][0-9]*$");
         private static Regex reBool = new Regex("^(true|false)$", RegexOptions.IgnoreCase);
 
         #region 解析Connection定义文件
@@ -223,14 +222,14 @@ namespace CodeM.Common.Orm
                     else if (nodeInfo.Path == "/connection/pool")
                     {
                         string maxStr = nodeInfo.GetAttribute("max");
-                        if (!rePositiveInt.IsMatch(maxStr))
+                        if (!RegexUtils.IsPositiveInteger(maxStr))
                         {
                             throw new Exception("max属性必须是有效正整数。 " + connectionFilePath + " - Line " + nodeInfo.Line);
                         }
                         result.MaxPoolSize = int.Parse(maxStr);
 
                         string minStr = nodeInfo.GetAttribute("min");
-                        if (!reNaturalInt.IsMatch(minStr))
+                        if (!RegexUtils.IsNaturalInteger(minStr))
                         {
                             throw new Exception("min属性必须是有效自然数。 " + connectionFilePath + " - Line " + nodeInfo.Line);
                         }
@@ -558,7 +557,7 @@ namespace CodeM.Common.Orm
                                 throw new Exception("length属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
 
-                            if (!rePositiveInt.IsMatch(lengthStr))
+                            if (!RegexUtils.IsPositiveInteger(lengthStr))
                             {
                                 throw new Exception("length属性必须是有效正整数。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
@@ -574,6 +573,52 @@ namespace CodeM.Common.Orm
                             }
                         }
 
+                        string minStr = nodeInfo.GetAttribute("min");
+                        if (minStr != null)
+                        {
+                            if (FieldUtils.IsNumeric(p.FieldType))
+                            {
+                                if (string.IsNullOrWhiteSpace(minStr))
+                                {
+                                    throw new Exception("min属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+
+                                if (!RegexUtils.IsNumber(minStr))
+                                {
+                                    throw new Exception("min属性必须是有效数值。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+
+                                p.MinValue = double.Parse(minStr);
+                            }
+                            else
+                            {
+                                throw new NotSupportedException(p.FieldType.ToString() + "类型不支持min设置。" + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string maxStr = nodeInfo.GetAttribute("max");
+                        if (maxStr != null)
+                        {
+                            if (FieldUtils.IsNumeric(p.FieldType))
+                            {
+                                if (string.IsNullOrWhiteSpace(maxStr))
+                                {
+                                    throw new Exception("max属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+
+                                if (!RegexUtils.IsNumber(maxStr))
+                                {
+                                    throw new Exception("max属性必须是有效数值。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                }
+
+                                p.MaxValue = double.Parse(maxStr);
+                            }
+                            else
+                            {
+                                throw new NotSupportedException(p.FieldType.ToString() + "类型不支持max设置。" + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
                         string precisionStr = nodeInfo.GetAttribute("precision");
                         if (precisionStr != null)
                         {
@@ -584,7 +629,7 @@ namespace CodeM.Common.Orm
                                     throw new Exception("precision属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
                                 }
 
-                                if (!reNaturalInt.IsMatch(precisionStr))
+                                if (!RegexUtils.IsNaturalInteger(precisionStr))
                                 {
                                     throw new Exception("precision属性必须是有效自然数。 " + modelFilePath + " - Line " + nodeInfo.Line);
                                 }

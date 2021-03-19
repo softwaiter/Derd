@@ -69,6 +69,16 @@ namespace CodeM.Common.Orm
         public long Length { get; set; } = 0;
 
         /// <summary>
+        /// 属性类型为数值型时，所允许的最小值
+        /// </summary>
+        public double? MinValue { get; set; } = null;
+
+        /// <summary>
+        /// 属性类型为数值型时，所允许的最大值
+        /// </summary>
+        public double? MaxValue { get; set; } = null;
+
+        /// <summary>
         /// 浮点数类型的精度，即保留小数位数
         /// </summary>
         public int Precision { get; set; } = 0;
@@ -252,6 +262,8 @@ namespace CodeM.Common.Orm
             cloneObj.FieldType = this.FieldType;
             cloneObj.Description = this.Description;
             cloneObj.Length = this.Length;
+            cloneObj.MinValue = this.MinValue;
+            cloneObj.MaxValue = this.MaxValue;
             cloneObj.Precision = this.Precision;
             cloneObj.AutoIncrement = this.AutoIncrement;
             cloneObj.Unsigned = this.Unsigned;

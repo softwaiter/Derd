@@ -1,6 +1,9 @@
-﻿using System;
+﻿using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Tools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Linq;
@@ -49,11 +52,58 @@ namespace CodeM.Common.Orm.Serialize
                 throw new Exception(string.Concat("属性值不能为空：", name));
             }
 
-            if (p.RealType == typeof(string) && value != null && p.Length > 0)
+            if (value != null)
             {
-                if (value.ToString().Length > p.Length)
+                if (FieldUtils.IsNumeric(p.FieldType))
                 {
-                    throw new Exception(string.Concat("属性值最大长度不能超过", p.Length, "：", name));
+                    if (!RegexUtils.IsNumber(value.ToString()))
+                    {
+                        throw new Exception(string.Concat("属性值期待类型：", p.RealType, "，实际类型为：", value.GetType()));
+                    }
+                }
+                else if (p.FieldType == DbType.Boolean)
+                {
+                    Type _typ = value.GetType();
+                    if (_typ == typeof(string) || _typ == typeof(DateTime))
+                    {
+                        throw new Exception(string.Concat("属性值期待类型：", p.RealType, "，实际类型为：", _typ));
+                    }
+                }
+                else if (p.FieldType == DbType.Date ||
+                    p.FieldType == DbType.DateTime ||
+                    p.FieldType == DbType.DateTime2)
+                {
+                    DateTime result;
+                    if (!DateTime.TryParse(value.ToString(), out result))
+                    {
+                        throw new Exception(string.Concat("属性值期待类型：", p.RealType, "，实际类型为：", value.GetType()));
+                    }
+                }
+
+                if (p.RealType == typeof(string) && p.Length > 0)
+                {
+                    if (value.ToString().Length > p.Length)
+                    {
+                        throw new Exception(string.Concat("属性值最大长度不能超过", p.Length, "：", name));
+                    }
+                }
+                else if (FieldUtils.IsNumeric(p.FieldType))
+                {
+                    double dValue = double.Parse(value.ToString());
+                    if (p.MinValue != null)
+                    {
+                        if (dValue < p.MinValue)
+                        {
+                            throw new Exception(string.Concat("属性值取值限制范围：", p.MinValue, "-", p.MaxValue));
+                        }
+                    }
+                    if (p.MaxValue != null)
+                    {
+                        if (dValue > p.MaxValue)
+                        {
+                            throw new Exception(string.Concat("属性值取值限制范围：", p.MinValue, "-", p.MaxValue));
+                        }
+                    }
                 }
             }
         }

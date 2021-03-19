@@ -91,7 +91,7 @@ namespace UnitTest
         {
             dynamic newuser = ModelObject.New("User");
             newuser.Name = "jishuwen";
-            newuser.Age = 100;
+            newuser.Age = 18;
             newuser.Birthday = new DateTime(1947, 1, 16);
             newuser.Deposit = 10000000.58;
             newuser.IsAdmin = true;
@@ -106,18 +106,18 @@ namespace UnitTest
             Assert.IsTrue(OrmUtils.Model("User").Count() == 2);
         }
 
-        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
-        public void Test8()
-        {
-            bool ret = OrmUtils.Model("User").TryRemoveTable();
-            Assert.IsTrue(ret);
-        }
-
         [Description("User模型属性Org真实数据类型应为String，应成功。")]
-        public void Test9()
+        public void Test8()
         {
             Property p = OrmUtils.Model("User").GetProperty("Org");
             Assert.AreEqual<Type>(p.RealType, typeof(string));
+        }
+
+        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        public void Test9()
+        {
+            bool ret = OrmUtils.Model("User").TryRemoveTable();
+            Assert.IsTrue(ret);
         }
 
     }
