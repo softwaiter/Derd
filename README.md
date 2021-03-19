@@ -38,7 +38,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.1.7
+Install-Package CodeM.Common.Orm -Version 1.1.8
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.1.7
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.1.7
+dotnet add package CodeM.Common.Orm --version 1.1.8
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.7
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.1.7" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.1.8" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.7
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.1.7
+paket add CodeM.Common.Orm --version 1.1.8
 ```
 
 
@@ -135,7 +135,7 @@ User模型定义
 <model name="User" table="t_user">
     <property name="Id" field="f_id" notNull="True" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
     <property name="Name" field="f_name" length="32" notNull="true" uniqueGroup="uc_name" joinInsert="true" joinUpdate="true" desc="名称" />
-    <property name="Age" field="f_age" type="UInt16" unsigned="true" indexGroup="idx_age" joinInsert="true" joinUpdate="true" desc="年龄" />
+    <property name="Age" field="f_age" type="UInt16" unsigned="true" min="1" max="150" indexGroup="idx_age" joinInsert="true" joinUpdate="true" desc="年龄" />
     <property name="Birthday" type="DateTime" field="f_birthday" fieldType="Date" desc="出生日期" defaultValue="1980/01/01" />
     <property name="Org" field="f_org_code" type="Org" joinProp="Code" desc="所属机构" />
     <property name="Deposit" field="f_deposit" type="Decimal" precision="2" beforeSave="{{EncryptDeposit}}" afterQuery="{{DecryptDeposit}}" desc="银行存款" defaultValue="12345" />
@@ -223,6 +223,14 @@ type属性转换表：
 ###### precision
 
 整数型，指浮点数的小数位数，默认0，可选。
+
+###### min
+
+数值型，当type属性为数值时，该属性用来指定属性取值的下限，默认无；可选。
+
+###### max
+
+数值型，当type属性为数值时，该属性用来指定属性取值的上限，默认无；可选。
 
 ###### primary
 
