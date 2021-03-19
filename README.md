@@ -38,7 +38,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.1.8
+Install-Package CodeM.Common.Orm -Version 1.1.9
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.1.8
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.1.8
+dotnet add package CodeM.Common.Orm --version 1.1.9
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.8
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.1.8" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.1.9" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.8
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.1.8
+paket add CodeM.Common.Orm --version 1.1.9
 ```
 
 
@@ -964,6 +964,25 @@ transCode：指定事务标识代码。
 List<dynamic> result = OrmUtils.Model("User").Equals("Name", "wangxm").Query();
 dynamic userWxm = result[0];
 Console.WriteLine(userWxm.Age);
+```
+
+
+
+##### public dynamic QueryFirst(int? transCode=null)
+
+查询符合条件的第一条记录，并返回其映射的动态对象，如果指定事务标识代码，则在事务中执行；否则，使用模型默认数据连接执行。
+
+###### 参数
+
+transCode：指定事务标识代码。
+
+###### 返回
+
+第一条记录映射的dynamic对象，包含的属性由GetValue方法确定，如果为通过GetValue设置，则包括模型所有属性。
+
+```c#
+dynamic user = OrmUtils.Model("User").Equals("Name", "wangxm").QueryFirst();
+Console.WriteLine(user.Name);
 ```
 
 
