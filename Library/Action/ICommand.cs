@@ -32,6 +32,8 @@ namespace CodeM.Common.Orm
 
         List<dynamic> Query(int? transCode);
 
+        dynamic QueryFirst(int? transCode);
+
         long Count(int? transCode);
 
         bool Exists(int? transCode);

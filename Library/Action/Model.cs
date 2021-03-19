@@ -801,6 +801,17 @@ namespace CodeM.Common.Orm
             }
         }
 
+        public dynamic QueryFirst(int? transCode = null)
+        {
+            if (!IsUsePaging)
+            {
+                PageIndex(1);
+                PageSize(1);
+            }
+            List<dynamic> result = Query(transCode);
+            return result.Count > 0 ? result[0] : null;
+        }
+
         public List<dynamic> Query(int? transCode = null)
         {
             DbTransaction trans = null;

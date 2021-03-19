@@ -36,6 +36,7 @@ namespace UnitTest
             Test7();
             Test8();
             Test9();
+            Test10();
         }
 
         [Description("创建User模型的物理表。")]
@@ -113,8 +114,15 @@ namespace UnitTest
             Assert.AreEqual<Type>(p.RealType, typeof(string));
         }
 
-        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        [Description("使用QueryFirst查询第一条用户对象，返回对象名应为wangxm")]
         public void Test9()
+        {
+            dynamic user = OrmUtils.Model("User").QueryFirst();
+            Assert.AreEqual(user.Name, "wangxm");
+        }
+
+        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        public void Test10()
         {
             bool ret = OrmUtils.Model("User").TryRemoveTable();
             Assert.IsTrue(ret);
