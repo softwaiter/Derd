@@ -58,15 +58,19 @@ namespace CodeM.Common.Orm.Serialize
                 {
                     if (!RegexUtils.IsNumber(value.ToString()))
                     {
-                        throw new Exception(string.Concat("属性值期待类型：", p.RealType, "，实际类型为：", value.GetType()));
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：", p.RealType, "，实际类型为：", value.GetType()));
                     }
                 }
                 else if (p.FieldType == DbType.Boolean)
                 {
                     Type _typ = value.GetType();
-                    if (_typ == typeof(string) || _typ == typeof(DateTime))
+                    if (_typ != typeof(bool))
                     {
-                        throw new Exception(string.Concat("属性值期待类型：", p.RealType, "，实际类型为：", _typ));
+                        bool result;
+                        if (!bool.TryParse(value.ToString(), out result))
+                        {
+                            throw new Exception(string.Concat(p.Name, "属性值期待类型：", p.RealType, "，实际类型为：", _typ));
+                        }
                     }
                 }
                 else if (p.FieldType == DbType.Date ||
@@ -76,7 +80,7 @@ namespace CodeM.Common.Orm.Serialize
                     DateTime result;
                     if (!DateTime.TryParse(value.ToString(), out result))
                     {
-                        throw new Exception(string.Concat("属性值期待类型：", p.RealType, "，实际类型为：", value.GetType()));
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：", p.RealType, "，实际类型为：", value.GetType()));
                     }
                 }
 
@@ -84,7 +88,7 @@ namespace CodeM.Common.Orm.Serialize
                 {
                     if (value.ToString().Length > p.Length)
                     {
-                        throw new Exception(string.Concat("属性值最大长度不能超过", p.Length, "：", name));
+                        throw new Exception(string.Concat(p.Name, "属性值最大长度不能超过", p.Length, "：", name));
                     }
                 }
                 else if (FieldUtils.IsNumeric(p.FieldType))
@@ -94,14 +98,14 @@ namespace CodeM.Common.Orm.Serialize
                     {
                         if (dValue < p.MinValue)
                         {
-                            throw new Exception(string.Concat("属性值取值限制范围：", p.MinValue, "-", p.MaxValue));
+                            throw new Exception(string.Concat(p.Name, "属性值取值限制范围：", p.MinValue, "-", p.MaxValue));
                         }
                     }
                     if (p.MaxValue != null)
                     {
                         if (dValue > p.MaxValue)
                         {
-                            throw new Exception(string.Concat("属性值取值限制范围：", p.MinValue, "-", p.MaxValue));
+                            throw new Exception(string.Concat(p.Name, "属性值取值限制范围：", p.MinValue, "-", p.MaxValue));
                         }
                     }
                 }
