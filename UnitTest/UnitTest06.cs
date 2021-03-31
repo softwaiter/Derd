@@ -9,7 +9,7 @@ using System.Threading;
 namespace UnitTest
 {
     [TestClass]
-    public class UnitTest6
+    public class UnitTest06
     {
         [TestInitialize]
         public void Init()

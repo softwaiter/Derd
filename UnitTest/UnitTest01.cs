@@ -6,7 +6,7 @@ using System.IO;
 namespace UnitTest
 {
     [TestClass]
-    public class UnitTest1
+    public class UnitTest01
     {
         [TestInitialize]
         public void Init()

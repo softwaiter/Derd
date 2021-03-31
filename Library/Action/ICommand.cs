@@ -14,6 +14,8 @@ namespace CodeM.Common.Orm
 
         void TruncateTable();
 
+        bool TableExists();
+
         bool TryTruncateTable();
 
         int GetTransaction();

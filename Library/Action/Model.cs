@@ -456,6 +456,20 @@ namespace CodeM.Common.Orm
             return false;
         }
 
+        public bool TableExists()
+        {
+            string sql = Features.GetTableExistsSql(this);
+            if (sql != null)
+            {
+                string database = ConnectionUtils.GetConnectionByModel(this).Database;
+                sql = string.Format(sql, Table, database);
+
+                long count = (long)DbUtils.ExecuteScalar(Path.ToLower(), sql);
+                return count > 0;
+            }
+            return false;
+        }
+
         public int GetTransaction()
         {
             return OrmUtils.GetTransaction(this.Path);

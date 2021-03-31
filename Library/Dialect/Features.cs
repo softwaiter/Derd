@@ -41,5 +41,10 @@
         {
             return Config.GetConfigValue<bool>("feature", model, "autoincrement");
         }
+
+        internal static string GetTableExistsSql(Model model)
+        {
+            return Config.GetConfigValue<string>("feature", model, "exists_sql");
+        }
     }
 }

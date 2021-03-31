@@ -8,7 +8,7 @@ using System.IO;
 namespace UnitTest
 {
     [TestClass]
-    public class UnitTest4
+    public class UnitTest04
     {
 
         [TestInitialize]
