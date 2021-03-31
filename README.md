@@ -38,7 +38,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.1.10
+Install-Package CodeM.Common.Orm -Version 1.1.11
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.1.10
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.1.10
+dotnet add package CodeM.Common.Orm --version 1.1.11
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.10
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.1.10" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.1.11" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.10
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.1.10
+paket add CodeM.Common.Orm --version 1.1.11
 ```
 
 
@@ -71,10 +71,12 @@ paket add CodeM.Common.Orm --version 1.1.10
 
 根据数据库连接所配置的数据库类型，需要安装相应的数据库依赖包，具体对应关系如下：
 
-| 数据库库类型 | 依赖包             |
-| ------------ | ------------------ |
-| Sqlite       | System.Data.SQLite |
-| Mysql        | MySql.Data         |
+| 数据库库类型 | 依赖包                        |
+| ------------ | ----------------------------- |
+| Sqlite       | System.Data.SQLite            |
+| Mysql        | MySql.Data                    |
+| Oracle       | Oracle.ManagedDataAccess.Core |
+| SqlServer    | Microsoft.Data.SqlClient      |
 
 使用时，可根据需要添加其中的一项或多项依赖。
 
@@ -93,7 +95,7 @@ paket add CodeM.Common.Orm --version 1.1.10
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <connection>
-    <dialect>sqlite</dialect>	<!--数据库类型，目前支持sqlite、mysql，最终版本将增加支持oracle、sqlserver、postgresql-->
+    <dialect>sqlite</dialect>	<!--数据库类型，目前支持sqlite、mysql、oracle、sqlserver-->
     <host>test.db</host>	<!--数据库文件地址或IP-->
     <port></port>	<!--数据库端口，为空即不设置，按数据库默认端口-->
     <user></user>	<!--数据库账户名-->
@@ -102,6 +104,8 @@ paket add CodeM.Common.Orm --version 1.1.10
     <pool max="100" min="0">true</pool>	<!--数据库连接池设置，max=最大数量，min=最小数量-->
 </connection>
 ```
+
+*注：dialect可选值全部要小写。
 
 
 
@@ -842,6 +846,20 @@ OrmUtils.Model("User").TruncateTable();		//清空模型User的物理表数据
 
 ```c#
 OrmUtils.Model("User").TryTruncateTable();		//清空模型User的物理表数据
+```
+
+
+
+##### public bool TableExists()
+
+判断当前模型对应的物理表是否存在。
+
+###### 返回
+
+存在返回True；否则返回False。
+
+```c#
+OrmUtils.Model("User").TableExists();
 ```
 
 
