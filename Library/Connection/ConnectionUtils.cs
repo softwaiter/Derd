@@ -19,6 +19,8 @@ namespace CodeM.Common.Orm
             //支持的数据库类型
             sAllowedDatabases.TryAdd("sqlite", "System.Data.SQLite.SQLiteFactory, System.Data.SQLite");
             sAllowedDatabases.TryAdd("mysql", "MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data");
+            sAllowedDatabases.TryAdd("oracle", "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess");
+            sAllowedDatabases.TryAdd("sqlserver", "Microsoft.Data.SqlClient.SqlClientFactory, Microsoft.Data.SqlClient");
         }
 
         internal static void ClearConnections()
