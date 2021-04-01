@@ -156,12 +156,12 @@ namespace CodeM.Common.Orm
             return -1;
         }
 
-        internal static bool SetVersion(int newVer)
+        internal static bool SetVersion(int newVer, int? transCode = null)
         {
             Model m = ModelUtils.GetModel(sVerModelName);
             dynamic newobj = m.NewObject();
             newobj.Version = newVer;
-            return m.SetValues(newobj).Save();
+            return m.SetValues(newobj).Save(transCode);
         }
         #endregion
     }

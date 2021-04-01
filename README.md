@@ -38,7 +38,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.1.12
+Install-Package CodeM.Common.Orm -Version 1.1.15
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.1.12
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.1.12
+dotnet add package CodeM.Common.Orm --version 1.1.15
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.12
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.1.12" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.1.15" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.12
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.1.12
+paket add CodeM.Common.Orm --version 1.1.15
 ```
 
 
@@ -690,13 +690,15 @@ Console.WriteLine("当前版本号：{0}", version);
 
 
 
-##### public static bool SetVersion(int version);
+##### public static bool SetVersion(int version, int? transCode=null);
 
 设置最新的模型版本号。
 
 ###### 参数
 
 version：最新的版本号；新版本号必须高于当前版本号，否则将设置失败。
+
+transCode：指定事务的标识代码，默认为null。
 
 ###### 返回
 

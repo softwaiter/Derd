@@ -211,14 +211,14 @@ namespace CodeM.Common.Orm
             return ModelUtils.GetVersion();
         }
 
-        public static bool SetVersion(int newVer)
+        public static bool SetVersion(int newVer, int? transCode = null)
         {
             int currVer = GetVersion();
             if (currVer >= 0)
             {
                 if (newVer > currVer)
                 {
-                    return ModelUtils.SetVersion(newVer);
+                    return ModelUtils.SetVersion(newVer, transCode);
                 }
             }
             return false;
