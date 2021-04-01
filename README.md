@@ -38,7 +38,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.1.11
+Install-Package CodeM.Common.Orm -Version 1.1.12
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.1.11
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.1.11
+dotnet add package CodeM.Common.Orm --version 1.1.12
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.11
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.1.11" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.1.12" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.11
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.1.11
+paket add CodeM.Common.Orm --version 1.1.12
 ```
 
 
@@ -341,8 +341,9 @@ Execute需要一个object类型的返回值，根据属性类型不同而不同�
 
 有了Processor实现类，还必须进行注册才可以正常使用，注册使用RegisterProcessor方法，在API使用部分有详细说明：
 
-```
-OrmUtils.RegisterProcessor("CurrentDateTime", "CodeM.Common.Orm.Processors.CurrentDateTime");
+```c#
+OrmUtils.RegisterProcessor("CurrentDateTime", 
+                           "CodeM.Common.Orm.Processors.CurrentDateTime");
 ```
 
 
@@ -656,6 +657,53 @@ modelName：模型名称，根目录下可使用短名称；否则，必须使�
 
 ```c#
 Model user = OrmUtils.Model("User");
+```
+
+
+
+##### public static bool EnableVersionControl();
+
+启动模型版本控制，版本控制只是对版本号进行管理，不对版本内容进行管理，用户需自行管理版本内容。
+
+###### 返回
+
+启动成功返回True；否则，返回False。
+
+```c#
+OrmUtils.EnableVersionControl();
+```
+
+
+
+##### public static int GetVersion();
+
+获取当前模型版本号。
+
+###### 返回
+
+版本控制如果已启动返回最新版本号；否则，返回-1。
+
+```c#
+int version = OrmUtils.GetVersion();
+Console.WriteLine("当前版本号：{0}", version);
+```
+
+
+
+##### public static bool SetVersion(int version);
+
+设置最新的模型版本号。
+
+###### 参数
+
+version：最新的版本号；新版本号必须高于当前版本号，否则将设置失败。
+
+###### 返回
+
+设置成功返回True；否则，返回False。
+
+```c#
+OrmUtils.SetVersion(1);
 ```
 
 
