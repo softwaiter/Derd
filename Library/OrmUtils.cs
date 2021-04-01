@@ -196,6 +196,13 @@ namespace CodeM.Common.Orm
                     return false;
                 }
             }
+            else
+            {
+                if (ModelUtils.GetVersion() == -1)
+                {
+                    return ModelUtils.SetVersion(0);
+                }
+            }
             return true;
         }
 
