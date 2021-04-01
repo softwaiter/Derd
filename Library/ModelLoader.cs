@@ -162,7 +162,7 @@ namespace CodeM.Common.Orm
                 p.Name = "Id";
                 p.Type = typeof(Int32);
                 p.RealType = p.Type;
-                p.Field = "Id";
+                p.Field = "f_id";
                 p.FieldType = DbType.Int32;
                 p.IsPrimaryKey = true;
                 p.AutoIncrement = true;

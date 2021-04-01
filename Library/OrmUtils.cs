@@ -27,6 +27,7 @@ namespace CodeM.Common.Orm
         public static void Load()
         {
             ModelLoader.Load(ModelPath);
+            ModelUtils.AddVersionControlModel();
         }
 
         /// <summary>
@@ -180,6 +181,40 @@ namespace CodeM.Common.Orm
                 bRet = m.TryTruncateTable() ? bRet : false;
             }
             return bRet;
+        }
+
+        public static bool EnableVersionControl()
+        {
+            if (!ModelUtils.VersionControlTableExists())
+            {
+                if (ModelUtils.CreateVersionControlTable())
+                {
+                    return ModelUtils.SetVersion(0);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static int GetVersion()
+        {
+            return ModelUtils.GetVersion();
+        }
+
+        public static bool SetVersion(int newVer)
+        {
+            int currVer = GetVersion();
+            if (currVer >= 0)
+            {
+                if (newVer > currVer)
+                {
+                    return ModelUtils.SetVersion(newVer);
+                }
+            }
+            return false;
         }
 
     }
