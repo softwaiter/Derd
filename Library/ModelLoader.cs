@@ -109,6 +109,10 @@ namespace CodeM.Common.Orm
                 //就一个文件，无论是否increment都重新解析一遍
                 ParseConnectionFile(fiConn, parent);
             }
+            else if ("/".Equals(parent))
+            {
+                throw new Exception("模型定义根目录必须配置数据库连接.connection.xml文件。");
+            }
 
             IEnumerable<FileInfo> modelFiles = di.EnumerateFiles("*.model.xml", SearchOption.TopDirectoryOnly);
             IEnumerator<FileInfo> modelFilesEnumerator = modelFiles.GetEnumerator();
