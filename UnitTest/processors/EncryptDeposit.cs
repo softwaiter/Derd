@@ -1,17 +1,15 @@
 ﻿using CodeM.Common.Orm;
+using CodeM.Common.Tools;
 
 namespace UnitTest.Processors
 {
     public class EncryptDeposit : IProcessor
     {
-        public object Execute(Model model, string prop, dynamic obj)
+        public object Execute(Model model, string prop, dynamic propValue)
         {
-            if (obj.Has(prop))
+            if (propValue != null)
             {
-                if (obj[prop] != null)
-                {
-                    return obj[prop] + 100000;
-                }
+                return propValue + 100000;
             }
             return Undefined.Value;
         }

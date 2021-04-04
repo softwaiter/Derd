@@ -2,6 +2,6 @@
 {
     public interface IProcessor
     {
-        object Execute(Model model, string prop, dynamic obj);
+        dynamic Execute(Model model, string prop, dynamic propValue);
     }
 }

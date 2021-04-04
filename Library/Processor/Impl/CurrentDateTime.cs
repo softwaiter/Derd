@@ -4,7 +4,7 @@ namespace CodeM.Common.Orm.Processors
 {
     public class CurrentDateTime: IProcessor
     {
-        public object Execute(Model model, string prop, dynamic obj)
+        public dynamic Execute(Model model, string prop, dynamic propValue)
         {
             return DateTime.Now;
         }

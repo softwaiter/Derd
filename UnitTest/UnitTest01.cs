@@ -22,6 +22,14 @@ namespace UnitTest
             OrmUtils.ExecSql(sql);
 
             OrmUtils.RemoveTables();
+
+            RemoveOrmTestTable();
+        }
+
+        private void RemoveOrmTestTable()
+        {
+            string sql = "Drop Table IF EXISTS orm_test";
+            OrmUtils.ExecSql(sql);
         }
 
         [TestMethod]
@@ -47,7 +55,7 @@ namespace UnitTest
             Assert.AreEqual<string>(m.Table, "t_user");
         }
 
-        [Description("使用Orm方法直接执行sql语句创建数据表orm_test")]
+        [Description("使用Orm方法直接执行sql语句创建数据表orm_test，应成功。")]
         public void Test3()
         {
             string sql = "Create Table orm_test(id integer primary key, name varchar(64), age int, address varchar(255))";
@@ -55,7 +63,7 @@ namespace UnitTest
             Assert.IsTrue(ret == 0);
         }
 
-        [Description("删除Test3创建的数据表orm_test")]
+        [Description("删除Test3创建的数据表orm_test，应成功。")]
         public void Test4()
         {
             string sql = "Drop Table  orm_test";

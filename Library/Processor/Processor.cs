@@ -33,12 +33,12 @@ namespace CodeM.Common.Orm
             throw new Exception(string.Concat("Processor实现未找到：", classname));
         }
 
-        public static object Call(string method, Model model, string prop, dynamic obj)
+        public static object Call(string method, Model model, string prop, dynamic propValue)
         {
             IProcessor inst;
             if (sImpls.TryGetValue(method.ToLower(), out inst))
             {
-                return inst.Execute(model, prop, obj);
+                return inst.Execute(model, prop, propValue);
             }
             throw new Exception(string.Concat("Processor不存在：", method));
         }

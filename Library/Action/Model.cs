@@ -883,7 +883,8 @@ namespace CodeM.Common.Orm
 
                                 if (!string.IsNullOrWhiteSpace(p.AfterQueryProcessor))
                                 {
-                                    object value = Processor.Call(p.AfterQueryProcessor, this, name, obj);
+                                    dynamic value = Processor.Call(p.AfterQueryProcessor, this, name, 
+                                        obj.Has(name) ? obj[name] : null);
                                     if (!Undefined.IsUndefinedValue(value))
                                     {
                                         if (value != null)
@@ -937,7 +938,8 @@ namespace CodeM.Common.Orm
 
                                         if (!string.IsNullOrWhiteSpace(lastProp.AfterQueryProcessor))
                                         {
-                                            object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName, currObj);
+                                            object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName,
+                                                currObj.Has(lastName) ? currObj[lastName] : null);
                                             if (!Undefined.IsUndefinedValue(value))
                                             {
                                                 if (value != null)

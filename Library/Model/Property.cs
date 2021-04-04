@@ -130,9 +130,10 @@ namespace CodeM.Common.Orm
         {
             if (NeedCalcBeforeSave)
             {
-                return Processor.Call(BeforeSaveProcessor, Owner, Name, obj);
+                return Processor.Call(BeforeSaveProcessor, Owner, Name, 
+                    obj.Has(Name) ? obj[Name] : null);
             }
-            return null;
+            return Undefined.Value;
         }
 
         /// <summary>
@@ -152,7 +153,8 @@ namespace CodeM.Common.Orm
         {
             if (NeedCalcAfterQuery)
             {
-                return Processor.Call(AfterQueryProcessor, Owner, Name, obj);
+                return Processor.Call(AfterQueryProcessor, Owner, Name, 
+                    obj.Has(Name) ? obj[Name] : null);
             }
             return null;
         }
@@ -198,7 +200,8 @@ namespace CodeM.Common.Orm
                     string propDefaultValue = DefaultValue.Trim();
                     string processorName = propDefaultValue.Substring(
                         2, propDefaultValue.Length - 4).Trim();
-                    object value = Processor.Call(processorName, Owner, Name, obj);
+                    dynamic value = Processor.Call(processorName, Owner, Name, 
+                        obj.Has(Name) ? obj[Name] : null);
                     if (!Undefined.IsUndefinedValue(value))
                     {
                         return value;
