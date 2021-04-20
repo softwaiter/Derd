@@ -87,6 +87,7 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
+        [Description("使用In操作查询用户，应返回对应数据条数。")]
         public void Test5()
         {
             List<dynamic> result = OrmUtils.Model("User").In("Name", "wangxm", "huxinyue").Query();
