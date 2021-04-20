@@ -153,7 +153,7 @@ namespace CodeM.Common.Orm
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
                     new KeyValuePair<string, object>(name, values[0])));
             }
-            else if (values.Length > 1)
+            else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.In,
                     new KeyValuePair<string, object>(name, values)));
@@ -168,7 +168,7 @@ namespace CodeM.Common.Orm
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
                     new KeyValuePair<string, object>(name, values[0])));
             }
-            else if (values.Length > 1)
+            else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotIn,
                     new KeyValuePair<string, object>(name, values)));
