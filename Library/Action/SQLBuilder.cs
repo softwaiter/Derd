@@ -89,6 +89,7 @@ namespace CodeM.Common.Orm
             StringBuilder sbJoins = new StringBuilder();
 
             Hashtable processedName = new Hashtable();
+            Hashtable processedModel = new Hashtable();
             foreach (string foreignTableName in foreignTables)
             {
                 string key = foreignTableName.Substring(0, foreignTableName.LastIndexOf(".")).Trim().ToLower();
@@ -103,6 +104,20 @@ namespace CodeM.Common.Orm
                 {
                     Property subProp = currM.GetProperty(subNames[i]);
                     Model subM = ModelUtils.GetModel(subProp.TypeValue);
+
+                    string joinModelName = string.Concat(currM.Name, "_", subM.Name).ToLower();
+                    if (processedModel.ContainsKey(joinModelName))
+                    {
+                        if (i == subNames.Length - 2)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
                     string joinField = subM.GetPrimaryKey(0).Field;
                     if (!string.IsNullOrWhiteSpace(subProp.JoinProp))
                     {
@@ -110,7 +125,10 @@ namespace CodeM.Common.Orm
                     }
                     sbJoins.Append(string.Concat(" LEFT JOIN ", subM.Table, " ON ",
                         currM.Table, ".", subProp.Field, "=", subM.Table, ".", joinField));
+
                     currM = subM;
+
+                    processedModel.Add(joinModelName, true);
 
                     if (i == subNames.Length - 2)
                     {
