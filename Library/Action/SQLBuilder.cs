@@ -114,6 +114,7 @@ namespace CodeM.Common.Orm
                         }
                         else
                         {
+                            currM = subM;
                             continue;
                         }
                     }
