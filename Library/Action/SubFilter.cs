@@ -261,7 +261,7 @@ namespace CodeM.Common.Orm
                                 p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "=?");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "`=?");
                         break;
                     case FilterOperator.NotEquals:
                         if (!p.NeedCalcBeforeSave)
@@ -277,7 +277,7 @@ namespace CodeM.Common.Orm
                                 p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "<>?");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "`<>?");
                         break;
                     case FilterOperator.Gt:
                         if (!p.NeedCalcBeforeSave)
@@ -293,7 +293,7 @@ namespace CodeM.Common.Orm
                                 p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, ">?");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "`>?");
                         break;
                     case FilterOperator.Gte:
                         if (!p.NeedCalcBeforeSave)
@@ -309,7 +309,7 @@ namespace CodeM.Common.Orm
                                 p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, ">=?");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "`>=?");
                         break;
                     case FilterOperator.Lt:
                         if (!p.NeedCalcBeforeSave)
@@ -325,7 +325,7 @@ namespace CodeM.Common.Orm
                                 p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "<?");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "`<?");
                         break;
                     case FilterOperator.Lte:
                         if (!p.NeedCalcBeforeSave)
@@ -341,7 +341,7 @@ namespace CodeM.Common.Orm
                                 p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, "<=?");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "`<=?");
                         break;
                     case FilterOperator.Like:
                         if (!p.NeedCalcBeforeSave)
@@ -357,7 +357,7 @@ namespace CodeM.Common.Orm
                                 p.DoBeforeSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " LIKE ?");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "` LIKE ?");
                         break;
                     case FilterOperator.NotLike:
                         if (!p.NeedCalcBeforeSave)
@@ -373,13 +373,13 @@ namespace CodeM.Common.Orm
                                 p.DoBeforeSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " NOT LIKE ?");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "` NOT LIKE ?");
                         break;
                     case FilterOperator.IsNull:
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " IS NULL");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "` IS NULL");
                         break;
                     case FilterOperator.IsNotNull:
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " IS NOT NULL");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "` IS NOT NULL");
                         break;
                     case FilterOperator.Between:
                         object[] values = (object[])expr.Value;
@@ -404,10 +404,10 @@ namespace CodeM.Common.Orm
                         }
                         result.Params.Add(dp);
                         result.Params.Add(dp2);
-                        result.SQL += string.Concat(p.Owner.Table, ".", p.Field, " BETWEEN ? AND ?");
+                        result.SQL += string.Concat("`", p.Owner.Table, "`.`", p.Field, "` BETWEEN ? AND ?");
                         break;
                     case FilterOperator.In:
-                        StringBuilder sbInSQL = new StringBuilder(string.Concat(p.Owner.Table, ".", p.Field, " IN("));
+                        StringBuilder sbInSQL = new StringBuilder(string.Concat("`", p.Owner.Table, "`.`", p.Field, "` IN("));
                         object[] items = (object[])expr.Value;
                         for (int i = 0; i < items.Length; i++)
                         {
@@ -425,7 +425,7 @@ namespace CodeM.Common.Orm
                         result.SQL += sbInSQL.ToString();
                         break;
                     case FilterOperator.NotIn:
-                        StringBuilder sbNotInSQL = new StringBuilder(string.Concat(p.Owner.Table, ".", p.Field, " NOT IN("));
+                        StringBuilder sbNotInSQL = new StringBuilder(string.Concat("`", p.Owner.Table, "`.`", p.Field, "` NOT IN("));
                         object[] notItems = (object[])expr.Value;
                         for (int i = 0; i < notItems.Length; i++)
                         {

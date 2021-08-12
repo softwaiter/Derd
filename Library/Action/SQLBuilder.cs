@@ -33,7 +33,7 @@ namespace CodeM.Common.Orm
                         {
                             insertFields += ",";
                         }
-                        insertFields += p.Field;
+                        insertFields += string.Concat("`", p.Field, "`");
 
                         if (insertValues.Length > 0)
                         {
@@ -43,7 +43,7 @@ namespace CodeM.Common.Orm
                     }
                 }
             }
-            result.SQL = string.Concat("INSERT INTO ", m.Table, " (", insertFields, ") VALUES(", insertValues + ")");
+            result.SQL = string.Concat("INSERT INTO `", m.Table, "` (", insertFields, ") VALUES(", insertValues + ")");
 
             return result;
         }
@@ -68,11 +68,11 @@ namespace CodeM.Common.Orm
                         {
                             updateContent += ",";
                         }
-                        updateContent += string.Concat(p.Field, "=?");
+                        updateContent += string.Concat("`", p.Field, "`=?");
                     }
                 }
             }
-            result.SQL = string.Concat("UPDATE ", m.Table, " SET ", updateContent);
+            result.SQL = string.Concat("UPDATE `", m.Table, "` SET ", updateContent);
 
             CommandSQL where = m.Where.Build(m);
             if (!string.IsNullOrEmpty(where.SQL))
@@ -124,8 +124,8 @@ namespace CodeM.Common.Orm
                     {
                         joinField = subM.GetProperty(subProp.JoinProp).Field;
                     }
-                    sbJoins.Append(string.Concat(" LEFT JOIN ", subM.Table, " ON ",
-                        currM.Table, ".", subProp.Field, "=", subM.Table, ".", joinField));
+                    sbJoins.Append(string.Concat(" LEFT JOIN `", subM.Table, "` ON `",
+                        currM.Table, "`.`", subProp.Field, "`=`", subM.Table, "`.`", joinField, "`"));
 
                     currM = subM;
 
@@ -171,7 +171,7 @@ namespace CodeM.Common.Orm
                     {
                         sbFields.Append(",");
                     }
-                    sbFields.Append(string.Concat(m.Table, ".", p.Field, " AS ", name));
+                    sbFields.Append(string.Concat("`", m.Table, "`.`", p.Field, "` AS `", name, "`"));
                 }
                 else    //Model属性引用
                 {
@@ -193,7 +193,7 @@ namespace CodeM.Common.Orm
 
                             Property lastProp = currM.GetProperty(subNames[i + 1]);
                             string fieldName = name.Replace(".", "_");
-                            sbFields.Append(string.Concat(currM.Table, ".", lastProp.Field, " AS ", fieldName));
+                            sbFields.Append(string.Concat("`", currM.Table, "`.`", lastProp.Field, "` AS `", fieldName, "`"));
 
                             break;
                         }
@@ -207,7 +207,7 @@ namespace CodeM.Common.Orm
             foreignTables.AddRange(m.ForeignSortNames);
             string joinSql = BuildJoinTableSQL(m, foreignTables);
             
-            result.SQL = string.Concat("SELECT ", sbFields, " FROM ", m.Table, joinSql);
+            result.SQL = string.Concat("SELECT ", sbFields, " FROM `", m.Table, "`", joinSql);
             if (!string.IsNullOrEmpty(where.SQL))
             {
                 result.SQL += string.Concat(" WHERE ", where.SQL);

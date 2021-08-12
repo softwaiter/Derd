@@ -217,7 +217,7 @@ namespace CodeM.Common.Orm
         {
             StringBuilder sb = new StringBuilder(64);
             string fieldType = FieldUtils.GetFieldType(Owner, FieldType);
-            sb.Append(string.Concat(Field, " ", fieldType));
+            sb.Append(string.Concat("`", Field, "` ", fieldType));
             if (Length > 0)
             {
                 if (FieldUtils.IsFloat(FieldType))

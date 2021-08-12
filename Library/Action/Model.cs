@@ -386,7 +386,7 @@ namespace CodeM.Common.Orm
             StringBuilder sb = new StringBuilder(ToString());
             if (replace)
             {
-                sb.Insert(0, string.Concat("DROP TABLE IF EXISTS ", Table, ";"));
+                sb.Insert(0, string.Concat("DROP TABLE IF EXISTS `", Table, "`;"));
             }
 
             DbUtils.ExecuteNonQuery(Path.ToLower(), sb.ToString());

@@ -187,7 +187,7 @@ namespace CodeM.Common.Orm
         public string BuildCreateTableSQL()
         {
             StringBuilder sb = new StringBuilder(PropertyCount * 10);
-            sb.Append(string.Concat("CREATE TABLE ", Table, "("));
+            sb.Append(string.Concat("CREATE TABLE `", Table, "`("));
             for (int i = 0; i < PropertyCount; i++)
             {
                 if (i > 0)
@@ -208,7 +208,7 @@ namespace CodeM.Common.Orm
                     {
                         sb.Append(",");
                     }
-                    sb.Append(string.Concat("CONSTRAINT ", e.Current.Key, " UNIQUE (", e.Current.Value, ")"));
+                    sb.Append(string.Concat("CONSTRAINT ", e.Current.Key, " UNIQUE (`", e.Current.Value, "`)"));
                     i++;
                 }
             }
@@ -227,7 +227,7 @@ namespace CodeM.Common.Orm
                     IEnumerator<KeyValuePair<string, string>> e = mIndexSettings.GetEnumerator();
                     while (e.MoveNext())
                     {
-                        sb.Append(string.Concat("CREATE INDEX ", e.Current.Key, " ON ", Table, "(", e.Current.Value, ");"));
+                        sb.Append(string.Concat("CREATE INDEX ", e.Current.Key, " ON `", Table, "`(`", e.Current.Value, "`);"));
                     }
                     return sb.ToString();
                 }
