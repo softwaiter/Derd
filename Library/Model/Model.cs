@@ -227,7 +227,8 @@ namespace CodeM.Common.Orm
                     IEnumerator<KeyValuePair<string, string>> e = mIndexSettings.GetEnumerator();
                     while (e.MoveNext())
                     {
-                        sb.Append(string.Concat("CREATE INDEX ", e.Current.Key, " ON `", Table, "`(`", e.Current.Value, "`);"));
+                        string indexFields = e.Current.Value.Replace(",", "`,`");
+                        sb.Append(string.Concat("CREATE INDEX ", e.Current.Key, " ON `", Table, "`(`", indexFields, "`);"));
                     }
                     return sb.ToString();
                 }
