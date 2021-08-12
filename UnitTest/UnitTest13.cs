@@ -22,6 +22,8 @@ namespace UnitTest
             OrmUtils.Load();
 
             OrmUtils.RemoveTables();
+
+            OrmUtils.EnableDebug(true);
         }
 
         [TestMethod]

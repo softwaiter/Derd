@@ -389,11 +389,13 @@ namespace CodeM.Common.Orm
                 sb.Insert(0, string.Concat("DROP TABLE IF EXISTS `", Table, "`;"));
             }
 
+            OrmUtils.PrintSQL(sb.ToString());
             DbUtils.ExecuteNonQuery(Path.ToLower(), sb.ToString());
 
             string tableIndexSQL = ToString(true);
             if (!string.IsNullOrWhiteSpace(tableIndexSQL))
             {
+                OrmUtils.PrintSQL(tableIndexSQL);
                 DbUtils.ExecuteNonQuery(Path.ToLower(), tableIndexSQL);
             }
         }
@@ -415,6 +417,7 @@ namespace CodeM.Common.Orm
         public void RemoveTable()
         {
             string sql = string.Concat("DROP TABLE IF EXISTS ", Table);
+            OrmUtils.PrintSQL(sql);
             DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
         }
 
@@ -439,6 +442,7 @@ namespace CodeM.Common.Orm
             {
                 sql = string.Concat("DELETE FROM ", Table);
             }
+            OrmUtils.PrintSQL(sql);
             DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
         }
 
@@ -463,6 +467,8 @@ namespace CodeM.Common.Orm
             {
                 string database = ConnectionUtils.GetConnectionByModel(this).Database;
                 sql = string.Format(sql, Table, database);
+
+                OrmUtils.PrintSQL(sql);
 
                 long count = (long)DbUtils.ExecuteScalar(Path.ToLower(), sql);
                 return count > 0;
@@ -657,6 +663,9 @@ namespace CodeM.Common.Orm
                 _CalcBeforeSaveProperties();
 
                 CommandSQL cmd = SQLBuilder.BuildInsertSQL(this);
+
+                OrmUtils.PrintSQL(cmd.SQL, cmd.Params.ToArray());
+
                 if (trans == null)
                 {
                     return DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) == 1;
@@ -704,6 +713,9 @@ namespace CodeM.Common.Orm
                 _CalcBeforeSaveProperties();
 
                 CommandSQL cmd = SQLBuilder.BuildUpdateSQL(this);
+
+                OrmUtils.PrintSQL(cmd.SQL, cmd.Params.ToArray());
+
                 if (trans == null)
                 {
                     return DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) > 0;
@@ -750,6 +762,8 @@ namespace CodeM.Common.Orm
                 {
                     sql += string.Concat(" WHERE ", where.SQL);
                 }
+
+                OrmUtils.PrintSQL(sql, where.Params.ToArray());
 
                 if (trans == null)
                 {
@@ -853,6 +867,10 @@ namespace CodeM.Common.Orm
                 List<dynamic> result = new List<dynamic>();
 
                 CommandSQL cmd = SQLBuilder.BuildQuerySQL(this);
+
+
+                OrmUtils.PrintSQL(cmd.SQL, cmd.Params.ToArray());
+
                 if (trans == null)
                 {
                     dr = DbUtils.ExecuteDataReader(Path, cmd.SQL, cmd.Params.ToArray());
@@ -998,6 +1016,8 @@ namespace CodeM.Common.Orm
                     sql += string.Concat(" WHERE ", where.SQL);
                 }
 
+                OrmUtils.PrintSQL(sql, where.Params.ToArray());
+
                 object count;
                 if (trans == null)
                 {
@@ -1045,6 +1065,8 @@ namespace CodeM.Common.Orm
                     sql += string.Concat(" WHERE ", where.SQL);
                 }
                 sql += "LIMIT 0,1";
+
+                OrmUtils.PrintSQL(sql, where.Params.ToArray());
 
                 if (trans == null)
                 {

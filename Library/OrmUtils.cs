@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Data;
 using System.Data.Common;
 using System.IO;
+using System.Text;
 
 namespace CodeM.Common.Orm
 {
@@ -37,6 +38,38 @@ namespace CodeM.Common.Orm
         {
             ModelLoader.Load(ModelPath, true);
         }
+
+        #region Debug
+        public static bool sAllowDebug = false;
+        public static void EnableDebug(bool enable)
+        {
+            sAllowDebug = enable;
+        }
+
+        internal static void PrintSQL(string sql, params DbParameter[] sqlParams)
+        {
+            if (sAllowDebug)
+            {
+                Console.WriteLine("-------------------------------------------------");
+                Console.WriteLine(sql);
+                if (sqlParams.Length > 0)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    foreach (DbParameter dp in sqlParams)
+                    {
+                        if (sb.Length > 0)
+                        {
+                            sb.Append(", ");
+                        }
+                        sb.Append(dp.Value.ToString());
+                    }
+                    Console.WriteLine(sb);
+                }
+                Console.WriteLine("================================================");
+                Console.WriteLine();
+            }
+        }
+        #endregion
 
         #region transaction
         private static ConcurrentDictionary<int, DbTransaction> sTransactions = new ConcurrentDictionary<int, DbTransaction>();
