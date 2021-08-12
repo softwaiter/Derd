@@ -38,7 +38,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.1.15
+Install-Package CodeM.Common.Orm -Version 1.1.19
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.1.15
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.1.15
+dotnet add package CodeM.Common.Orm --version 1.1.19
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.15
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.1.15" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.1.19" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.15
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.1.15
+paket add CodeM.Common.Orm --version 1.1.19
 ```
 
 
@@ -707,6 +707,20 @@ transCode：指定事务的标识代码，默认为null。
 ```c#
 OrmUtils.SetVersion(1);
 ```
+
+
+
+##### public static void EnableDebug(bool enable);
+
+设置是否允许调试，输出执行的SQL语句。
+
+###### 参数
+
+enable：是否允许调试，默认false。
+
+###### 返回
+
+无
 
 
 
