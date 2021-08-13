@@ -387,7 +387,10 @@ namespace CodeM.Common.Orm
         bool mIsSelectForUpdate = false;
         public Model SelectForUpdate()
         {
-            mIsSelectForUpdate = true;
+            if (Features.IsSupportSelectForUpdate(this))
+            {
+                mIsSelectForUpdate = true;
+            }
             return this;
         }
 
