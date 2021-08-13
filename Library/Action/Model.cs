@@ -1,4 +1,5 @@
 ﻿using CodeM.Common.DbHelper;
+using CodeM.Common.Orm.Action;
 using CodeM.Common.Orm.Dialect;
 using CodeM.Common.Orm.Serialize;
 using System;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace CodeM.Common.Orm
 {
-    public partial class Model : ISetValue, IGetValue, IPaging, ISort, ICommand
+    public partial class Model : ISetValue, IGetValue, IPaging, ISort, ICommand, IAssist
     {
         #region ISetValue
         ModelObject mSetValues;
@@ -378,7 +379,41 @@ namespace CodeM.Common.Orm
             mUsePaging = false;
             mPageSize = 100;
             mPageIndex = 1;
+
+            mIsSelectForUpdate = false;
         }
+
+        #region IAssist
+        bool mIsSelectForUpdate = false;
+        public Model SelectForUpdate()
+        {
+            mIsSelectForUpdate = true;
+            return this;
+        }
+
+        public bool IsSelectForUpdate
+        {
+            get
+            {
+                return mIsSelectForUpdate;
+            }
+        }
+
+        bool mIsNoWait = false;
+        public Model NoWait()
+        {
+            mIsNoWait = true;
+            return this;
+        }
+
+        public bool IsNoWait
+        {
+            get
+            {
+                return mIsNoWait;
+            }
+        }
+        #endregion
 
         #region ICommand
         public void CreateTable(bool replace = false)

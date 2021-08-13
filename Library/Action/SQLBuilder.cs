@@ -224,6 +224,16 @@ namespace CodeM.Common.Orm
                 result.SQL += string.Concat(" LIMIT ", (m.CurrPageIndex - 1) * m.CurrPageSize, ",", m.CurrPageSize);
             }
 
+            if (m.IsSelectForUpdate)
+            {
+                result.SQL += " FOR UPDATE";
+
+                if (m.IsNoWait)
+                {
+                    result.SQL += " NOWAIT";
+                }
+            }
+
             return result;
         }
 

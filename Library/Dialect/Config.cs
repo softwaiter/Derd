@@ -32,6 +32,10 @@ namespace CodeM.Common.Orm.Dialect
                 { "mysql", "select count(*)  from information_schema.TABLES t where t.TABLE_SCHEMA ='{1}' and t.TABLE_NAME ='{0}'" },
                 { "oracle", "select count(*) from user_tables t where table_name=upper('{0}')" },
                 { "sqlserver", "select count(*) from sysobjects where id = object_id('{1}.Owner.{0}')" }
+            }},
+            { "select_forupdate", new Hashtable() {
+                { "default", true },
+                { "sqlite", false }
             }}
         });
 

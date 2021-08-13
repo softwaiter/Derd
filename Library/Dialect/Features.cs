@@ -46,5 +46,10 @@
         {
             return Config.GetConfigValue<string>("feature", model, "exists_sql");
         }
+
+        internal static bool IsSupportSelectForUpdate(Model model)
+        {
+            return Config.GetConfigValue<bool>("feature", model, "select_forupdate");
+        }
     }
 }
