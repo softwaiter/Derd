@@ -46,7 +46,8 @@ namespace UnitTest
         public void Test2()
         {
             dynamic newshopping = ModelObject.New("Shopping");
-            newshopping.Name = "iPhone 12";
+            newshopping.Code = "iPhone 12";
+            newshopping.Name = "苹果12手机";
             newshopping.Order = "S202100812085255000";
             bool ret = OrmUtils.Model("Shopping").SetValues(newshopping).Save();
             Assert.IsTrue(ret);
@@ -59,11 +60,11 @@ namespace UnitTest
             Assert.IsTrue(bRet);
         }
 
-        [Description("查询订单号为S202100812085255001的记录，返回记录的商品名称：iPhone 12。")]
+        [Description("查询订单号为S202100812085255001的记录，返回记录的商品编码：iPhone 12。")]
         public void Test4()
         {
             dynamic obj = OrmUtils.Model("Shopping").Equals("Order", "S202100812085255001").QueryFirst();
-            Assert.AreEqual(obj.Name, "iPhone 12");
+            Assert.AreEqual(obj.Code, "iPhone 12");
         }
     }
 }

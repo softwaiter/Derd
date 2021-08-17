@@ -208,7 +208,10 @@ namespace CodeM.Common.Orm
                     {
                         sb.Append(",");
                     }
-                    sb.Append(string.Concat("CONSTRAINT ", e.Current.Key, " UNIQUE (`", e.Current.Value, "`)"));
+                    
+                    string constraintFields = e.Current.Value.Replace(",", "`,`");
+                    sb.Append(string.Concat("CONSTRAINT ", e.Current.Key, " UNIQUE (`", constraintFields, "`)"));
+
                     i++;
                 }
             }
