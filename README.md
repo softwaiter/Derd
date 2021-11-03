@@ -38,7 +38,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.1.22
+Install-Package CodeM.Common.Orm -Version 1.1.23
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.1.22
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.1.22
+dotnet add package CodeM.Common.Orm --version 1.1.23
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.22
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.1.22" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.1.23" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.22
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.1.22
+paket add CodeM.Common.Orm --version 1.1.23
 ```
 
 
