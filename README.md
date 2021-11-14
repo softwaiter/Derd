@@ -3,7 +3,7 @@
 
 ## 一、概述
 
-​		nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作类库，全名称为CodeM.Common.Orm。netcoreORM模型定义文件基于XML文件格式，模型管理基于目录自动分类；数据库类型支持Sqlite、MySql、Oracle、Sqlserver、Postgresql等，数据库配置文件和模型定义一样基于目录划分，并支持基于目录层级的继承能力；数据操作采用链式方式，简单易用。
+nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作类库，全名称为CodeM.Common.Orm。netcoreORM模型定义文件基于XML文件格式，模型管理基于目录自动分类；数据库类型支持Sqlite、MySql、Oracle、Sqlserver、Postgresql等，数据库配置文件和模型定义一样基于目录划分，并支持基于目录层级的继承能力；数据操作采用链式方式，简单易用。
 
 #### 特点列表：
 
@@ -38,7 +38,7 @@
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.1.23
+Install-Package CodeM.Common.Orm -Version 1.2.0
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.1.23
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.1.23
+dotnet add package CodeM.Common.Orm --version 1.2.0
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.23
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.1.23" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.2.0" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.1.23
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.1.23
+paket add CodeM.Common.Orm --version 1.2.0
 ```
 
 
