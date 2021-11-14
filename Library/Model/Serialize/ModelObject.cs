@@ -56,7 +56,7 @@ namespace CodeM.Common.Orm.Serialize
             {
                 if (FieldUtils.IsNumeric(p.FieldType))
                 {
-                    if (!RegexUtils.IsNumber(value.ToString()))
+                    if (!Xmtool.Regex().IsNumber(value.ToString()))
                     {
                         throw new Exception(string.Concat(p.Name, "属性值期待类型：", p.RealType, "，实际类型为：", value.GetType()));
                     }

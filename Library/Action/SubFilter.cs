@@ -180,8 +180,6 @@ namespace CodeM.Common.Orm
         {
             CommandSQL result = new CommandSQL();
 
-            Json2DynamicParser j2d = new Json2DynamicParser();
-
             KeyValuePair<string, object> expr = new KeyValuePair<string, object>();
             Model currM;
             Property p = null;

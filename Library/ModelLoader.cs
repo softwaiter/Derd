@@ -1,6 +1,5 @@
 ﻿using CodeM.Common.Orm.Dialect;
 using CodeM.Common.Tools;
-using CodeM.Common.Tools.Xml;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -188,7 +187,7 @@ namespace CodeM.Common.Orm
         private static ConnectionSetting ParseConnectionSetting(string connectionFilePath)
         {
             ConnectionSetting result = new ConnectionSetting();
-            XmlUtils.Iterate(connectionFilePath, (nodeInfo) => {
+            Xmtool.Xml().Iterate(connectionFilePath, (nodeInfo) => {
                 if (!nodeInfo.IsEndNode)
                 {
                     if (nodeInfo.Path == "/connection/dialect/@text")
@@ -226,14 +225,14 @@ namespace CodeM.Common.Orm
                     else if (nodeInfo.Path == "/connection/pool")
                     {
                         string maxStr = nodeInfo.GetAttribute("max");
-                        if (!RegexUtils.IsPositiveInteger(maxStr))
+                        if (!Xmtool.Regex().IsPositiveInteger(maxStr))
                         {
                             throw new Exception("max属性必须是有效正整数。 " + connectionFilePath + " - Line " + nodeInfo.Line);
                         }
                         result.MaxPoolSize = int.Parse(maxStr);
 
                         string minStr = nodeInfo.GetAttribute("min");
-                        if (!RegexUtils.IsNaturalInteger(minStr))
+                        if (!Xmtool.Regex().IsNaturalInteger(minStr))
                         {
                             throw new Exception("min属性必须是有效自然数。 " + connectionFilePath + " - Line " + nodeInfo.Line);
                         }
@@ -418,7 +417,7 @@ namespace CodeM.Common.Orm
             Model model = new Model();
             model.Path = parent.ToLower();
 
-            XmlUtils.Iterate(modelFilePath, (nodeInfo) =>
+            Xmtool.Xml().Iterate(modelFilePath, (nodeInfo) =>
             {
                 if (nodeInfo.Path == "/model")
                 {
@@ -561,7 +560,7 @@ namespace CodeM.Common.Orm
                                 throw new Exception("length属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
 
-                            if (!RegexUtils.IsPositiveInteger(lengthStr))
+                            if (!Xmtool.Regex().IsPositiveInteger(lengthStr))
                             {
                                 throw new Exception("length属性必须是有效正整数。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
@@ -587,7 +586,7 @@ namespace CodeM.Common.Orm
                                     throw new Exception("min属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
                                 }
 
-                                if (!RegexUtils.IsNumber(minStr))
+                                if (!Xmtool.Regex().IsNumber(minStr))
                                 {
                                     throw new Exception("min属性必须是有效数值。 " + modelFilePath + " - Line " + nodeInfo.Line);
                                 }
@@ -610,7 +609,7 @@ namespace CodeM.Common.Orm
                                     throw new Exception("max属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
                                 }
 
-                                if (!RegexUtils.IsNumber(maxStr))
+                                if (!Xmtool.Regex().IsNumber(maxStr))
                                 {
                                     throw new Exception("max属性必须是有效数值。 " + modelFilePath + " - Line " + nodeInfo.Line);
                                 }
@@ -633,7 +632,7 @@ namespace CodeM.Common.Orm
                                     throw new Exception("precision属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
                                 }
 
-                                if (!RegexUtils.IsNaturalInteger(precisionStr))
+                                if (!Xmtool.Regex().IsNaturalInteger(precisionStr))
                                 {
                                     throw new Exception("precision属性必须是有效自然数。 " + modelFilePath + " - Line " + nodeInfo.Line);
                                 }
