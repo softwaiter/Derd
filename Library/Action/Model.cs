@@ -12,6 +12,35 @@ namespace CodeM.Common.Orm
 {
     public partial class Model : ISetValue, IGetValue, IPaging, ISort, ICommand, IAssist
     {
+        public enum AggregateType
+        {
+            NONE = 0,
+            COUNT = 1,
+            SUM = 2,
+            DISTINCT = 3,
+            MAX = 4,
+            MIN = 5,
+            AVG = 6
+        }
+
+        internal class GetValueSetting
+        {
+            public GetValueSetting(string name)
+            {
+                this.Name = name;
+            }
+
+            public GetValueSetting(string name, AggregateType type)
+                :this(name)
+            {
+                this.Type = type;
+            }
+
+            public AggregateType Type { get; set; } = AggregateType.NONE;
+
+            public string Name { get; set; }
+        }
+
         #region ISetValue
         ModelObject mSetValues;
 
@@ -51,9 +80,9 @@ namespace CodeM.Common.Orm
         #endregion
 
         #region IGetValue
-        List<string> mGetValues = new List<string>();
+        List<GetValueSetting> mGetValues = new List<GetValueSetting>();
 
-        internal List<string> ReturnValues
+        internal List<GetValueSetting> ReturnValues
         {
             get
             {
@@ -61,12 +90,12 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public Model GetValue(params string[] names)
+        public Model GetValue(AggregateType aggType, params string[] names)
         {
             foreach (string name in names)
             {
                 string compactName = name.Trim();
-                if (mGetValues.IndexOf(compactName) < 0)
+                if (!mGetValues.Exists(item => item.Name == name))
                 {
                     if (!compactName.Contains("."))
                     {
@@ -99,10 +128,15 @@ namespace CodeM.Common.Orm
                         }
                     }
 
-                    mGetValues.Add(compactName);
+                    mGetValues.Add(new GetValueSetting(compactName, aggType));
                 }
             }
             return this;
+        }
+
+        public Model GetValue(params string[] names)
+        {
+            return GetValue(AggregateType.NONE, names);
         }
         #endregion
 
@@ -898,7 +932,7 @@ namespace CodeM.Common.Orm
                     for (int i = 0; i < PropertyCount; i++)
                     {
                         Property p = GetProperty(i);
-                        mGetValues.Add(p.Name);
+                        mGetValues.Add(new GetValueSetting(p.Name));
                     }
                 }
 
@@ -923,33 +957,33 @@ namespace CodeM.Common.Orm
                     while (dr.Read())
                     {
                         ModelObject obj = ModelObject.New(this, false);
-                        foreach (string name in mGetValues)
+                        foreach (GetValueSetting gvs  in mGetValues)
                         {
-                            if (!name.Contains("."))
+                            if (!gvs.Name.Contains("."))
                             {
-                                Property p = GetProperty(name);
-                                if (dr.IsDBNull(name))
+                                Property p = GetProperty(gvs.Name);
+                                if (dr.IsDBNull(gvs.Name))
                                 {
-                                    obj.SetValue(name, null);
+                                    obj.SetValue(gvs.Name, null);
                                 }
                                 else
                                 {
-                                    SetPropertyValueFromDB(obj, p, name, dr);
+                                    SetPropertyValueFromDB(obj, p, gvs.Name, dr);
                                 }
 
                                 if (!string.IsNullOrWhiteSpace(p.AfterQueryProcessor))
                                 {
-                                    dynamic value = Processor.Call(p.AfterQueryProcessor, this, name, 
-                                        obj.Has(name) ? obj[name] : null);
+                                    dynamic value = Processor.Call(p.AfterQueryProcessor, this, gvs.Name, 
+                                        obj.Has(gvs.Name) ? obj[gvs.Name] : null);
                                     if (!Undefined.IsUndefinedValue(value))
                                     {
                                         if (value != null)
                                         {
-                                            obj.SetValue(name, Convert.ChangeType(value, p.RealType));
+                                            obj.SetValue(gvs.Name, Convert.ChangeType(value, p.RealType));
                                         }
                                         else
                                         {
-                                            obj.SetValue(name, null);
+                                            obj.SetValue(gvs.Name, null);
                                         }
                                     }
                                 }
@@ -958,7 +992,7 @@ namespace CodeM.Common.Orm
                             {
                                 Model currM = this;
                                 ModelObject currObj = obj;
-                                string[] subNames = name.Split(".");
+                                string[] subNames = gvs.Name.Split(".");
                                 for (int i = 0; i < subNames.Length; i++)
                                 {
                                     string subName = subNames[i];
@@ -982,7 +1016,7 @@ namespace CodeM.Common.Orm
                                         string lastName = subNames[subNames.Length - 1];
                                         Property lastProp = currM.GetProperty(lastName);
 
-                                        string fieldName = name.Replace(".", "_");
+                                        string fieldName = gvs.Name.Replace(".", "_");
                                         if (dr.IsDBNull(fieldName))
                                         {
                                             currObj.SetValue(lastName, null);

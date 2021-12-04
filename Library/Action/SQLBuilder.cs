@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text;
+using static CodeM.Common.Orm.Model;
 
 namespace CodeM.Common.Orm
 {
@@ -143,11 +144,32 @@ namespace CodeM.Common.Orm
             return sbJoins.ToString();
         }
 
+        internal static string GenQueryField(GetValueSetting gvs, string field)
+        {
+            switch (gvs.Type)
+            {
+                case AggregateType.COUNT:
+                    return string.Concat("COUNT(", field, ")");
+                case AggregateType.DISTINCT:
+                    return string.Concat("DISTINCT(", field, ")");
+                case AggregateType.SUM:
+                    return string.Concat("SUM(", field, ")");
+                case AggregateType.MAX:
+                    return string.Concat("MAX(", field, ")");
+                case AggregateType.MIN:
+                    return string.Concat("MIN(", field, ")");
+                case AggregateType.AVG:
+                    return string.Concat("AVG(", field, ")");
+                default:
+                    return field;
+            }
+        }
+
         internal static CommandSQL BuildQuerySQL(Model m)
         {
             CommandSQL result = new CommandSQL();
 
-            List<string> queryFields = new List<string>();
+            List<GetValueSetting> queryFields = new List<GetValueSetting>();
             if (m.ReturnValues.Count > 0)
             {
                 queryFields.AddRange(m.ReturnValues);
@@ -156,29 +178,31 @@ namespace CodeM.Common.Orm
             {
                 for (int i = 0; i < m.PropertyCount; i++)
                 {
-                    queryFields.Add(m.GetProperty(i).Name);
+                    queryFields.Add(new GetValueSetting(m.GetProperty(i).Name));
                 }
             }
 
             List<string> foreignTables = new List<string>();
             StringBuilder sbFields = new StringBuilder();
-            foreach (string name in queryFields)
+            foreach (GetValueSetting gvs in queryFields)
             {
-                if (!name.Contains("."))    //直接属性
+                if (!gvs.Name.Contains("."))    //直接属性
                 {
-                    Property p = m.GetProperty(name);
+                    Property p = m.GetProperty(gvs.Name);
                     if (sbFields.Length > 0)
                     {
                         sbFields.Append(",");
                     }
-                    sbFields.Append(string.Concat("`", m.Table, "`.`", p.Field, "` AS `", name, "`"));
+                    sbFields.Append(string.Concat(
+                        GenQueryField(gvs, string.Concat("`", m.Table, "`.`", p.Field, "`")),
+                        " AS `", gvs.Name, "`"));
                 }
                 else    //Model属性引用
                 {
-                    foreignTables.Add(name);
+                    foreignTables.Add(gvs.Name);
 
                     Model currM = m;
-                    string[] subNames = name.Split(".");
+                    string[] subNames = gvs.Name.Split(".");
                     for (int i = 0; i < subNames.Length; i++)
                     {
                         Property subProp = currM.GetProperty(subNames[i]);
@@ -191,9 +215,11 @@ namespace CodeM.Common.Orm
                                 sbFields.Append(",");
                             }
 
-                            Property lastProp = currM.GetProperty(subNames[i + 1]);
-                            string fieldName = name.Replace(".", "_");
-                            sbFields.Append(string.Concat("`", currM.Table, "`.`", lastProp.Field, "` AS `", fieldName, "`"));
+                            Property lastProp = currM.GetProperty(subNames[i + 1]); 
+                            string fieldName = gvs.Name.Replace(".", "_");
+                            sbFields.Append(string.Concat(
+                                GenQueryField(gvs, string.Concat("`", currM.Table, "`.`", lastProp.Field, "`")),
+                                " AS `", fieldName, "`"));
 
                             break;
                         }
