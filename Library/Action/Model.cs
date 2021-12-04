@@ -965,6 +965,11 @@ namespace CodeM.Common.Orm
             return result.Count > 0 ? result[0] : null;
         }
 
+        private string GetCountPropName(string name)
+        {
+            return string.Concat(name, "_Count");
+        }
+
         public List<dynamic> Query(int? transCode = null)
         {
             DbTransaction trans = null;
@@ -1017,14 +1022,29 @@ namespace CodeM.Common.Orm
                                 Property p = GetProperty(gvs.Name);
                                 if (dr.IsDBNull(gvs.Name))
                                 {
-                                    obj.SetValue(gvs.Name, null);
+                                    if (gvs.Type == AggregateType.COUNT)
+                                    {
+                                        obj.SetValue(GetCountPropName(gvs.Name), 0);
+                                    }
+                                    else
+                                    {
+                                        obj.SetValue(gvs.Name, null);
+                                    }
                                 }
                                 else
                                 {
-                                    SetPropertyValueFromDB(obj, p, gvs.Name, dr);
+                                    if (gvs.Type == AggregateType.COUNT)
+                                    {
+                                        obj.SetValue(GetCountPropName(gvs.Name), dr.GetInt64(gvs.Name));
+                                    }
+                                    else
+                                    {
+                                        SetPropertyValueFromDB(obj, p, gvs.Name, dr);
+                                    }
                                 }
 
-                                if (!string.IsNullOrWhiteSpace(p.AfterQueryProcessor))
+                                if (gvs.Type == AggregateType.NONE &&
+                                    !string.IsNullOrWhiteSpace(p.AfterQueryProcessor))
                                 {
                                     dynamic value = Processor.Call(p.AfterQueryProcessor, this, gvs.Name, 
                                         obj.Has(gvs.Name) ? obj[gvs.Name] : null);
@@ -1072,14 +1092,29 @@ namespace CodeM.Common.Orm
                                         string fieldName = gvs.Name.Replace(".", "_");
                                         if (dr.IsDBNull(fieldName))
                                         {
-                                            currObj.SetValue(lastName, null);
+                                            if (gvs.Type == AggregateType.COUNT)
+                                            {
+                                                currObj.SetValue(GetCountPropName(lastName), 0);
+                                            }
+                                            else
+                                            {
+                                                currObj.SetValue(lastName, null);
+                                            }
                                         }
                                         else
                                         {
-                                            SetPropertyValueFromDB(currObj, lastProp, lastName, dr, fieldName); 
+                                            if (gvs.Type == AggregateType.COUNT)
+                                            {
+                                                currObj.SetValue(GetCountPropName(lastName), dr.GetInt64(fieldName));
+                                            }
+                                            else
+                                            {
+                                                SetPropertyValueFromDB(currObj, lastProp, lastName, dr, fieldName);
+                                            }
                                         }
 
-                                        if (!string.IsNullOrWhiteSpace(lastProp.AfterQueryProcessor))
+                                        if (gvs.Type == AggregateType.NONE &&
+                                            !string.IsNullOrWhiteSpace(lastProp.AfterQueryProcessor))
                                         {
                                             object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName,
                                                 currObj.Has(lastName) ? currObj[lastName] : null);

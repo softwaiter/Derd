@@ -84,7 +84,7 @@ namespace UnitTest
                 .Equals("Age", 18)
                 .GetValue(Model.AggregateType.COUNT, "Id")
                 .QueryFirst();
-            Assert.AreEqual(2, result.Id);
+            Assert.AreEqual(2, result.Id_Count);
         }
 
         [Description("获取所有人种最大的年龄，应为18。")]
@@ -125,11 +125,11 @@ namespace UnitTest
 
             dynamic obj18 = result.Find(item => item.Age == 18);
             Assert.IsNotNull(obj18);
-            Assert.AreEqual(2, obj18.Id);
+            Assert.AreEqual(2, obj18.Id_Count);
 
             dynamic obj14 = result.Find(item => item.Age == 14);
             Assert.IsNotNull(obj14);
-            Assert.AreEqual(1, obj14.Id);
+            Assert.AreEqual(1, obj14.Id_Count);
         }
     }
 }
