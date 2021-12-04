@@ -408,6 +408,7 @@ namespace CodeM.Common.Orm
             mGetValues.Clear();
             mFilter.Reset();
             mSorts.Clear();
+            mGroupByNames.Clear();
             mForeignSortNames.Clear();
 
             mUsePaging = false;
@@ -448,6 +449,58 @@ namespace CodeM.Common.Orm
             get
             {
                 return mIsNoWait;
+            }
+        }
+
+        List<string> mGroupByNames = new List<string>();
+        public Model GroupBy(params string[] names)
+        {
+            foreach (string name in names)
+            {
+                string compactName = name.Trim();
+                if (!mGroupByNames.Exists(item => item == name))
+                {
+                    if (!compactName.Contains("."))
+                    {
+                        Property p = GetProperty(compactName);
+                        if (p == null)
+                        {
+                            throw new Exception(string.Concat("未找到属性：", compactName));
+                        }
+                    }
+                    else
+                    {
+                        string[] typeItems = compactName.Split(".");
+                        Model currM = this;
+                        for (int i = 0; i < typeItems.Length; i++)
+                        {
+                            Property p = currM.GetProperty(typeItems[i]);
+                            if (p == null)
+                            {
+                                throw new Exception(string.Concat("未找到属性：", compactName));
+                            }
+
+                            if (i < typeItems.Length - 1)
+                            {
+                                currM = ModelUtils.GetModel(p.TypeValue);
+                                if (currM == null)
+                                {
+                                    throw new Exception(string.Concat("非法的Model引用：", p.TypeValue));
+                                }
+                            }
+                        }
+                    }
+                    mGroupByNames.Add(compactName);
+                }
+            }
+            return this;
+        }
+
+        internal List<string> GroupByNames
+        {
+            get
+            {
+                return mGroupByNames;
             }
         }
         #endregion

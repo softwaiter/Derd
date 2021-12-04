@@ -35,6 +35,7 @@ namespace UnitTest
             Test5();
             Test6();
             Test7();
+            Test8();
         }
 
         [Description("创建User模型的物理表。")]
@@ -111,6 +112,24 @@ namespace UnitTest
                 .GetValue(Model.AggregateType.AVG, "Age")
                 .QueryFirst();
             Assert.AreEqual(17, result.Age);
+        }
+
+        [Description("使用GroupBy计算每个年龄段的人数，应该18岁2人，14岁1人。")]
+        public void Test8()
+        {
+            List<dynamic> result = OrmUtils.Model("User")
+                .GetValue("Age")
+                .GetValue(Model.AggregateType.COUNT, "Id")
+                .GroupBy("Age")
+                .Query();
+
+            dynamic obj18 = result.Find(item => item.Age == 18);
+            Assert.IsNotNull(obj18);
+            Assert.AreEqual(2, obj18.Id);
+
+            dynamic obj14 = result.Find(item => item.Age == 14);
+            Assert.IsNotNull(obj14);
+            Assert.AreEqual(1, obj14.Id);
         }
     }
 }

@@ -165,6 +165,53 @@ namespace CodeM.Common.Orm
             }
         }
 
+        internal static string BuildGroupBySQL(Model m)
+        {
+            StringBuilder sbResult = new StringBuilder();
+
+            if (m.GroupByNames.Count > 0)
+            {
+                sbResult.Append("GROUP BY ");
+                foreach (string name in m.GroupByNames)
+                {
+                    if (!name.Contains("."))    //直接属性
+                    {
+                        Property p = m.GetProperty(name);
+                        if (sbResult.Length > 9)
+                        {
+                            sbResult.Append(",");
+                        }
+                        sbResult.Append(string.Concat("`", m.Table, "`.`", p.Field, "`"));
+                    }
+                    else    //Model属性引用
+                    {
+                        Model currM = m;
+                        string[] subNames = name.Split(".");
+                        for (int i = 0; i < subNames.Length; i++)
+                        {
+                            Property subProp = currM.GetProperty(subNames[i]);
+                            currM = ModelUtils.GetModel(subProp.TypeValue);
+
+                            if (i == subNames.Length - 2)
+                            {
+                                if (sbResult.Length > 9)
+                                {
+                                    sbResult.Append(",");
+                                }
+
+                                Property lastProp = currM.GetProperty(subNames[i + 1]);
+                                sbResult.Append(string.Concat("`", currM.Table, "`.`", lastProp.Field, "`"));
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return sbResult.ToString();
+        }
+
         internal static CommandSQL BuildQuerySQL(Model m)
         {
             CommandSQL result = new CommandSQL();
@@ -238,6 +285,15 @@ namespace CodeM.Common.Orm
             {
                 result.SQL += string.Concat(" WHERE ", where.SQL);
                 result.Params.AddRange(where.Params);
+            }
+
+            if (m.GroupByNames.Count > 0)
+            {
+                string groupBySQL = BuildGroupBySQL(m);
+                if (!string.IsNullOrWhiteSpace(groupBySQL))
+                {
+                    result.SQL += string.Concat(" ", groupBySQL, " ");
+                }
             }
 
             if (!string.IsNullOrEmpty(m.Sort))

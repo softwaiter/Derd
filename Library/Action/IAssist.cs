@@ -5,5 +5,7 @@
         Model SelectForUpdate();
 
         Model NoWait();
+
+        Model GroupBy(params string[] names);
     }
 }
