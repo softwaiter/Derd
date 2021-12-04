@@ -1466,6 +1466,30 @@ values：指定值，数组类型，可指定任意多个值。
 
 
 
+#### GroupBy分组方法（支持链式调用）
+
+##### public Model GroupBy(params string[] names)
+
+设置根据一个或多个属性对查询结果进行分组
+
+###### 参数
+
+names：进行分组的属性。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+OrmUtils.Model("User")
+    .GroupBy("Org")
+    .GetValue("Org")
+    .GetValue(AggregateType.Max, "Age")
+    .Query(); // 查询每个机构内最大的人员年龄
+```
+
+
+
 #### 设置分页方法（支持链式调用）
 
 ##### public Model PageSize(int size)
