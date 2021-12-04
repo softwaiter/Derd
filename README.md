@@ -1154,9 +1154,15 @@ OrmUtils.Model("User").SetValues(newuser).Save();
 
 #### 设置查询返回属性方法
 
-##### public Model GetValue(params string[] names)
+##### public Model GetValue(AggregateType aggType, params string[] names)
 
 设置Query查询方法返回对象的属性，如果不设置，默认返回模型的所有属性。
+
+###### 参数
+
+aggType：指定要使用的聚合函数。
+
+names：设置要返回的属性数组。
 
 ###### 返回
 
@@ -1179,8 +1185,6 @@ if (result.Count > 0)
     Console.WriteLine("所属机构名称：{0}", result[0].OrgId.Name);
 }
 ```
-
-
 
 
 
