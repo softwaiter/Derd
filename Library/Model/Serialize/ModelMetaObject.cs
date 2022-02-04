@@ -1,8 +1,10 @@
-﻿using System.Dynamic;
+﻿using System;
+using System.Dynamic;
 using System.Linq.Expressions;
 
 namespace CodeM.Common.Orm.Serialize
 {
+    [Serializable]
     public class ModelMetaObject : DynamicMetaObject
     {
         ModelObject mValue;

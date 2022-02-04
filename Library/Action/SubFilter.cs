@@ -27,6 +27,7 @@ namespace CodeM.Common.Orm
         NotIn = 16384
     }
 
+    [Serializable]
     public class SubFilter : IFilter
     {
         private IFilter mParent = null;
