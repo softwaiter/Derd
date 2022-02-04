@@ -11,6 +11,7 @@ using System.Linq.Expressions;
 
 namespace CodeM.Common.Orm.Serialize
 {
+    [Serializable]
     public class ModelObject : ICollection<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>, IEnumerable, IDictionary<string, object>, IDynamicMetaObjectProvider
     {
         private Model mModel;

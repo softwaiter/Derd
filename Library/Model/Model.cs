@@ -6,6 +6,7 @@ using System.Text;
 
 namespace CodeM.Common.Orm
 {
+    [Serializable]
     public partial class Model : ICloneable
     {
         private ConcurrentDictionary<string, Property> mProperties = new ConcurrentDictionary<string, Property>();

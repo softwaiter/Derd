@@ -5,6 +5,7 @@ using System.Text;
 
 namespace CodeM.Common.Orm
 {
+    [Serializable]
     public class Property : ICloneable
     {
 
