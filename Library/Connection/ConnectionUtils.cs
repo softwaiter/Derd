@@ -21,6 +21,7 @@ namespace CodeM.Common.Orm
             sAllowedDatabases.TryAdd("mysql", "MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data");
             sAllowedDatabases.TryAdd("oracle", "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess");
             sAllowedDatabases.TryAdd("sqlserver", "Microsoft.Data.SqlClient.SqlClientFactory, Microsoft.Data.SqlClient");
+            sAllowedDatabases.TryAdd("postgres", "Npgsql.NpgsqlFactory, Npgsql");
         }
 
         internal static void ClearConnections()

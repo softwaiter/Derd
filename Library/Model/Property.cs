@@ -246,7 +246,7 @@ namespace CodeM.Common.Orm
             {
                 sb.Append(" NOT NULL");
             }
-            if (Features.IsSupportUnsigned(Owner) && 
+            if (Features.IsSupportComment(Owner) && 
                 !string.IsNullOrWhiteSpace(Description))
             {
                 sb.Append(string.Concat(" COMMENT '", Description, "'"));

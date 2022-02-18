@@ -92,7 +92,7 @@ namespace UnitTest
         {
             List<dynamic> result = OrmUtils.Model("User").In("Name", "wangxm", "huxinyue").Query();
             Assert.AreEqual(result.Count, 2);
-            List<dynamic> result2 = OrmUtils.Model("User").In("Name").Query();
+            List<dynamic> result2 = OrmUtils.Model("User").In("Name", "").Query();
             Assert.AreEqual(result2.Count, 0);
         }
 

@@ -15,5 +15,15 @@
     <user>root</user>
     <password>root</password>
     <database>test</database>
+	<charset>utf8</charset>
     <pool max="100" min="0">true</pool>
+</connection>-->
+<!--<connection>
+	<dialect>sqlserver</dialect>
+	<host>localhost</host>
+	<port></port>
+	<user>sa</user>
+	<password>sa123</password>
+	<database>test</database>
+	<pool max="100" min="0">true</pool>
 </connection>-->

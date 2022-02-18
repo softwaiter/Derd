@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CodeM.Common.Orm
 {
@@ -20,6 +21,10 @@ namespace CodeM.Common.Orm
         public string Password { get; set; } = null;
 
         public string Database { get; set; } = null;
+
+        public bool Encrypt { get; set; } = false;
+
+        public string Charset { get; set; } = null;
 
         public bool Pooling { get; set; } = false;
 
@@ -59,6 +64,25 @@ namespace CodeM.Common.Orm
             if (!string.IsNullOrWhiteSpace(Database))
             {
                 settings.Add(string.Concat("Database=", Database));
+            }
+
+            if ("mysql".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+            {
+                if (!string.IsNullOrWhiteSpace(Charset))
+                {
+                    settings.Add(string.Concat("Charset=", Charset));
+                }
+            }
+            else if ("sqlserver".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+            {
+                if (Encrypt)
+                {
+                    settings.Add("Encrypt=yes");
+                }
+                else
+                {
+                    settings.Add("Encrypt=no");
+                }
             }
 
             settings.Add(string.Concat("Pooling=", (Pooling ? "True" : "False")));

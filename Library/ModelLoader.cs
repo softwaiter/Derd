@@ -222,6 +222,18 @@ namespace CodeM.Common.Orm
                     {
                         result.Database = nodeInfo.Text.Trim();
                     }
+                    else if (nodeInfo.Path == "/connection/charset/@text")
+                    {
+                        result.Charset = nodeInfo.Text.Trim();
+                    }
+                    else if (nodeInfo.Path == "/connection/encrypt/@text")
+                    {
+                        if (!reBool.IsMatch(nodeInfo.Text.Trim()))
+                        {
+                            throw new Exception("encrypt节点值必须是布尔型。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                        }
+                        result.Encrypt = bool.Parse(nodeInfo.Text.Trim());
+                    }
                     else if (nodeInfo.Path == "/connection/pool")
                     {
                         string maxStr = nodeInfo.GetAttribute("max");
