@@ -1,4 +1,5 @@
-﻿using CodeM.Common.Orm.Serialize;
+﻿using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Orm.Serialize;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -185,10 +186,31 @@ namespace CodeM.Common.Orm
             return ModelObject.New(this);
         }
 
-        public string BuildCreateTableSQL()
+        private string BuildCommentSQL()
         {
             StringBuilder sb = new StringBuilder(PropertyCount * 10);
-            sb.Append(string.Concat("CREATE TABLE `", Table, "`("));
+            for (int i = 0; i < PropertyCount; i++)
+            {
+                Property p = GetProperty(i);
+                if (Features.IsSupportComment(this) &&
+                    !string.IsNullOrWhiteSpace(p.Description))
+                { 
+                    string extCmd = Features.GetCommentExtCommand(this, Table, p.Field, p.Description);
+                    if (!string.IsNullOrWhiteSpace(extCmd))
+                    {
+                        sb.Append(string.Concat(extCmd, ";"));
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+
+        public string BuildCreateTableSQL()
+        {
+            string[] quotes = Features.GetObjectQuotes(this);
+
+            StringBuilder sb = new StringBuilder(PropertyCount * 10);
+            sb.Append(string.Concat("CREATE TABLE ", quotes[0], Table, quotes[1], "("));
             for (int i = 0; i < PropertyCount; i++)
             {
                 if (i > 0)
@@ -210,14 +232,17 @@ namespace CodeM.Common.Orm
                         sb.Append(",");
                     }
                     
-                    string constraintFields = e.Current.Value.Replace(",", "`,`");
-                    sb.Append(string.Concat("CONSTRAINT ", e.Current.Key, " UNIQUE (`", constraintFields, "`)"));
+                    string constraintFields = e.Current.Value.Replace(",", string.Concat(quotes[1], ",", quotes[0]));
+                    sb.Append(string.Concat("CONSTRAINT ", e.Current.Key, " UNIQUE (", quotes[0], constraintFields, quotes[1], ")"));
 
                     i++;
                 }
             }
-
             sb.Append(");");
+
+            string extCmd = BuildCommentSQL();
+            sb.Append(extCmd);
+
             return sb.ToString();
         }
 
@@ -227,12 +252,14 @@ namespace CodeM.Common.Orm
             {
                 if (mIndexSettings.Count > 0)
                 {
+                    string[] quotes = Features.GetObjectQuotes(this);
+
                     StringBuilder sb = new StringBuilder((Table.Length + 30) * mIndexSettings.Count);
                     IEnumerator<KeyValuePair<string, string>> e = mIndexSettings.GetEnumerator();
                     while (e.MoveNext())
                     {
-                        string indexFields = e.Current.Value.Replace(",", "`,`");
-                        sb.Append(string.Concat("CREATE INDEX ", e.Current.Key, " ON `", Table, "`(`", indexFields, "`);"));
+                        string indexFields = e.Current.Value.Replace(",", string.Concat(quotes[1], ",", quotes[0]));
+                        sb.Append(string.Concat("CREATE INDEX ", e.Current.Key, " ON ", quotes[0], Table, quotes[1], "(", quotes[0], indexFields, quotes[1], ");"));
                     }
                     return sb.ToString();
                 }

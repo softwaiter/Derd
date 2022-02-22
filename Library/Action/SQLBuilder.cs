@@ -1,4 +1,5 @@
 ﻿using CodeM.Common.DbHelper;
+using CodeM.Common.Orm.Dialect;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,6 +15,8 @@ namespace CodeM.Common.Orm
 
         public static CommandSQL BuildInsertSQL(Model m)
         {
+            string[] quotes = Features.GetObjectQuotes(m);
+
             CommandSQL result = new CommandSQL();
 
             object value;
@@ -26,7 +29,8 @@ namespace CodeM.Common.Orm
                 {
                     if (m.Values.TryGetValue(p.Name, out value))
                     {
-                        DbParameter dp = DbUtils.CreateParam(m.Path, Guid.NewGuid().ToString("N"),
+                        string paramName = Guid.NewGuid().ToString("N");
+                        DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
                             value, p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
 
@@ -34,7 +38,7 @@ namespace CodeM.Common.Orm
                         {
                             insertFields += ",";
                         }
-                        insertFields += string.Concat("`", p.Field, "`");
+                        insertFields += string.Concat(quotes[0], p.Field, quotes[1]);
 
                         if (insertValues.Length > 0)
                         {
@@ -44,13 +48,15 @@ namespace CodeM.Common.Orm
                     }
                 }
             }
-            result.SQL = string.Concat("INSERT INTO `", m.Table, "` (", insertFields, ") VALUES(", insertValues + ")");
+            result.SQL = string.Concat("INSERT INTO ", quotes[0], m.Table, quotes[1], " (", insertFields, ") VALUES(", insertValues + ")");
 
             return result;
         }
 
         public static CommandSQL BuildUpdateSQL(Model m)
         {
+            string[] quotes = Features.GetObjectQuotes(m);
+
             CommandSQL result = new CommandSQL();
 
             string updateContent = string.Empty;
@@ -69,11 +75,11 @@ namespace CodeM.Common.Orm
                         {
                             updateContent += ",";
                         }
-                        updateContent += string.Concat("`", p.Field, "`=?");
+                        updateContent += string.Concat(quotes[0], p.Field, quotes[1], "=?");
                     }
                 }
             }
-            result.SQL = string.Concat("UPDATE `", m.Table, "` SET ", updateContent);
+            result.SQL = string.Concat("UPDATE ", quotes[0], m.Table, quotes[1], " SET ", updateContent);
 
             CommandSQL where = m.Where.Build(m);
             if (!string.IsNullOrEmpty(where.SQL))
@@ -87,6 +93,8 @@ namespace CodeM.Common.Orm
 
         internal static string BuildJoinTableSQL(Model m, List<string> foreignTables)
         {
+            string[] quotes = Features.GetObjectQuotes(m);
+
             StringBuilder sbJoins = new StringBuilder();
 
             Hashtable processedName = new Hashtable();
@@ -125,8 +133,8 @@ namespace CodeM.Common.Orm
                     {
                         joinField = subM.GetProperty(subProp.JoinProp).Field;
                     }
-                    sbJoins.Append(string.Concat(" LEFT JOIN `", subM.Table, "` ON `",
-                        currM.Table, "`.`", subProp.Field, "`=`", subM.Table, "`.`", joinField, "`"));
+                    sbJoins.Append(string.Concat(" LEFT JOIN ", quotes[0], subM.Table, quotes[1], " ON ", quotes[0],
+                        currM.Table, quotes[1], ".", quotes[0], subProp.Field, quotes[1], "=", quotes[0], subM.Table, quotes[1], ".", quotes[0], joinField, quotes[1]));
 
                     currM = subM;
 
@@ -167,6 +175,8 @@ namespace CodeM.Common.Orm
 
         internal static string BuildGroupBySQL(Model m)
         {
+            string[] quotes = Features.GetObjectQuotes(m);
+
             StringBuilder sbResult = new StringBuilder();
 
             if (m.GroupByNames.Count > 0)
@@ -181,7 +191,7 @@ namespace CodeM.Common.Orm
                         {
                             sbResult.Append(",");
                         }
-                        sbResult.Append(string.Concat("`", m.Table, "`.`", p.Field, "`"));
+                        sbResult.Append(string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1]));
                     }
                     else    //Model属性引用
                     {
@@ -200,7 +210,7 @@ namespace CodeM.Common.Orm
                                 }
 
                                 Property lastProp = currM.GetProperty(subNames[i + 1]);
-                                sbResult.Append(string.Concat("`", currM.Table, "`.`", lastProp.Field, "`"));
+                                sbResult.Append(string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1]));
 
                                 break;
                             }
@@ -214,6 +224,8 @@ namespace CodeM.Common.Orm
 
         internal static CommandSQL BuildQuerySQL(Model m)
         {
+            string[] quotes = Features.GetObjectQuotes(m);
+
             CommandSQL result = new CommandSQL();
 
             List<GetValueSetting> queryFields = new List<GetValueSetting>();
@@ -241,8 +253,8 @@ namespace CodeM.Common.Orm
                         sbFields.Append(",");
                     }
                     sbFields.Append(string.Concat(
-                        GenQueryField(gvs, string.Concat("`", m.Table, "`.`", p.Field, "`")),
-                        " AS `", gvs.Name, "`"));
+                        GenQueryField(gvs, string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1])),
+                        " AS ", quotes[0], gvs.Name, quotes[1]));
                 }
                 else    //Model属性引用
                 {
@@ -265,8 +277,8 @@ namespace CodeM.Common.Orm
                             Property lastProp = currM.GetProperty(subNames[i + 1]); 
                             string fieldName = gvs.Name.Replace(".", "_");
                             sbFields.Append(string.Concat(
-                                GenQueryField(gvs, string.Concat("`", currM.Table, "`.`", lastProp.Field, "`")),
-                                " AS `", fieldName, "`"));
+                                GenQueryField(gvs, string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1])),
+                                " AS ", quotes[0], fieldName, quotes[1]));
 
                             break;
                         }
@@ -280,7 +292,7 @@ namespace CodeM.Common.Orm
             foreignTables.AddRange(m.ForeignSortNames);
             string joinSql = BuildJoinTableSQL(m, foreignTables);
             
-            result.SQL = string.Concat("SELECT ", sbFields, " FROM `", m.Table, "`", joinSql);
+            result.SQL = string.Concat("SELECT ", sbFields, " FROM ", quotes[0], m.Table, quotes[1], joinSql);
             if (!string.IsNullOrEmpty(where.SQL))
             {
                 result.SQL += string.Concat(" WHERE ", where.SQL);

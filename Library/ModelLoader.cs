@@ -407,15 +407,15 @@ namespace CodeM.Common.Orm
             }
             else if (type == typeof(UInt16))
             {
-                return DbType.UInt16;
+                return DbType.Int32;
             }
             else if (type == typeof(UInt32))
             {
-                return DbType.UInt32;
+                return DbType.Int64;
             }
             else if (type == typeof(UInt64))
             {
-                return DbType.UInt64;
+                return DbType.Int64;
             }
             else if (type == typeof(DateTime))
             {

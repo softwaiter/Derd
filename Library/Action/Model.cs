@@ -508,10 +508,12 @@ namespace CodeM.Common.Orm
         #region ICommand
         public void CreateTable(bool replace = false)
         {
+            string[] quotes = Features.GetObjectQuotes(this);
+
             StringBuilder sb = new StringBuilder(ToString());
             if (replace)
             {
-                sb.Insert(0, string.Concat("DROP TABLE IF EXISTS `", Table, "`;"));
+                sb.Insert(0, string.Concat("DROP TABLE IF EXISTS ", quotes[0], Table, quotes[1], ";"));
             }
 
             OrmUtils.PrintSQL(sb.ToString());

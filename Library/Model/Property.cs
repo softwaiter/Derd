@@ -48,7 +48,7 @@ namespace CodeM.Common.Orm
         /// 属性对应的数据库字段类型
         /// </summary>
         public DbType FieldType { get; set; }
-
+        
         /// <summary>
         /// 属性描述
         /// </summary>
@@ -216,9 +216,11 @@ namespace CodeM.Common.Orm
 
         public override string ToString()
         {
+            string[] quotes = Features.GetObjectQuotes(Owner);
+
             StringBuilder sb = new StringBuilder(64);
             string fieldType = FieldUtils.GetFieldType(Owner, FieldType);
-            sb.Append(string.Concat("`", Field, "` ", fieldType));
+            sb.Append(string.Concat(quotes[0], Field, quotes[1], " ", fieldType));
             if (Length > 0)
             {
                 if (FieldUtils.IsFloat(FieldType))
@@ -249,7 +251,11 @@ namespace CodeM.Common.Orm
             if (Features.IsSupportComment(Owner) && 
                 !string.IsNullOrWhiteSpace(Description))
             {
-                sb.Append(string.Concat(" COMMENT '", Description, "'"));
+                string extCmd = Features.GetCommentExtCommand(Owner, Owner.Table, Field, Description);
+                if (string.IsNullOrWhiteSpace(extCmd))
+                {
+                    sb.Append(string.Concat(" COMMENT '", Description, "'"));
+                }
             }
             return sb.ToString();
         }

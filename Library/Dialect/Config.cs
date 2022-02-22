@@ -13,12 +13,18 @@ namespace CodeM.Common.Orm.Dialect
         {
             { "unsigned", new Hashtable() {
                 { "default", true },
-                { "sqlite", false }
+                { "sqlite", false },
+                { "sqlserver", false }
             }},
             { "comment", new Hashtable() {
                 { "default", true },
                 { "sqlite", false }
             }},
+            { "comment_ext", new Hashtable() {
+                { "default", "" },
+                { "sqlserver", "execute sp_addextendedproperty N'MS_Description',N'{2}',N'SCHEMA',N'dbo',N'table',N'{0}',N'column',N'{1}'" }
+            }},
+
             { "autoincrement", new Hashtable() {
                 { "default", true },
                 { "oracle", false }
@@ -36,6 +42,10 @@ namespace CodeM.Common.Orm.Dialect
             { "select_forupdate", new Hashtable() {
                 { "default", true },
                 { "sqlite", false }
+            }},
+            { "object_quote", new Hashtable() {
+                { "default", new string[] { "`", "`" } },
+                { "sqlserver", new string[] { "[", "]" } }
             }}
         });
 
@@ -46,7 +56,8 @@ namespace CodeM.Common.Orm.Dialect
         {
             { "tag", new Hashtable() {
                 { "default", "AUTOINCREMENT" },
-                { "mysql", "AUTO_INCREMENT" }
+                { "mysql", "AUTO_INCREMENT" },
+                { "sqlserver", "IDENTITY" }
             }}
         });
 
@@ -127,33 +138,33 @@ namespace CodeM.Common.Orm.Dialect
             }},
             { DbType.SByte, new Hashtable() {
                 { "default", "integer" },
-                { "mysql", "tinyint" }
+                { "mysql", "tinyint" },
+                { "sqlserver", "tinyint" }
             }},
             { DbType.Byte, new Hashtable() {
                 { "default", "integer" },
-                { "mysql", "tinyint" }
+                { "mysql", "tinyint" },
+                { "sqlserver", "tinyint" }
             }},
             { DbType.Int16, new Hashtable() {
                 { "default", "integer" },
-                { "mysql", "smallint" }
+                { "mysql", "smallint" },
+                { "sqlserver", "smallint" }
             }},
             { DbType.UInt16, new Hashtable() {
-                { "default", "integer" },
-                { "mysql", "smallint" }
+                { "default", "integer" }
             }},
             { DbType.Int32, new Hashtable() {
                 { "default", "integer" }
             }},
             { DbType.UInt32, new Hashtable() {
-                { "default", "integer" }
+                { "default", "bigint" }
             }},
             { DbType.Int64, new Hashtable() {
-                { "default", "integer" },
-                { "mysql", "bigint" }
+                { "default", "bigint" }
             }},
             { DbType.UInt64, new Hashtable() {
-                { "default", "integer" },
-                { "mysql", "bigint" }
+                { "default", "bigint" }
             }},
             { DbType.Single, new Hashtable() {
                 { "default", "float" }
@@ -164,10 +175,12 @@ namespace CodeM.Common.Orm.Dialect
             }},
             { DbType.Double, new Hashtable() {
                 { "default", "double" },
-                { "sqlite", "real" }
+                { "sqlite", "real" },
+                { "sqlserver", "real" }
             }},
             { DbType.Boolean, new Hashtable() {
-                { "default", "boolean" }
+                { "default", "boolean" },
+                { "sqlserver", "bit" }
             }},
             { DbType.DateTime, new Hashtable() {
                 { "default", "datetime" }
@@ -179,7 +192,8 @@ namespace CodeM.Common.Orm.Dialect
                 { "default", "time" }
             }},
             { DbType.Object, new Hashtable() {
-                { "default", "blob" }
+                { "default", "blob" },
+                { "sqlserver", "varbinary" }
             }}
         });
 

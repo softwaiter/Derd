@@ -32,6 +32,12 @@
             return Config.GetConfigValue<bool>("feature", model, "comment");
         }
 
+        internal static string GetCommentExtCommand(Model model, string tableName, string colName, string colDesc)
+        {
+            string extStr = Config.GetConfigValue<string>("feature", model, "comment_ext");
+            return string.Format(extStr, tableName, colName, colDesc);
+        }
+
         /// <summary>
         /// 判断数据库类型是否支持整数自增功能
         /// </summary>
@@ -50,6 +56,11 @@
         internal static bool IsSupportSelectForUpdate(Model model)
         {
             return Config.GetConfigValue<bool>("feature", model, "select_forupdate");
+        }
+
+        internal static string[] GetObjectQuotes(Model model)
+        {
+            return Config.GetConfigValue<string[]>("feature", model, "object_quote");
         }
     }
 }
