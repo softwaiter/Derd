@@ -61,20 +61,26 @@ namespace UnitTest
             newuser3.Age = 18;
             bool ret4 = OrmUtils.Model("User").SetValues(newuser3).Save();
             Assert.IsTrue(ret4);
+
+            dynamic newuser4 = ModelObject.New("User");
+            newuser4.Name = "lisi";
+            newuser4.Age = 10;
+            bool ret5 = OrmUtils.Model("User").SetValues(newuser4).Save();
+            Assert.IsTrue(ret5);
         }
 
         [Description("使用Distinct去重同年龄的人，应查询得到2人。")]
         public void Test2()
         {
             List<dynamic> result = OrmUtils.Model("User").GetValue(Model.AggregateType.DISTINCT, "Age").Query();
-            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual(3, result.Count);
         }
 
-        [Description("计算所有人的年龄之和，应为50。")]
+        [Description("计算所有人的年龄之和，应为60。")]
         public void Test3()
         {
             dynamic result = OrmUtils.Model("User").GetValue(Model.AggregateType.SUM, "Age").QueryFirst();
-            Assert.AreEqual(50, result.Age);
+            Assert.AreEqual(60, result.Age);
         }
 
         [Description("使用COUNT方式获取18岁年龄段的人员数量，应为2人。")]
@@ -87,7 +93,7 @@ namespace UnitTest
             Assert.AreEqual(2, result.Id_Count);
         }
 
-        [Description("获取所有人种最大的年龄，应为18。")]
+        [Description("获取所有人中最大的年龄，应为18。")]
         public void Test5()
         {
             dynamic result = OrmUtils.Model("User")
@@ -96,25 +102,25 @@ namespace UnitTest
             Assert.AreEqual(18, result.Age);
         }
 
-        [Description("获取所有人种最小的年龄，应为14。")]
+        [Description("获取所有人种最小的年龄，应为10。")]
         public void Test6()
         {
             dynamic result = OrmUtils.Model("User")
                 .GetValue(Model.AggregateType.MIN, "Age")
                 .QueryFirst();
-            Assert.AreEqual(14, result.Age);
+            Assert.AreEqual(10, result.Age);
         }
 
-        [Description("获取人员平均年龄，应为17。")]
+        [Description("获取人员平均年龄，应为15。")]
         public void Test7()
         {
             dynamic result = OrmUtils.Model("User")
                 .GetValue(Model.AggregateType.AVG, "Age")
                 .QueryFirst();
-            Assert.AreEqual(17, result.Age);
+            Assert.AreEqual(15, result.Age);
         }
 
-        [Description("使用GroupBy计算每个年龄段的人数，应该18岁2人，14岁1人。")]
+        [Description("使用GroupBy计算每个年龄段的人数，应该18岁2人，14岁1人，10岁1人。")]
         public void Test8()
         {
             List<dynamic> result = OrmUtils.Model("User")
@@ -130,6 +136,10 @@ namespace UnitTest
             dynamic obj14 = result.Find(item => item.Age == 14);
             Assert.IsNotNull(obj14);
             Assert.AreEqual(1, obj14.Id_Count);
+
+            dynamic obj10 = result.Find(item => item.Age == 10);
+            Assert.IsNotNull(obj10);
+            Assert.AreEqual(1, obj10.Id_Count);
         }
     }
 }

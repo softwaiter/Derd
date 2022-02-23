@@ -1038,7 +1038,8 @@ namespace CodeM.Common.Orm
                                 {
                                     if (gvs.Type == AggregateType.COUNT)
                                     {
-                                        obj.SetValue(GetCountPropName(gvs.Name), dr.GetInt64(gvs.Name));
+                                        object countObj = dr.GetValue(gvs.Name);
+                                        obj.SetValue(GetCountPropName(gvs.Name), Convert.ToInt64(countObj));
                                     }
                                     else
                                     {
@@ -1108,7 +1109,8 @@ namespace CodeM.Common.Orm
                                         {
                                             if (gvs.Type == AggregateType.COUNT)
                                             {
-                                                currObj.SetValue(GetCountPropName(lastName), dr.GetInt64(fieldName));
+                                                object countObj = dr.GetValue(fieldName);
+                                                currObj.SetValue(GetCountPropName(lastName), Convert.ToInt64(countObj));
                                             }
                                             else
                                             {

@@ -34,10 +34,10 @@ namespace CodeM.Common.Orm.Dialect
                 { "sqlite", false }
             }},
             { "exists_sql_format", new Hashtable() {    // 输入table、database
-                { "sqlite", "select count(*) as c from Sqlite_master where type ='table' and name ='{0}'" },
-                { "mysql", "select count(*)  from information_schema.TABLES t where t.TABLE_SCHEMA ='{1}' and t.TABLE_NAME ='{0}'" },
-                { "oracle", "select count(*) from user_tables t where table_name=upper('{0}')" },
-                { "sqlserver", "select count(*) from sysobjects where id = object_id('{1}.Owner.{0}')" }
+                { "sqlite", "SELECT COUNT(*) AS c FROM Sqlite_master WHERE type ='table' AND name ='{0}'" },
+                { "mysql", "SELECT COUNT(*) FROM information_schema.TABLES t WHERE t.TABLE_SCHEMA ='{1}' AND t.TABLE_NAME ='{0}'" },
+                { "oracle", "SELECT COUNT(*) FROM user_tables t WHERE table_name=upper('{0}')" },
+                { "sqlserver", "SELECT COUNT(*) FROM sysObjects WHERE Id=OBJECT_ID(N'{0}') and xtype='U'" }
             }},
             { "select_forupdate", new Hashtable() {
                 { "default", true },
