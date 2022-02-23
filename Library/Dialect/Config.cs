@@ -20,7 +20,7 @@ namespace CodeM.Common.Orm.Dialect
                 { "default", true },
                 { "sqlite", false }
             }},
-            { "comment_ext", new Hashtable() {
+            { "comment_ext_format", new Hashtable() {   //输入table、column、column-description
                 { "default", "" },
                 { "sqlserver", "execute sp_addextendedproperty N'MS_Description',N'{2}',N'SCHEMA',N'dbo',N'table',N'{0}',N'column',N'{1}'" }
             }},
@@ -33,7 +33,7 @@ namespace CodeM.Common.Orm.Dialect
                 { "default", true },
                 { "sqlite", false }
             }},
-            { "exists_sql", new Hashtable() {
+            { "exists_sql_format", new Hashtable() {    // 输入table、database
                 { "sqlite", "select count(*) as c from Sqlite_master where type ='table' and name ='{0}'" },
                 { "mysql", "select count(*)  from information_schema.TABLES t where t.TABLE_SCHEMA ='{1}' and t.TABLE_NAME ='{0}'" },
                 { "oracle", "select count(*) from user_tables t where table_name=upper('{0}')" },
@@ -46,6 +46,10 @@ namespace CodeM.Common.Orm.Dialect
             { "object_quote", new Hashtable() {
                 { "default", new string[] { "`", "`" } },
                 { "sqlserver", new string[] { "[", "]" } }
+            }},
+            { "command_param_format", new Hashtable() { // 输入paramname
+                { "default", "?" },
+                { "sqlserver", "@{0}" }
             }}
         });
 

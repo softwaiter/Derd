@@ -44,7 +44,8 @@ namespace CodeM.Common.Orm
                         {
                             insertValues += ",";
                         }
-                        insertValues += "?";
+                        string paramPlaceholder = Features.GetCommandParamName(m, paramName);
+                        insertValues += paramPlaceholder;
                     }
                 }
             }
@@ -67,7 +68,8 @@ namespace CodeM.Common.Orm
                 {
                     if (m.Values.Has(p.Name))
                     {
-                        DbParameter dp = DbUtils.CreateParam(m.Path, Guid.NewGuid().ToString("N"),
+                        string paramName = Guid.NewGuid().ToString("N");
+                        DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
                             m.Values[p.Name], p.FieldType, ParameterDirection.Input);
                         result.Params.Add(dp);
 
@@ -75,7 +77,8 @@ namespace CodeM.Common.Orm
                         {
                             updateContent += ",";
                         }
-                        updateContent += string.Concat(quotes[0], p.Field, quotes[1], "=?");
+                        string paramPlaceholder = Features.GetCommandParamName(m, paramName);
+                        updateContent += string.Concat(quotes[0], p.Field, quotes[1], "=", paramPlaceholder);
                     }
                 }
             }

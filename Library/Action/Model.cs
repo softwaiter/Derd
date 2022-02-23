@@ -1190,7 +1190,7 @@ namespace CodeM.Common.Orm
                     count = DbUtils.ExecuteScalar(trans, sql, where.Params.ToArray());
                 }
 
-                return (long)count;
+                return Convert.ToInt64(count);
             }
             finally
             {

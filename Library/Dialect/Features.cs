@@ -34,7 +34,7 @@
 
         internal static string GetCommentExtCommand(Model model, string tableName, string colName, string colDesc)
         {
-            string extStr = Config.GetConfigValue<string>("feature", model, "comment_ext");
+            string extStr = Config.GetConfigValue<string>("feature", model, "comment_ext_format");
             return string.Format(extStr, tableName, colName, colDesc);
         }
 
@@ -50,7 +50,7 @@
 
         internal static string GetTableExistsSql(Model model)
         {
-            return Config.GetConfigValue<string>("feature", model, "exists_sql");
+            return Config.GetConfigValue<string>("feature", model, "exists_sql_format");
         }
 
         internal static bool IsSupportSelectForUpdate(Model model)
@@ -61,6 +61,12 @@
         internal static string[] GetObjectQuotes(Model model)
         {
             return Config.GetConfigValue<string[]>("feature", model, "object_quote");
+        }
+
+        internal static string GetCommandParamName(Model model, string name)
+        {
+            string paramStr = Config.GetConfigValue<string>("feature", model, "command_param_format");
+            return string.Format(paramStr, name);
         }
     }
 }
