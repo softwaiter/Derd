@@ -68,5 +68,11 @@
             string paramStr = Config.GetConfigValue<string>("feature", model, "command_param_format");
             return string.Format(paramStr, name);
         }
+
+        internal static string GetPagingCommand(Model model, string sql, int pagesize, int pageindex)
+        {
+            string pagingStr = Config.GetConfigValue<string>("feature", model, "paging_command_format");
+            return string.Format(pagingStr, sql, pagesize, pageindex, (pageindex - 1) * pagesize);
+        }
     }
 }

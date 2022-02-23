@@ -295,7 +295,7 @@ namespace CodeM.Common.Orm
             foreignTables.AddRange(m.ForeignSortNames);
             string joinSql = BuildJoinTableSQL(m, foreignTables);
             
-            result.SQL = string.Concat("SELECT ", sbFields, " FROM ", quotes[0], m.Table, quotes[1], joinSql);
+            result.SQL = string.Concat(sbFields, " FROM ", quotes[0], m.Table, quotes[1], joinSql);
             if (!string.IsNullOrEmpty(where.SQL))
             {
                 result.SQL += string.Concat(" WHERE ", where.SQL);
@@ -318,7 +318,11 @@ namespace CodeM.Common.Orm
 
             if (m.IsUsePaging)
             {
-                result.SQL += string.Concat(" LIMIT ", (m.CurrPageIndex - 1) * m.CurrPageSize, ",", m.CurrPageSize);
+                result.SQL = Features.GetPagingCommand(m, result.SQL, m.CurrPageSize, m.CurrPageIndex);
+            }
+            else
+            {
+                result.SQL = string.Concat("SELECT ", result.SQL);
             }
 
             if (m.IsSelectForUpdate)

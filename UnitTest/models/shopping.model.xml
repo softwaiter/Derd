@@ -3,8 +3,8 @@
     <property name="Id" field="f_id" notNull="True" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
     <property name="Code" length="32" notNull="true" uniqueGroup="uc_code_name" desc="商品编码" />
     <property name="Name" length="32" notNull="true" uniqueGroup="uc_code_name" desc="商品名称" />
-    <property name="Desc" field="desc" length="128" desc="商品说明" />
-    <property name="Order" field="order" length="32" notNull="true" indexGroup="idx_order_code" desc="订单号" />
+    <property name="Desc" length="128" desc="商品说明" />
+    <property name="Order" length="32" notNull="true" indexGroup="idx_order_code" desc="订单号" />
     <property name="CreateTime" type="DateTime" field="f_createtime" defaultValue="{{CurrentDateTime}}" joinUpdate="false" desc="创建时间" />
     <property name="UpdateTime" type="DateTime" field="f_updatetime" beforeSave="{{CurrentDateTime}}" desc="更新时间" />
 </model>

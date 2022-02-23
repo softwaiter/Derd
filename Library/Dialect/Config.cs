@@ -50,6 +50,10 @@ namespace CodeM.Common.Orm.Dialect
             { "command_param_format", new Hashtable() { // 输入paramname
                 { "default", "?" },
                 { "sqlserver", "@{0}" }
+            }},
+            { "paging_command_format", new Hashtable() {    // 输入sql、pagesize、pageindex、offset
+                { "default", "SELECT {0} LIMIT {3}, {1}" },
+                { "sqlserver", "SELECT TOP {1} R.* from (SELECT ROW_NUMBER() OVER(ORDER BY (SELECT 0)) AS RN, * FROM (SELECT TOP 9223372036854775807 {0}) AS Q) AS R WHERE RN > {3}" }
             }}
         });
 

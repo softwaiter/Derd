@@ -597,7 +597,8 @@ namespace CodeM.Common.Orm
 
                 OrmUtils.PrintSQL(sql);
 
-                long count = (long)DbUtils.ExecuteScalar(Path.ToLower(), sql);
+                object result = DbUtils.ExecuteScalar(Path.ToLower(), sql);
+                long count = Convert.ToInt64(result);
                 return count > 0;
             }
             return false;
@@ -1221,12 +1222,12 @@ namespace CodeM.Common.Orm
                 CommandSQL where = mFilter.Build(this);
 
                 string joinSql = SQLBuilder.BuildJoinTableSQL(this, where.ForeignTables);
-                string sql = string.Concat("SELECT * FROM ", this.Table, joinSql);
+                string sql = string.Concat("* FROM ", this.Table, joinSql);
                 if (!string.IsNullOrWhiteSpace(where.SQL))
                 {
                     sql += string.Concat(" WHERE ", where.SQL);
                 }
-                sql += "LIMIT 0,1";
+                sql = Features.GetPagingCommand(this, sql, 1, 1);
 
                 OrmUtils.PrintSQL(sql, where.Params.ToArray());
 
