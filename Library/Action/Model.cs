@@ -508,22 +508,40 @@ namespace CodeM.Common.Orm
         #region ICommand
         public void CreateTable(bool replace = false)
         {
-            string[] quotes = Features.GetObjectQuotes(this);
-
             StringBuilder sb = new StringBuilder(ToString());
             if (replace)
             {
-                sb.Insert(0, string.Concat("DROP TABLE IF EXISTS ", quotes[0], Table, quotes[1], ";"));
+                RemoveTable();
             }
 
             OrmUtils.PrintSQL(sb.ToString());
-            DbUtils.ExecuteNonQuery(Path.ToLower(), sb.ToString());
+            CommandUtils.ExecuteNonQuery(this, Path.ToLower(), sb.ToString());
 
             string tableIndexSQL = ToString(true);
             if (!string.IsNullOrWhiteSpace(tableIndexSQL))
             {
                 OrmUtils.PrintSQL(tableIndexSQL);
-                DbUtils.ExecuteNonQuery(Path.ToLower(), tableIndexSQL);
+                CommandUtils.ExecuteNonQuery(this, Path.ToLower(), tableIndexSQL);
+            }
+
+            if (Features.IsSupportAutoIncrement(this))
+            {
+                for (int i = 0; i < PropertyCount; i++)
+                {
+                    Property p = GetProperty(i);
+                    if (p.AutoIncrement)
+                    {
+                        string[] aiCmds = Features.GetAutoIncrementExtCommand(this, Table, p.Field);
+                        foreach (string cmd in aiCmds)
+                        {
+                            if (!string.IsNullOrEmpty(cmd))
+                            {
+                                OrmUtils.PrintSQL(cmd);
+                                DbUtils.ExecuteNonQuery(Path.ToLower(), cmd);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -541,43 +559,97 @@ namespace CodeM.Common.Orm
             return false;
         }
 
-        public void RemoveTable()
+        public void RemoveTable(bool throwError = false)
         {
-            string sql = string.Concat("DROP TABLE IF EXISTS ", Table);
-            OrmUtils.PrintSQL(sql);
-            DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+            try
+            {
+                string[] quotes = Features.GetObjectQuotes(this);
+
+                string sql = string.Concat("DROP TABLE IF EXISTS ", quotes[0], Table, quotes[1]);
+                if (!Features.IsSupportIfExists(this))
+                {
+                    sql = string.Concat("DROP TABLE ", quotes[0], Table, quotes[1]);
+                }
+                OrmUtils.PrintSQL(sql);
+                CommandUtils.ExecuteNonQuery(this, Path.ToLower(), sql);
+            }
+            catch (Exception exp)
+            {
+                if (throwError)
+                {
+                    throw exp;
+                }
+            }
+
+            try
+            {
+                for (int i = 0; i < PropertyCount; i++)
+                {
+                    Property p = GetProperty(i);
+                    if (p.AutoIncrement)
+                    {
+                        string[] aiCmds = Features.GetAutoIncrementGCExtCommand(this, Table, p.Field);
+                        foreach (string cmd in aiCmds)
+                        {
+                            if (!string.IsNullOrEmpty(cmd))
+                            {
+                                OrmUtils.PrintSQL(cmd);
+                                DbUtils.ExecuteNonQuery(Path.ToLower(), cmd);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception exp)
+            {
+                if (throwError)
+                {
+                    throw exp;
+                }
+            }
         }
 
         public bool TryRemoveTable()
         {
             try
             {
-                RemoveTable();
+                RemoveTable(true);
                 return true;
             }
             catch
             {
-                ;
+                return false;
             }
-            return false;
         }
 
-        public void TruncateTable()
+        public void TruncateTable(bool throwError = false)
         {
-            string sql = string.Concat("TRUNCATE TABLE ", Table);
-            if (!Features.IsSupportTruncate(this))
+            try
             {
-                sql = string.Concat("DELETE FROM ", Table);
+                string[] quotes = Features.GetObjectQuotes(this);
+
+                string sql = string.Concat("TRUNCATE TABLE ", quotes[0], Table, quotes[1]);
+                if (!Features.IsSupportTruncate(this))
+                {
+                    sql = string.Concat("DELETE FROM ", quotes[0], Table, quotes[1]);
+                }
+                OrmUtils.PrintSQL(sql);
+                CommandUtils.ExecuteNonQuery(this, Path.ToLower(), sql);
             }
-            OrmUtils.PrintSQL(sql);
-            DbUtils.ExecuteNonQuery(Path.ToLower(), sql);
+            catch (Exception exp)
+            {
+                if (throwError)
+                {
+                    throw exp;
+                }
+            }
         }
 
         public bool TryTruncateTable()
         {
             try
             {
-                TruncateTable();
+                TruncateTable(true);
                 return true;
             }
             catch
@@ -589,12 +661,10 @@ namespace CodeM.Common.Orm
 
         public bool TableExists()
         {
-            string sql = Features.GetTableExistsSql(this);
+            string database = ConnectionUtils.GetConnectionByModel(this).Database;
+            string sql = Features.GetTableExistsSql(this, database, Table);
             if (sql != null)
             {
-                string database = ConnectionUtils.GetConnectionByModel(this).Database;
-                sql = string.Format(sql, Table, database);
-
                 OrmUtils.PrintSQL(sql);
 
                 object result = DbUtils.ExecuteScalar(Path.ToLower(), sql);
@@ -796,11 +866,11 @@ namespace CodeM.Common.Orm
 
                 if (trans == null)
                 {
-                    return DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) == 1;
+                    return CommandUtils.ExecuteNonQuery(this, Path, cmd.SQL, cmd.Params.ToArray()) == 1;
                 }
                 else
                 {
-                    return DbUtils.ExecuteNonQuery(trans, cmd.SQL, cmd.Params.ToArray()) == 1;
+                    return CommandUtils.ExecuteNonQuery(this, trans, cmd.SQL, cmd.Params.ToArray()) == 1;
                 }
             }
             finally
@@ -846,11 +916,11 @@ namespace CodeM.Common.Orm
 
                 if (trans == null)
                 {
-                    return DbUtils.ExecuteNonQuery(Path, cmd.SQL, cmd.Params.ToArray()) > 0;
+                    return CommandUtils.ExecuteNonQuery(this, Path, cmd.SQL, cmd.Params.ToArray()) > 0;
                 }
                 else
                 {
-                    return DbUtils.ExecuteNonQuery(trans, cmd.SQL, cmd.Params.ToArray()) > 0;
+                    return CommandUtils.ExecuteNonQuery(this, trans, cmd.SQL, cmd.Params.ToArray()) > 0;
                 }
             }
             finally
@@ -895,11 +965,11 @@ namespace CodeM.Common.Orm
 
                 if (trans == null)
                 {
-                    return DbUtils.ExecuteNonQuery(this.Path, sql, where.Params.ToArray()) > 0;
+                    return CommandUtils.ExecuteNonQuery(this, Path, sql, where.Params.ToArray()) > 0;
                 }
                 else
                 {
-                    return DbUtils.ExecuteNonQuery(trans, sql, where.Params.ToArray()) > 0;
+                    return CommandUtils.ExecuteNonQuery(this, trans, sql, where.Params.ToArray()) > 0;
                 }
             }
             finally
@@ -1175,7 +1245,8 @@ namespace CodeM.Common.Orm
                 CommandSQL where = mFilter.Build(this);
 
                 string joinSql = SQLBuilder.BuildJoinTableSQL(this, where.ForeignTables);
-                string sql = string.Concat("SELECT COUNT(1) FROM ", this.Table, joinSql);
+                string[] quotes = Features.GetObjectQuotes(this);
+                string sql = string.Concat("SELECT COUNT(1) FROM ", quotes[0], this.Table, quotes[1], joinSql);
                 if (!string.IsNullOrWhiteSpace(where.SQL))
                 {
                     sql += string.Concat(" WHERE ", where.SQL);
@@ -1224,7 +1295,8 @@ namespace CodeM.Common.Orm
                 CommandSQL where = mFilter.Build(this);
 
                 string joinSql = SQLBuilder.BuildJoinTableSQL(this, where.ForeignTables);
-                string sql = string.Concat("* FROM ", this.Table, joinSql);
+                string[] quotes = Features.GetObjectQuotes(this);
+                string sql = string.Concat("* FROM ", quotes[0], this.Table, quotes[1], joinSql);
                 if (!string.IsNullOrWhiteSpace(where.SQL))
                 {
                     sql += string.Concat(" WHERE ", where.SQL);

@@ -1,6 +1,5 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.Dialect;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -12,7 +11,6 @@ namespace CodeM.Common.Orm
 {
     internal class SQLBuilder
     {
-
         public static CommandSQL BuildInsertSQL(Model m)
         {
             string[] quotes = Features.GetObjectQuotes(m);
@@ -29,23 +27,27 @@ namespace CodeM.Common.Orm
                 {
                     if (m.Values.TryGetValue(p.Name, out value))
                     {
-                        string paramName = Guid.NewGuid().ToString("N");
-                        DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
-                            value, p.FieldType, ParameterDirection.Input);
-                        result.Params.Add(dp);
-
-                        if (insertFields.Length > 0)
+                        if (value != null)
                         {
-                            insertFields += ",";
-                        }
-                        insertFields += string.Concat(quotes[0], p.Field, quotes[1]);
+                            DbType dbType = CommandUtils.GetDbParamType(p);
+                            string paramName = CommandUtils.GenParamName(p);
+                            DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
+                                value, dbType, ParameterDirection.Input);
+                            result.Params.Add(dp);
 
-                        if (insertValues.Length > 0)
-                        {
-                            insertValues += ",";
+                            if (insertFields.Length > 0)
+                            {
+                                insertFields += ",";
+                            }
+                            insertFields += string.Concat(quotes[0], p.Field, quotes[1]);
+
+                            if (insertValues.Length > 0)
+                            {
+                                insertValues += ",";
+                            }
+                            string paramPlaceholder = Features.GetCommandParamName(m, paramName);
+                            insertValues += paramPlaceholder;
                         }
-                        string paramPlaceholder = Features.GetCommandParamName(m, paramName);
-                        insertValues += paramPlaceholder;
                     }
                 }
             }
@@ -68,9 +70,10 @@ namespace CodeM.Common.Orm
                 {
                     if (m.Values.Has(p.Name))
                     {
-                        string paramName = Guid.NewGuid().ToString("N");
+                        DbType dbType = CommandUtils.GetDbParamType(p);
+                        string paramName = CommandUtils.GenParamName(p);
                         DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
-                            m.Values[p.Name], p.FieldType, ParameterDirection.Input);
+                            m.Values[p.Name], dbType, ParameterDirection.Input);
                         result.Params.Add(dp);
 
                         if (updateContent.Length > 0)
@@ -228,6 +231,12 @@ namespace CodeM.Common.Orm
         internal static CommandSQL BuildQuerySQL(Model m)
         {
             string[] quotes = Features.GetObjectQuotes(m);
+            string[] aliasQuotes = new string[] { quotes[0], quotes[1] };
+            string[] specAliasQuotes = Features.GetFieldAliasQuotes(m);
+            if (specAliasQuotes.Length > 0)
+            {
+                aliasQuotes = specAliasQuotes;
+            }
 
             CommandSQL result = new CommandSQL();
 
@@ -257,7 +266,7 @@ namespace CodeM.Common.Orm
                     }
                     sbFields.Append(string.Concat(
                         GenQueryField(gvs, string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1])),
-                        " AS ", quotes[0], gvs.Name, quotes[1]));
+                        " AS ", aliasQuotes[0], gvs.Name, aliasQuotes[1]));
                 }
                 else    //Model属性引用
                 {
@@ -281,7 +290,7 @@ namespace CodeM.Common.Orm
                             string fieldName = gvs.Name.Replace(".", "_");
                             sbFields.Append(string.Concat(
                                 GenQueryField(gvs, string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1])),
-                                " AS ", quotes[0], fieldName, quotes[1]));
+                                " AS ", aliasQuotes[0], fieldName, aliasQuotes[1]));
 
                             break;
                         }

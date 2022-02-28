@@ -8,11 +8,11 @@ namespace CodeM.Common.Orm
 
         bool TryCreateTable(bool force = false);
 
-        void RemoveTable();
+        void RemoveTable(bool throwError = false);
 
         bool TryRemoveTable();
 
-        void TruncateTable();
+        void TruncateTable(bool throwError = false);
 
         bool TableExists();
 

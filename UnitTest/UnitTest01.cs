@@ -18,9 +18,6 @@ namespace UnitTest
             OrmUtils.ModelPath = modelPath;
             OrmUtils.Load();
 
-            string sql = "Drop Table  IF EXISTS orm_test";
-            OrmUtils.ExecSql(sql);
-
             OrmUtils.RemoveTables();
 
             RemoveOrmTestTable();
@@ -28,8 +25,15 @@ namespace UnitTest
 
         private void RemoveOrmTestTable()
         {
-            string sql = "Drop Table IF EXISTS orm_test";
-            OrmUtils.ExecSql(sql);
+            try
+            {
+                string sql = "Drop Table orm_test";
+                OrmUtils.ExecSql(sql);
+            }
+            catch
+            {
+                ;
+            }
         }
 
         [TestMethod]

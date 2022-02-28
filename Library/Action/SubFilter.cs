@@ -226,10 +226,12 @@ namespace CodeM.Common.Orm
                     }
                 }
 
-                string paramName = Guid.NewGuid().ToString("N");
+                string paramName = CommandUtils.GenParamName(p);
                 string paramPlaceholder = Features.GetCommandParamName(currM, paramName);
-                string paramName2 = Guid.NewGuid().ToString("N");
+                string paramName2 = CommandUtils.GenParamName(p);
                 string paramPlaceholder2 = Features.GetCommandParamName(currM, paramName2);
+
+                DbType dbType = CommandUtils.GetDbParamType(p);
 
                 switch (item.Key)
                 {
@@ -257,14 +259,14 @@ namespace CodeM.Common.Orm
                         if (!p.NeedCalcBeforeSave)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, p.FieldType, ParameterDirection.Input);
+                                expr.Value, dbType, ParameterDirection.Input);
                         }
                         else
                         {
                             dynamic inputObj = currM.NewObject();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "=", paramPlaceholder);
@@ -273,14 +275,14 @@ namespace CodeM.Common.Orm
                         if (!p.NeedCalcBeforeSave)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, p.FieldType, ParameterDirection.Input);
+                                expr.Value, dbType, ParameterDirection.Input);
                         }
                         else
                         {
                             dynamic inputObj = currM.NewObject();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "<>", paramPlaceholder);
@@ -289,14 +291,14 @@ namespace CodeM.Common.Orm
                         if (!p.NeedCalcBeforeSave)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, p.FieldType, ParameterDirection.Input);
+                                expr.Value, dbType, ParameterDirection.Input);
                         }
                         else
                         {
                             dynamic inputObj = currM.NewObject();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], ">", paramPlaceholder);
@@ -305,14 +307,14 @@ namespace CodeM.Common.Orm
                         if (!p.NeedCalcBeforeSave)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, p.FieldType, ParameterDirection.Input);
+                                expr.Value, dbType, ParameterDirection.Input);
                         }
                         else
                         {
                             dynamic inputObj = currM.NewObject();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], ">=", paramPlaceholder);
@@ -321,14 +323,14 @@ namespace CodeM.Common.Orm
                         if (!p.NeedCalcBeforeSave)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, p.FieldType, ParameterDirection.Input);
+                                expr.Value, dbType, ParameterDirection.Input);
                         }
                         else
                         {
                             dynamic inputObj = currM.NewObject();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "<", paramPlaceholder);
@@ -337,14 +339,14 @@ namespace CodeM.Common.Orm
                         if (!p.NeedCalcBeforeSave)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, p.FieldType, ParameterDirection.Input);
+                                expr.Value, dbType, ParameterDirection.Input);
                         }
                         else
                         {
                             dynamic inputObj = currM.NewObject();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "<=", paramPlaceholder);
@@ -392,21 +394,21 @@ namespace CodeM.Common.Orm
                         if (!p.NeedCalcBeforeSave)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                values[0], p.FieldType, ParameterDirection.Input);
+                                values[0], dbType, ParameterDirection.Input);
                             dp2 = DbUtils.CreateParam(currM.Path, paramName2,
-                                values[1], p.FieldType, ParameterDirection.Input);
+                                values[1], dbType, ParameterDirection.Input);
                         }
                         else
                         {
                             dynamic inputObj = currM.NewObject();
                             inputObj[p.Name] = values[0];
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), p.FieldType, ParameterDirection.Input);
+                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
 
                             dynamic inputObj2 = currM.NewObject();
                             inputObj2[p.Name] = values[1];
                             dp2 = DbUtils.CreateParam(currM.Path, paramName2,
-                                p.DoBeforeSaveProcessor(inputObj2), p.FieldType, ParameterDirection.Input);
+                                p.DoBeforeSaveProcessor(inputObj2), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.Params.Add(dp2);
@@ -422,9 +424,9 @@ namespace CodeM.Common.Orm
                                 sbInSQL.Append(",");
                             }
 
-                            string inParamName = Guid.NewGuid().ToString("N");
+                            string inParamName = CommandUtils.GenParamName(p);
                             dp = DbUtils.CreateParam(currM.Path, inParamName,
-                                items[i], p.FieldType, ParameterDirection.Input);
+                                items[i], dbType, ParameterDirection.Input);
                             result.Params.Add(dp);
                             string inParamPlaceholder = Features.GetCommandParamName(currM, inParamName);
                             sbInSQL.Append(inParamPlaceholder);
@@ -442,9 +444,9 @@ namespace CodeM.Common.Orm
                                 sbNotInSQL.Append(",");
                             }
 
-                            string notInParamName = Guid.NewGuid().ToString("N");
+                            string notInParamName = CommandUtils.GenParamName(p);
                             dp = DbUtils.CreateParam(currM.Path, notInParamName,
-                                notItems[i], p.FieldType, ParameterDirection.Input);
+                                notItems[i], dbType, ParameterDirection.Input);
                             result.Params.Add(dp);
                             string notInParamPlaceholder = Features.GetCommandParamName(currM, notInParamName);
                             sbNotInSQL.Append(notInParamPlaceholder);

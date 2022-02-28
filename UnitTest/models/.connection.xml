@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<!--<connection>
+<connection>
     <dialect>sqlite</dialect>
     <host>test.db</host>
     <port></port>
@@ -7,7 +7,7 @@
     <password></password>
     <database></database>
     <pool max="100" min="0">true</pool>
-</connection>-->
+</connection>
 <!--<connection>
     <dialect>mysql</dialect>
     <host>127.0.0.1</host>
@@ -18,7 +18,7 @@
 	<charset>utf8</charset>
     <pool max="100" min="0">true</pool>
 </connection>-->
-<connection>
+<!--<connection>
 	<dialect>sqlserver</dialect>
 	<host>localhost</host>
 	<port></port>
@@ -26,4 +26,13 @@
 	<password>sa123</password>
 	<database>test</database>
 	<pool max="100" min="0">true</pool>
-</connection>
+</connection>-->
+<!--<connection>
+	<dialect>oracle</dialect>
+	<host>localhost</host>
+	<port></port>
+	<user>system</user>
+	<password>orcl123</password>
+	<database>test</database>
+	<pool max="100" min="0">true</pool>
+</connection>-->

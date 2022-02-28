@@ -14,7 +14,8 @@ namespace CodeM.Common.Orm.Dialect
             { "unsigned", new Hashtable() {
                 { "default", true },
                 { "sqlite", false },
-                { "sqlserver", false }
+                { "sqlserver", false },
+                { "oracle", false }
             }},
             { "comment", new Hashtable() {
                 { "default", true },
@@ -22,38 +23,61 @@ namespace CodeM.Common.Orm.Dialect
             }},
             { "comment_ext_format", new Hashtable() {   //输入table、column、column-description
                 { "default", "" },
-                { "sqlserver", "execute sp_addextendedproperty N'MS_Description',N'{2}',N'SCHEMA',N'dbo',N'table',N'{0}',N'column',N'{1}'" }
+                { "sqlserver", "execute sp_addextendedproperty N'MS_Description',N'{2}',N'SCHEMA',N'dbo',N'table',N'{0}',N'column',N'{1}'" },
+                { "oracle", "comment on column {0}.{1} is '{2}'" }
             }},
-
             { "autoincrement", new Hashtable() {
-                { "default", true },
-                { "oracle", false }
+                { "default", true }
+            }},
+            { "autoincrement_ext_format", new Hashtable() { //输入table、column
+                { "default", new string[] { } },
+                { "oracle", new string[] { "CREATE SEQUENCE SEQ_{0}_{1} INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE", "CREATE TRIGGER TIG_{0}_{1} BEFORE insert ON {0} FOR EACH ROW begin select SEQ_{0}_{1}.nextval into:New.{1} from dual;end;" } }
+            }},
+            { "autoincrement_gc_ext_format", new Hashtable() { //输入table、column
+                { "default", new string[] { } },
+                { "oracle", new string[] { "DROP SEQUENCE SEQ_{0}_{1}" } }
             }},
             { "truncate", new Hashtable() {
                 { "default", true },
                 { "sqlite", false }
             }},
-            { "exists_sql_format", new Hashtable() {    // 输入table、database
-                { "sqlite", "SELECT COUNT(*) AS c FROM Sqlite_master WHERE type ='table' AND name ='{0}'" },
-                { "mysql", "SELECT COUNT(*) FROM information_schema.TABLES t WHERE t.TABLE_SCHEMA ='{1}' AND t.TABLE_NAME ='{0}'" },
-                { "oracle", "SELECT COUNT(*) FROM user_tables t WHERE table_name=upper('{0}')" },
-                { "sqlserver", "SELECT COUNT(*) FROM sysObjects WHERE Id=OBJECT_ID(N'{0}') and xtype='U'" }
+            { "ifexists", new Hashtable() {
+                { "default", true },
+                { "oracle", false }
+            }},
+            { "exists_sql_format", new Hashtable() {    // 输入database、table
+                { "sqlite", "SELECT COUNT(*) AS c FROM Sqlite_master WHERE type ='table' AND name ='{1}'" },
+                { "mysql", "SELECT COUNT(*) FROM information_schema.TABLES t WHERE t.TABLE_SCHEMA ='{0}' AND t.TABLE_NAME ='{1}'" },
+                { "oracle", "SELECT COUNT(*) FROM user_tables t WHERE table_name=upper('{1}')" },
+                { "sqlserver", "SELECT COUNT(*) FROM sysObjects WHERE Id=OBJECT_ID(N'{1}') and xtype='U'" }
             }},
             { "select_forupdate", new Hashtable() {
                 { "default", true },
-                { "sqlite", false }
+                { "sqlite", false },
+                { "sqlserver", false }
             }},
             { "object_quote", new Hashtable() {
                 { "default", new string[] { "`", "`" } },
-                { "sqlserver", new string[] { "[", "]" } }
+                { "sqlserver", new string[] { "[", "]" } },
+                { "oracle", new string[] { "", "" } }
+            }},
+            { "field_alias_quote", new Hashtable() {
+                { "default", new string[] { } },
+                { "oracle", new string[] { "\"", "\"" } }
             }},
             { "command_param_format", new Hashtable() { // 输入paramname
                 { "default", "?" },
-                { "sqlserver", "@{0}" }
+                { "sqlserver", "@{0}" },
+                { "oracle", ":{0}" }
             }},
-            { "paging_command_format", new Hashtable() {    // 输入sql、pagesize、pageindex、offset
+            { "paging_command_format", new Hashtable() {    // 输入sql、pagesize、pageindex、offset、limit
                 { "default", "SELECT {0} LIMIT {3}, {1}" },
-                { "sqlserver", "SELECT TOP {1} R.* from (SELECT ROW_NUMBER() OVER(ORDER BY (SELECT 0)) AS RN, * FROM (SELECT TOP 9223372036854775807 {0}) AS Q) AS R WHERE RN > {3}" }
+                { "sqlserver", "SELECT TOP {1} R.* from (SELECT ROW_NUMBER() OVER(ORDER BY (SELECT 0)) AS RN, * FROM (SELECT TOP 9223372036854775807 {0}) AS Q) AS R WHERE RN > {3}" },
+                { "oracle", "SELECT R.* FROM (SELECT ROWNUM RN, Q.* FROM (SELECT {0}) Q) R WHERE R.RN BETWEEN {3} AND {4}" }
+            }},
+            { "exec_multi_command", new Hashtable() {
+                { "default", true },
+                { "oracle", false }
             }}
         });
 
@@ -169,10 +193,12 @@ namespace CodeM.Common.Orm.Dialect
                 { "default", "bigint" }
             }},
             { DbType.Int64, new Hashtable() {
-                { "default", "bigint" }
+                { "default", "bigint" },
+                { "oracle", "long" }
             }},
             { DbType.UInt64, new Hashtable() {
-                { "default", "bigint" }
+                { "default", "bigint" },
+                { "oracle", "long" }
             }},
             { DbType.Single, new Hashtable() {
                 { "default", "float" }
@@ -184,20 +210,25 @@ namespace CodeM.Common.Orm.Dialect
             { DbType.Double, new Hashtable() {
                 { "default", "double" },
                 { "sqlite", "real" },
-                { "sqlserver", "real" }
+                { "sqlserver", "real" },
+                { "oracle", "float" }
             }},
             { DbType.Boolean, new Hashtable() {
                 { "default", "boolean" },
-                { "sqlserver", "bit" }
+                { "sqlserver", "bit" },
+                { "oracle", "number" }
             }},
             { DbType.DateTime, new Hashtable() {
-                { "default", "datetime" }
+                { "default", "datetime" },
+                { "oracle", "timestamp" }
+
             }},
             { DbType.Date, new Hashtable() {
                 { "default", "date" }
             }},
             { DbType.Time, new Hashtable() {
-                { "default", "time" }
+                { "default", "time" },
+                { "oracle", "timestamp" }
             }},
             { DbType.Object, new Hashtable() {
                 { "default", "blob" },

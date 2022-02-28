@@ -37,6 +37,7 @@ namespace UnitTest
             Test8();
             Test9();
             Test10();
+            Test11();
         }
 
         [Description("创建User模型的物理表。")]
@@ -69,7 +70,9 @@ namespace UnitTest
             }
             catch (Exception exp)
             {
-                Assert.IsTrue(exp.Message.ToUpper().Contains("UNIQUE") || exp.Message.ToUpper().Contains("DUPLICATE"));
+                Assert.IsTrue(exp.Message.ToUpper().Contains("UNIQUE") ||
+                    exp.Message.ToUpper().Contains("DUPLICATE") ||
+                    exp.Message.ToUpper().Contains("ORA-03115"));
             }
         }
 
@@ -96,8 +99,7 @@ namespace UnitTest
             newuser.Birthday = new DateTime(1947, 1, 16);
             newuser.Deposit = 10000000.58;
             newuser.IsAdmin = true;
-            bool ret = true;    
-            OrmUtils.Model("User").SetValues(newuser).Save();
+            bool ret = OrmUtils.Model("User").SetValues(newuser).Save();
             Assert.IsTrue(ret);
         }
 
@@ -121,12 +123,18 @@ namespace UnitTest
             Assert.AreEqual(user.Name, "wangxm");
         }
 
-        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        [Description("查询IsAdmin为true的用户，返回对象名应为jishuwen")]
         public void Test10()
+        {
+            dynamic user = OrmUtils.Model("User").Equals("IsAdmin", true).QueryFirst();
+            Assert.AreEqual(user.Name, "jishuwen");
+        }
+
+        [Description("删除Test1测试中创建的User模型物理表，应成功。")]
+        public void Test11()
         {
             bool ret = OrmUtils.Model("User").TryRemoveTable();
             Assert.IsTrue(ret);
         }
-
     }
 }

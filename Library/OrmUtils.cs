@@ -162,14 +162,16 @@ namespace CodeM.Common.Orm
 
         public static bool TryCreateTables(bool force = false)
         {
-            bool bRet = true;
             int count = ModelUtils.ModelCount;
             for (int i = 0; i < count; i++)
             {
                 Model m = ModelUtils.Get(i);
-                bRet = m.TryCreateTable(force) ? bRet : false;
+                if (!m.TryCreateTable(force))
+                {
+                    return false;
+                }
             }
-            return bRet;
+            return true;
         }
 
         public static void RemoveTables()
@@ -184,14 +186,16 @@ namespace CodeM.Common.Orm
 
         public static bool TryRemoveTables()
         {
-            bool bRet = true;
             int count = ModelUtils.ModelCount;
             for (int i = 0; i < count; i++)
             {
                 Model m = ModelUtils.Get(i);
-                bRet = m.TryRemoveTable() ? bRet : false;
+                if (!m.TryRemoveTable())
+                {
+                    return false;
+                }
             }
-            return bRet;
+            return true;
         }
 
         public static void TruncateTables()
@@ -206,14 +210,16 @@ namespace CodeM.Common.Orm
 
         public static bool TryTruncateTables()
         {
-            bool bRet = true;
             int count = ModelUtils.ModelCount;
             for (int i = 0; i < count; i++)
             {
                 Model m = ModelUtils.Get(i);
-                bRet = m.TryTruncateTable() ? bRet : false;
+                if (!m.TryTruncateTable())
+                {
+                    return false;
+                }
             }
-            return bRet;
+            return true;
         }
 
         public static bool EnableVersionControl()

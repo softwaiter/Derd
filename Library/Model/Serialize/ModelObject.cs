@@ -59,7 +59,7 @@ namespace CodeM.Common.Orm.Serialize
                 {
                     if (!Xmtool.Regex().IsNumber(value.ToString()))
                     {
-                        throw new Exception(string.Concat(p.Name, "属性值期待类型：", p.RealType, "，实际类型为：", value.GetType()));
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：", p.FieldType, "，实际类型为：", value.GetType()));
                     }
                 }
                 else if (p.FieldType == DbType.Boolean)
@@ -70,7 +70,7 @@ namespace CodeM.Common.Orm.Serialize
                         bool result;
                         if (!bool.TryParse(value.ToString(), out result))
                         {
-                            throw new Exception(string.Concat(p.Name, "属性值期待类型：", p.RealType, "，实际类型为：", _typ));
+                            throw new Exception(string.Concat(p.Name, "属性值期待类型：", p.FieldType, "，实际类型为：", _typ));
                         }
                     }
                 }
@@ -81,7 +81,7 @@ namespace CodeM.Common.Orm.Serialize
                     DateTime result;
                     if (!DateTime.TryParse(value.ToString(), out result))
                     {
-                        throw new Exception(string.Concat(p.Name, "属性值期待类型：", p.RealType, "，实际类型为：", value.GetType()));
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：", p.FieldType, "，实际类型为：", value.GetType()));
                     }
                 }
 

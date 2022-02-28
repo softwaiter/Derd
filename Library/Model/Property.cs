@@ -242,7 +242,11 @@ namespace CodeM.Common.Orm
             }
             if (AutoIncrement && Features.IsSupportAutoIncrement(Owner))
             {
-                sb.Append(string.Concat(" ", FieldUtils.GetFieldAutoIncrementTag(Owner)));
+                string[] extCmds = Features.GetAutoIncrementExtCommand(Owner, Owner.Table, Field);
+                if (extCmds.Length == 0)
+                {
+                    sb.Append(string.Concat(" ", FieldUtils.GetFieldAutoIncrementTag(Owner)));
+                }
             }
             if (IsNotNull)
             {

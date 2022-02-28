@@ -233,7 +233,7 @@ namespace CodeM.Common.Orm
                     }
                     
                     string constraintFields = e.Current.Value.Replace(",", string.Concat(quotes[1], ",", quotes[0]));
-                    sb.Append(string.Concat("CONSTRAINT ", Table, "_", e.Current.Key, " UNIQUE (", quotes[0], constraintFields, quotes[1], ")"));
+                    sb.Append(string.Concat("CONSTRAINT ", Table, "$unique$", e.Current.Key, " UNIQUE (", quotes[0], constraintFields, quotes[1], ")"));
 
                     i++;
                 }
@@ -259,7 +259,7 @@ namespace CodeM.Common.Orm
                     while (e.MoveNext())
                     {
                         string indexFields = e.Current.Value.Replace(",", string.Concat(quotes[1], ",", quotes[0]));
-                        sb.Append(string.Concat("CREATE INDEX ", e.Current.Key, " ON ", quotes[0], Table, quotes[1], "(", quotes[0], indexFields, quotes[1], ");"));
+                        sb.Append(string.Concat("CREATE INDEX ", Table, "$", e.Current.Key, " ON ", quotes[0], Table, quotes[1], "(", quotes[0], indexFields, quotes[1], ");"));
                     }
                     return sb.ToString();
                 }

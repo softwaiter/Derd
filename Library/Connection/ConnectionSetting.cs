@@ -36,19 +36,52 @@ namespace CodeM.Common.Orm
         {
             List<string> settings = new List<string>();
 
-            if ("sqlite".Equals(Dialect))
+            if ("oracle".Equals(Dialect))
             {
-                settings.Add("Version=3");
+                int connPort = Port > 0 ? Port : 1521;
+                string datasourceFormat = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVICE_NAME={2})))";
+                settings.Add(string.Format(datasourceFormat, Host, connPort, Database));
             }
-
-            if (!string.IsNullOrWhiteSpace(Host))
+            else
             {
-                settings.Add(string.Concat("Data Source=", Host));
-            }
+                if ("sqlite".Equals(Dialect))
+                {
+                    settings.Add("Version=3");
+                }
 
-            if (Port > 0)
-            {
-                settings.Add(string.Concat("Port=", Port));
+                if (!string.IsNullOrWhiteSpace(Host))
+                {
+                    settings.Add(string.Concat("Data Source=", Host));
+                }
+
+                if (Port > 0)
+                {
+                    settings.Add(string.Concat("Port=", Port));
+                }
+
+                if (!string.IsNullOrWhiteSpace(Database))
+                {
+                    settings.Add(string.Concat("Database=", Database));
+                }
+
+                if ("mysql".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!string.IsNullOrWhiteSpace(Charset))
+                    {
+                        settings.Add(string.Concat("Charset=", Charset));
+                    }
+                }
+                else if ("sqlserver".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (Encrypt)
+                    {
+                        settings.Add("Encrypt=yes");
+                    }
+                    else
+                    {
+                        settings.Add("Encrypt=no");
+                    }
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(User))
@@ -61,37 +94,13 @@ namespace CodeM.Common.Orm
                 settings.Add(string.Concat("Password=", Password));
             }
 
-            if (!string.IsNullOrWhiteSpace(Database))
-            {
-                settings.Add(string.Concat("Database=", Database));
-            }
+            //settings.Add(string.Concat("Pooling=", (Pooling ? "True" : "False")));
 
-            if ("mysql".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
-            {
-                if (!string.IsNullOrWhiteSpace(Charset))
-                {
-                    settings.Add(string.Concat("Charset=", Charset));
-                }
-            }
-            else if ("sqlserver".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
-            {
-                if (Encrypt)
-                {
-                    settings.Add("Encrypt=yes");
-                }
-                else
-                {
-                    settings.Add("Encrypt=no");
-                }
-            }
-
-            settings.Add(string.Concat("Pooling=", (Pooling ? "True" : "False")));
-
-            if (Pooling)
-            {
-                settings.Add(string.Concat("Max Pool Size=", MaxPoolSize));
-                settings.Add(string.Concat("Min Pool Size=", MinPoolSize));
-            }
+            //if (Pooling)
+            //{
+            //    settings.Add(string.Concat("Max Pool Size=", MaxPoolSize));
+            //    settings.Add(string.Concat("Min Pool Size=", MinPoolSize));
+            //}
 
             return string.Join(';', settings);
         }
