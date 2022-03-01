@@ -2,16 +2,24 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.3.0</Version>
+    <Version>1.5.0</Version>
     <Authors>softwaiter</Authors>
-    <AssemblyVersion>1.3.0.0</AssemblyVersion>
-    <FileVersion>1.3.0.0</FileVersion>
+    <AssemblyVersion>1.5.0.0</AssemblyVersion>
+    <FileVersion>1.5.0.0</FileVersion>
     <RepositoryUrl>https://github.com/softwaiter/netcoreORM</RepositoryUrl>
-    <Description>一套轻量级Object/Relational Mapping操作库</Description>
+    <Description>一套轻量级Object/Relational Mapping通用数据库操作框架</Description>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/softwaiter/netcoreORM</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CodeM.Common.DbHelper" Version="1.1.0" />

@@ -1,9 +1,9 @@
 # netcoreORM
-.NetCore轻量级ORM框架
+.NetCore轻量级ORM通用数据库操作框架
 
 ## 一、概述
 
-nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作类库，全名称为CodeM.Common.Orm。netcoreORM模型定义文件基于XML文件格式，模型管理基于目录自动分类；数据库类型支持Sqlite、MySql、Oracle、Sqlserver、Postgresql等，数据库配置文件和模型定义一样基于目录划分，并支持基于目录层级的继承能力；数据操作采用链式方式，简单易用。
+nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作框架，全名称为CodeM.Common.Orm。netcoreORM模型定义文件基于XML文件格式，模型管理基于目录自动分类；数据库类型支持Sqlite、MySql、Oracle、Sqlserver、Postgresql等，数据库配置文件和模型定义一样基于目录划分，并支持基于目录层级的继承能力；数据操作采用链式方式，简单易用。
 
 #### 特点列表：
 
@@ -38,7 +38,7 @@ nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作类�
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.2.0
+Install-Package CodeM.Common.Orm -Version 1.5.0
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.2.0
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.2.0
+dotnet add package CodeM.Common.Orm --version 1.5.0
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.2.0
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.2.0" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.5.0" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.2.0
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.2.0
+paket add CodeM.Common.Orm --version 1.5.0
 ```
 
 
@@ -77,6 +77,7 @@ paket add CodeM.Common.Orm --version 1.2.0
 | Mysql        | MySql.Data                    |
 | Oracle       | Oracle.ManagedDataAccess.Core |
 | SqlServer    | Microsoft.Data.SqlClient      |
+| Postgres     | Npgsql                        |
 
 使用时，可根据需要添加其中的一项或多项依赖。
 
@@ -88,14 +89,15 @@ paket add CodeM.Common.Orm --version 1.2.0
 
 所有的模型定义按照存储目录划分，模型定义根目录通过OrmUtils.ModelPath属性进行指定，默认为当前程序的根目录下的models子目录。
 
-数据库连接和模型存储目录相对应，模型存储根目录及其下面的子目录都可以通过数据库配置文件设置自己的数据库连接，如果当前目录没有数据库连接配置文件，将继续向上寻找父目录的数据库连接配置文件，直到找到为止；基于此设计逻辑，根目录必须有数据库连接配置文件。
+支持多数据源定义，数据库连接和模型存储目录相对应，模型存储根目录及其下面的子目录都可以通过数据库配置文件设置自己的数据库连接，如果当前目录没有数据库连接配置文件，将继续向上寻找父目录的数据库连接配置文件，直到找到为止；基于此设计逻辑，根目录必须有数据库连接配置文件。
 
 数据库连接配置文件命必须为.connection.xml，格式如下：
 
 ```xml
+<!--SQLite数据库-->
 <?xml version="1.0" encoding="utf-8" ?>
 <connection>
-    <dialect>sqlite</dialect>	<!--数据库类型，目前支持sqlite、mysql、oracle、sqlserver-->
+    <dialect>sqlite</dialect>	<!--数据库类型，目前支持sqlite、mysql、oracle、sqlserver、postgres-->
     <host>test.db</host>	<!--数据库文件地址或IP-->
     <port></port>	<!--数据库端口，为空即不设置，按数据库默认端口-->
     <user></user>	<!--数据库账户名-->
@@ -105,6 +107,63 @@ paket add CodeM.Common.Orm --version 1.2.0
 </connection>
 ```
 
+```xml
+<!--MySQL数据库-->
+<?xml version="1.0" encoding="utf-8" ?>
+<connection>
+    <dialect>mysql</dialect>
+    <host>127.0.0.1</host>  <!--数据库服务器地址或IP-->
+    <port></port>
+    <user>root</user>
+    <password>root</password>
+    <database>test</database>   <!--数据库名称-->
+	<charset>utf8</charset> <!--发送到数据库的字符串编码格式-->
+    <pool max="100" min="0">true</pool>
+</connection>
+```
+
+```xml
+<!--SqlServer数据库-->
+<?xml version="1.0" encoding="utf-8" ?>
+<connection>
+	<dialect>sqlserver</dialect>
+	<host>localhost</host>
+	<port></port>
+	<user>sa</user>
+	<password>sa123</password>
+	<database>test</database>
+    <encrypt>true</encrypt> <!--是否使用SSL加密传输-->
+	<pool max="100" min="0">true</pool>
+</connection>
+```
+
+```xml
+<!--Oracle数据库-->
+<?xml version="1.0" encoding="utf-8" ?>
+<connection>
+	<dialect>oracle</dialect>
+	<host>localhost</host>
+	<port></port>
+	<user>system</user>
+	<password>orcl123</password>
+	<database>test</database>
+	<pool max="100" min="0">true</pool>
+</connection>
+```
+
+```xml
+<!--Postgres数据库-->
+<?xml version="1.0" encoding="utf-8" ?>
+<connection>
+	<dialect>postgres</dialect>
+	<host>localhost</host>
+	<port></port>
+	<user>postgres</user>
+	<password>postgres</password>
+	<database>test</database>
+	<pool max="100" min="0">true</pool>
+</connection>
+```
 *注：dialect可选值全部要小写。
 
 
