@@ -36,3 +36,12 @@
 	<database>test</database>
 	<pool max="100" min="0">true</pool>
 </connection>-->
+<!--<connection>
+	<dialect>postgres</dialect>
+	<host>localhost</host>
+	<port></port>
+	<user>postgres</user>
+	<password>postgres</password>
+	<database>test</database>
+	<pool max="100" min="0">true</pool>
+</connection>-->

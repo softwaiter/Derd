@@ -10,7 +10,8 @@ namespace CodeM.Common.Orm
     {
         public static DbType GetDbParamType(Property p)
         {
-            if (p.FieldType == DbType.Boolean)
+            if (p.FieldType == DbType.Boolean &&
+                Features.IsUseIntegerInsteadOfBool(p.Owner))
             {
                 return DbType.Int16;
             }
@@ -20,7 +21,7 @@ namespace CodeM.Common.Orm
         public static string GenParamName(Property p) 
         {
             string suffix = DateTime.Now.ToString("FFFFFF");
-            return string.Concat(p.Name, "$", suffix);
+            return string.Concat(p.Name, suffix);
         }
 
         public static int ExecuteNonQuery(Model m, string datasourceName, string commandText, params DbParameter[] commandParams)

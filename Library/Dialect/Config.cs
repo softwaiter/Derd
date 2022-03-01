@@ -12,10 +12,8 @@ namespace CodeM.Common.Orm.Dialect
         static Hashtable sFeaturesSupported = Hashtable.Synchronized(new Hashtable()
         {
             { "unsigned", new Hashtable() {
-                { "default", true },
-                { "sqlite", false },
-                { "sqlserver", false },
-                { "oracle", false }
+                { "default", false },
+                { "mysql", true }
             }},
             { "comment", new Hashtable() {
                 { "default", true },
@@ -24,10 +22,15 @@ namespace CodeM.Common.Orm.Dialect
             { "comment_ext_format", new Hashtable() {   //输入table、column、column-description
                 { "default", "" },
                 { "sqlserver", "execute sp_addextendedproperty N'MS_Description',N'{2}',N'SCHEMA',N'dbo',N'table',N'{0}',N'column',N'{1}'" },
-                { "oracle", "comment on column {0}.{1} is '{2}'" }
+                { "oracle", "comment on column {0}.{1} is '{2}'" },
+                { "postgres", "comment on column {0}.{1} is '{2}'" }
             }},
             { "autoincrement", new Hashtable() {
                 { "default", true }
+            }},
+            { "autoincrement_type_replace", new Hashtable() {
+                { "default", "" },
+                { "postgres", "serial" }
             }},
             { "autoincrement_ext_format", new Hashtable() { //输入table、column
                 { "default", new string[] { } },
@@ -49,7 +52,8 @@ namespace CodeM.Common.Orm.Dialect
                 { "sqlite", "SELECT COUNT(*) AS c FROM Sqlite_master WHERE type ='table' AND name ='{1}'" },
                 { "mysql", "SELECT COUNT(*) FROM information_schema.TABLES t WHERE t.TABLE_SCHEMA ='{0}' AND t.TABLE_NAME ='{1}'" },
                 { "oracle", "SELECT COUNT(*) FROM user_tables t WHERE table_name=upper('{1}')" },
-                { "sqlserver", "SELECT COUNT(*) FROM sysObjects WHERE Id=OBJECT_ID(N'{1}') and xtype='U'" }
+                { "sqlserver", "SELECT COUNT(*) FROM sysObjects WHERE Id=OBJECT_ID(N'{1}') and xtype='U'" },
+                { "postgres", "SELECT COUNT(*) FROM pg_class WHERE relname = '{1}'" }
             }},
             { "select_forupdate", new Hashtable() {
                 { "default", true },
@@ -59,7 +63,8 @@ namespace CodeM.Common.Orm.Dialect
             { "object_quote", new Hashtable() {
                 { "default", new string[] { "`", "`" } },
                 { "sqlserver", new string[] { "[", "]" } },
-                { "oracle", new string[] { "", "" } }
+                { "oracle", new string[] { "", "" } },
+                { "postgres", new string[] { "\"", "\"" } },
             }},
             { "field_alias_quote", new Hashtable() {
                 { "default", new string[] { } },
@@ -68,16 +73,22 @@ namespace CodeM.Common.Orm.Dialect
             { "command_param_format", new Hashtable() { // 输入paramname
                 { "default", "?" },
                 { "sqlserver", "@{0}" },
-                { "oracle", ":{0}" }
+                { "oracle", ":{0}" },
+                { "postgres", "@{0}" }
             }},
             { "paging_command_format", new Hashtable() {    // 输入sql、pagesize、pageindex、offset、limit
                 { "default", "SELECT {0} LIMIT {3}, {1}" },
                 { "sqlserver", "SELECT TOP {1} R.* from (SELECT ROW_NUMBER() OVER(ORDER BY (SELECT 0)) AS RN, * FROM (SELECT TOP 9223372036854775807 {0}) AS Q) AS R WHERE RN > {3}" },
-                { "oracle", "SELECT R.* FROM (SELECT ROWNUM RN, Q.* FROM (SELECT {0}) Q) R WHERE R.RN BETWEEN {3} AND {4}" }
+                { "oracle", "SELECT R.* FROM (SELECT ROWNUM RN, Q.* FROM (SELECT {0}) Q) R WHERE R.RN BETWEEN {3} AND {4}" },
+                { "postgres", "SELECT {0} LIMIT {1} OFFSET {3}" }
             }},
             { "exec_multi_command", new Hashtable() {
                 { "default", true },
                 { "oracle", false }
+            }},
+            { "boolean_is_int", new Hashtable() {
+                { "default", false },
+                { "oracle", true }
             }}
         });
 
@@ -171,17 +182,20 @@ namespace CodeM.Common.Orm.Dialect
             { DbType.SByte, new Hashtable() {
                 { "default", "integer" },
                 { "mysql", "tinyint" },
-                { "sqlserver", "tinyint" }
+                { "sqlserver", "tinyint" },
+                { "postgres", "smallint" }
             }},
             { DbType.Byte, new Hashtable() {
                 { "default", "integer" },
                 { "mysql", "tinyint" },
-                { "sqlserver", "tinyint" }
+                { "sqlserver", "tinyint" },
+                { "postgres", "smallint" }
             }},
             { DbType.Int16, new Hashtable() {
                 { "default", "integer" },
                 { "mysql", "smallint" },
-                { "sqlserver", "smallint" }
+                { "sqlserver", "smallint" },
+                { "postgres", "smallint" }
             }},
             { DbType.UInt16, new Hashtable() {
                 { "default", "integer" }
@@ -201,17 +215,20 @@ namespace CodeM.Common.Orm.Dialect
                 { "oracle", "long" }
             }},
             { DbType.Single, new Hashtable() {
-                { "default", "float" }
+                { "default", "float" },
+                { "postgres", "float4" },
             }},
             { DbType.Decimal, new Hashtable() {
                 { "default", "decimal" },
-                { "sqlite", "numeric" }
+                { "sqlite", "numeric" },
+                { "postgres", "numeric" }
             }},
             { DbType.Double, new Hashtable() {
                 { "default", "double" },
                 { "sqlite", "real" },
                 { "sqlserver", "real" },
-                { "oracle", "float" }
+                { "oracle", "float" },
+                { "postgres", "float8" },
             }},
             { DbType.Boolean, new Hashtable() {
                 { "default", "boolean" },
@@ -220,8 +237,8 @@ namespace CodeM.Common.Orm.Dialect
             }},
             { DbType.DateTime, new Hashtable() {
                 { "default", "datetime" },
-                { "oracle", "timestamp" }
-
+                { "oracle", "timestamp" },
+                { "postgres", "timestamp" }
             }},
             { DbType.Date, new Hashtable() {
                 { "default", "date" }
@@ -232,7 +249,8 @@ namespace CodeM.Common.Orm.Dialect
             }},
             { DbType.Object, new Hashtable() {
                 { "default", "blob" },
-                { "sqlserver", "varbinary" }
+                { "sqlserver", "varbinary" },
+                { "postgres", "bytea" }
             }}
         });
 

@@ -51,7 +51,14 @@ namespace CodeM.Common.Orm
 
                 if (!string.IsNullOrWhiteSpace(Host))
                 {
-                    settings.Add(string.Concat("Data Source=", Host));
+                    if ("postgres".Equals(Dialect))
+                    {
+                        settings.Add(string.Concat("Host=", Host));
+                    }
+                    else
+                    {
+                        settings.Add(string.Concat("Data Source=", Host));
+                    }
                 }
 
                 if (Port > 0)
@@ -94,13 +101,13 @@ namespace CodeM.Common.Orm
                 settings.Add(string.Concat("Password=", Password));
             }
 
-            //settings.Add(string.Concat("Pooling=", (Pooling ? "True" : "False")));
+            settings.Add(string.Concat("Pooling=", (Pooling ? "True" : "False")));
 
-            //if (Pooling)
-            //{
-            //    settings.Add(string.Concat("Max Pool Size=", MaxPoolSize));
-            //    settings.Add(string.Concat("Min Pool Size=", MinPoolSize));
-            //}
+            if (Pooling && !"postgres".Equals(Dialect))
+            {
+                settings.Add(string.Concat("Max Pool Size=", MaxPoolSize));
+                settings.Add(string.Concat("Min Pool Size=", MinPoolSize));
+            }
 
             return string.Join(';', settings);
         }

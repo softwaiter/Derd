@@ -57,6 +57,26 @@
         }
 
         /// <summary>
+        /// 判断数据库类型是否支持整数自增功能
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        internal static bool IsSupportAutoIncrement(Model model)
+        {
+            return Config.GetConfigValue<bool>("feature", model, "autoincrement");
+        }
+
+        /// <summary>
+        /// 查询数据库用于支持自增序列的特殊字段类型
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        internal static string GetAutoIncrementReplaceType(Model model)
+        {
+            return Config.GetConfigValue<string>("feature", model, "autoincrement_type_replace");
+        }
+
+        /// <summary>
         /// 获取AutoIncrement的个性化写法
         /// </summary>
         /// <param name="model"></param>
@@ -97,16 +117,6 @@
                 }
             }
             return result;
-        }
-
-        /// <summary>
-        /// 判断数据库类型是否支持整数自增功能
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        internal static bool IsSupportAutoIncrement(Model model)
-        {
-            return Config.GetConfigValue<bool>("feature", model, "autoincrement");
         }
 
         internal static string GetTableExistsSql(Model model, string database, string table)
@@ -156,6 +166,16 @@
         internal static bool IsSupportMultiCommand(Model model)
         {
             return Config.GetConfigValue<bool>("feature", model, "exec_multi_command");
+        }
+
+        /// <summary>
+        /// 是否构建参数时使用整型代替布尔型
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        internal static bool IsUseIntegerInsteadOfBool(Model model)
+        {
+            return Config.GetConfigValue<bool>("feature", model, "boolean_is_int");
         }
     }
 }

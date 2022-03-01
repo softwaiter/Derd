@@ -219,28 +219,40 @@ namespace CodeM.Common.Orm
             string[] quotes = Features.GetObjectQuotes(Owner);
 
             StringBuilder sb = new StringBuilder(64);
-            string fieldType = FieldUtils.GetFieldType(Owner, FieldType);
-            sb.Append(string.Concat(quotes[0], Field, quotes[1], " ", fieldType));
-            if (Length > 0)
+            sb.Append(string.Concat(quotes[0], Field, quotes[1]));
+
+            string autoIncrReplaceType = Features.GetAutoIncrementReplaceType(Owner);
+            if (AutoIncrement && !string.IsNullOrWhiteSpace(autoIncrReplaceType))
             {
-                if (FieldUtils.IsFloat(FieldType))
-                {
-                    sb.Append(string.Concat("(", Length, ",", Precision, ")"));
-                }
-                else
-                {
-                    sb.Append(string.Concat("(", Length, ")"));
-                }
+                sb.Append(string.Concat(" ", autoIncrReplaceType));
             }
-            if (Features.IsSupportUnsigned(Owner) && Unsigned)
+            else
             {
-                sb.Append(" UNSIGNED");
+                string fieldType = FieldUtils.GetFieldType(Owner, FieldType);
+                sb.Append(string.Concat(" ", fieldType));
+                if (Length > 0)
+                {
+                    if (FieldUtils.IsFloat(FieldType))
+                    {
+                        sb.Append(string.Concat("(", Length, ",", Precision, ")"));
+                    }
+                    else
+                    {
+                        sb.Append(string.Concat("(", Length, ")"));
+                    }
+                }
+                if (Features.IsSupportUnsigned(Owner) && Unsigned)
+                {
+                    sb.Append(" UNSIGNED");
+                }
             }
             if (IsPrimaryKey && Owner.PrimaryKeyCount == 1)
             {
                 sb.Append(" PRIMARY KEY");
             }
-            if (AutoIncrement && Features.IsSupportAutoIncrement(Owner))
+            if (AutoIncrement && 
+                Features.IsSupportAutoIncrement(Owner) &&
+                string.IsNullOrWhiteSpace(autoIncrReplaceType))
             {
                 string[] extCmds = Features.GetAutoIncrementExtCommand(Owner, Owner.Table, Field);
                 if (extCmds.Length == 0)

@@ -1071,7 +1071,6 @@ namespace CodeM.Common.Orm
 
                 CommandSQL cmd = SQLBuilder.BuildQuerySQL(this);
 
-
                 OrmUtils.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
                 if (trans == null)
