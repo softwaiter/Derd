@@ -102,7 +102,7 @@ namespace UnitTest
             Assert.AreEqual(18, result.Age);
         }
 
-        [Description("获取所有人种最小的年龄，应为10。")]
+        [Description("获取所有人中最小的年龄，应为10。")]
         public void Test6()
         {
             dynamic result = OrmUtils.Model("User")

@@ -226,12 +226,19 @@ namespace CodeM.Common.Orm
                     }
                 }
 
-                string paramName = CommandUtils.GenParamName(p);
-                string paramPlaceholder = Features.GetCommandParamName(currM, paramName);
-                string paramName2 = CommandUtils.GenParamName(p);
-                string paramPlaceholder2 = Features.GetCommandParamName(currM, paramName2);
-
-                DbType dbType = CommandUtils.GetDbParamType(p);
+                DbType dbType = DbType.String;
+                string paramName = null;
+                string paramPlaceholder = null;
+                string paramName2 = null;
+                string paramPlaceholder2 = null;
+                if (p != null)
+                {
+                    dbType = CommandUtils.GetDbParamType(p);
+                    paramName = CommandUtils.GenParamName(p);
+                    paramPlaceholder = Features.GetCommandParamName(currM, paramName);
+                    paramName2 = CommandUtils.GenParamName(p);
+                    paramPlaceholder2 = Features.GetCommandParamName(currM, paramName2);
+                }
 
                 switch (item.Key)
                 {
