@@ -38,7 +38,7 @@ nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作框�
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.5.0
+Install-Package CodeM.Common.Orm -Version 1.6.0
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.5.0
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.5.0
+dotnet add package CodeM.Common.Orm --version 1.6.0
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.5.0
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.5.0" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.6.0" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.5.0
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.5.0
+paket add CodeM.Common.Orm --version 1.6.0
 ```
 
 
