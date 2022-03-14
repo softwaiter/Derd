@@ -28,6 +28,14 @@ namespace CodeM.Common.Orm
 
         public string Table { get; set; }
 
+        internal string BeforeSaveProcessor { get; set; } = null;
+
+        internal string AfterSaveProcessor { get; set; } = null;
+
+        internal string BeforeDeleteProcessor { get; set; } = null;
+
+        internal string AfterDeleteProcessor { get; set; } = null;
+
         internal bool AddProperty(Property p)
         {
             p.Owner = this;

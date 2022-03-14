@@ -459,6 +459,70 @@ namespace CodeM.Common.Orm
                         {
                             model.Table = model.Name;
                         }
+
+                        string beforeSaveProcStr = nodeInfo.GetAttribute("beforeSave");
+                        if (beforeSaveProcStr != null)
+                        {
+                            beforeSaveProcStr = beforeSaveProcStr.Trim();
+                            if (beforeSaveProcStr.Length > 4 &&
+                                beforeSaveProcStr.StartsWith("{{") &&
+                                beforeSaveProcStr.EndsWith("}}"))
+                            {
+                                model.BeforeSaveProcessor = beforeSaveProcStr.Substring(2, beforeSaveProcStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("beforeSave属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string afterSaveProcStr = nodeInfo.GetAttribute("afterSave");
+                        if (afterSaveProcStr != null)
+                        {
+                            afterSaveProcStr = afterSaveProcStr.Trim();
+                            if (afterSaveProcStr.Length > 4 &&
+                                afterSaveProcStr.StartsWith("{{") &&
+                                afterSaveProcStr.EndsWith("}}"))
+                            {
+                                model.AfterSaveProcessor = afterSaveProcStr.Substring(2, afterSaveProcStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("afterSave属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string beforeDeleteProcStr = nodeInfo.GetAttribute("beforeDelete");
+                        if (beforeDeleteProcStr != null)
+                        {
+                            beforeDeleteProcStr = beforeDeleteProcStr.Trim();
+                            if (beforeDeleteProcStr.Length > 4 &&
+                                beforeDeleteProcStr.StartsWith("{{") &&
+                                beforeDeleteProcStr.EndsWith("}}"))
+                            {
+                                model.BeforeDeleteProcessor = beforeDeleteProcStr.Substring(2, beforeDeleteProcStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("beforeDelete属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string afterDeleteProcStr = nodeInfo.GetAttribute("afterDelete");
+                        if (afterDeleteProcStr != null)
+                        {
+                            afterDeleteProcStr = afterDeleteProcStr.Trim();
+                            if (afterDeleteProcStr.Length > 4 &&
+                                afterDeleteProcStr.StartsWith("{{") &&
+                                afterDeleteProcStr.EndsWith("}}"))
+                            {
+                                model.AfterDeleteProcessor = afterDeleteProcStr.Substring(2, afterDeleteProcStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("afterDelete属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
                     }
                 }
                 else if (nodeInfo.Path == "/model/property")

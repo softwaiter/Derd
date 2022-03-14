@@ -829,6 +829,22 @@ namespace CodeM.Common.Orm
             }
         }
 
+        private void _CalcBeforeSaveProcessor()
+        {
+            if (!string.IsNullOrWhiteSpace(BeforeSaveProcessor))
+            {
+                Processor.Call(BeforeSaveProcessor, this, null, mSetValues);
+            }
+        }
+
+        private void _CalcAfterSaveProcessor()
+        {
+            if (!string.IsNullOrWhiteSpace(AfterSaveProcessor))
+            {
+                Processor.Call(AfterSaveProcessor, this, null, mSetValues);
+            }
+        }
+
         public bool Save(bool validate = false)
         {
             return Save(null, validate);
@@ -861,17 +877,20 @@ namespace CodeM.Common.Orm
                 _CalcBeforeSaveProperties();
 
                 CommandSQL cmd = SQLBuilder.BuildInsertSQL(this);
-
                 OrmUtils.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
+                bool bRet = false;
+                _CalcBeforeSaveProcessor();
                 if (trans == null)
                 {
-                    return CommandUtils.ExecuteNonQuery(this, Path, cmd.SQL, cmd.Params.ToArray()) == 1;
+                    bRet = CommandUtils.ExecuteNonQuery(this, Path, cmd.SQL, cmd.Params.ToArray()) == 1;
                 }
                 else
                 {
-                    return CommandUtils.ExecuteNonQuery(this, trans, cmd.SQL, cmd.Params.ToArray()) == 1;
+                    bRet = CommandUtils.ExecuteNonQuery(this, trans, cmd.SQL, cmd.Params.ToArray()) == 1;
                 }
+                _CalcAfterSaveProcessor();
+                return bRet;
             }
             finally
             {
@@ -911,21 +930,40 @@ namespace CodeM.Common.Orm
                 _CalcBeforeSaveProperties();
 
                 CommandSQL cmd = SQLBuilder.BuildUpdateSQL(this);
-
                 OrmUtils.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
+                bool bRet = false;
+                _CalcBeforeSaveProcessor();
                 if (trans == null)
                 {
-                    return CommandUtils.ExecuteNonQuery(this, Path, cmd.SQL, cmd.Params.ToArray()) > 0;
+                    bRet = CommandUtils.ExecuteNonQuery(this, Path, cmd.SQL, cmd.Params.ToArray()) > 0;
                 }
                 else
                 {
-                    return CommandUtils.ExecuteNonQuery(this, trans, cmd.SQL, cmd.Params.ToArray()) > 0;
+                    bRet = CommandUtils.ExecuteNonQuery(this, trans, cmd.SQL, cmd.Params.ToArray()) > 0;
                 }
+                _CalcAfterSaveProcessor();
+                return bRet;
             }
             finally
             {
                 Reset();
+            }
+        }
+
+        private void _CalcBeforeDeleteProcessor()
+        {
+            if (!string.IsNullOrWhiteSpace(BeforeDeleteProcessor))
+            {
+                Processor.Call(BeforeDeleteProcessor, this, null, mSetValues);
+            }
+        }
+
+        private void _CalcAfterDeleteProcessor()
+        {
+            if (!string.IsNullOrWhiteSpace(AfterDeleteProcessor))
+            {
+                Processor.Call(AfterDeleteProcessor, this, null, mSetValues);
             }
         }
 
@@ -963,14 +1001,18 @@ namespace CodeM.Common.Orm
 
                 OrmUtils.PrintSQL(sql, where.Params.ToArray());
 
+                bool bRet = false;
+                _CalcBeforeDeleteProcessor();
                 if (trans == null)
                 {
-                    return CommandUtils.ExecuteNonQuery(this, Path, sql, where.Params.ToArray()) > 0;
+                    bRet = CommandUtils.ExecuteNonQuery(this, Path, sql, where.Params.ToArray()) > 0;
                 }
                 else
                 {
-                    return CommandUtils.ExecuteNonQuery(this, trans, sql, where.Params.ToArray()) > 0;
+                    bRet = CommandUtils.ExecuteNonQuery(this, trans, sql, where.Params.ToArray()) > 0;
                 }
+                _CalcAfterDeleteProcessor();
+                return bRet;
             }
             finally
             {
