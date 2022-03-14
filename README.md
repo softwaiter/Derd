@@ -218,6 +218,30 @@ User模型定义
 
 对应模型的物理表名称，如果未设置，将采用name属性值；可选。
 
+###### beforeSave
+
+字符串，模型保存前处理器，可选。
+
+该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
+
+###### afterSave
+
+字符串，模型保存后处理器，可选。
+
+该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
+
+###### beforeDelete
+
+字符串，模型删除前处理器，可选。
+
+该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
+
+###### afterDelete
+
+字符串，模型删除后处理器，可选。
+
+该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
+
 ### 2. property属性：
 
 ###### name
@@ -371,9 +395,9 @@ namespace CodeM.Common.Orm
 
 model: 当前Model定义对象
 
-prop: 当前属性的名称
+prop: 当Processor用在property之上时，值为当前属性的名称；当Processor用在model之上时，该值为null。
 
-obj: 当前Model的数据实例
+obj: 当Processor用在property之上时，值为当前属性的最新内容；当Processor用在model之上时，该值为model的内容对象。
 
 
 
