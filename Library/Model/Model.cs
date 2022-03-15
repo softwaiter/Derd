@@ -282,6 +282,10 @@ namespace CodeM.Common.Orm
             m.Path = this.Path;
             m.Name = this.Name;
             m.Table = this.Table;
+            m.BeforeSaveProcessor = this.BeforeSaveProcessor;
+            m.AfterSaveProcessor = this.AfterSaveProcessor;
+            m.BeforeDeleteProcessor = this.BeforeDeleteProcessor;
+            m.AfterDeleteProcessor = this.AfterDeleteProcessor;
 
             for (int i = 0; i < PropertyCount; i++)
             {
