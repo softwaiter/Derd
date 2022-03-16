@@ -181,6 +181,7 @@ namespace CodeM.Common.Orm
         {
             string[] quotes = Features.GetObjectQuotes(model);
 
+            bool recordEqualsProperties = true;
             CommandSQL result = new CommandSQL();
 
             KeyValuePair<string, object> expr = new KeyValuePair<string, object>();
@@ -199,6 +200,10 @@ namespace CodeM.Common.Orm
                     if (!expr.Key.Contains("."))
                     {
                         p = model.GetProperty(expr.Key);
+                        if (recordEqualsProperties && item.Key == FilterOperator.Equals)
+                        {
+                            result.FilterProperties.Add(expr.Key, expr.Value);
+                        }
                     }
                     else
                     {
@@ -224,6 +229,11 @@ namespace CodeM.Common.Orm
                     {
                         result.SQL += " AND ";
                     }
+                }
+                else if (item.Key == FilterOperator.Or)
+                {
+                    recordEqualsProperties = false;
+                    result.FilterProperties.Clear();
                 }
 
                 DbType dbType = DbType.String;

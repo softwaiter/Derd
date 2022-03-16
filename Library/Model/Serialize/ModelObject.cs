@@ -12,12 +12,12 @@ using System.Linq.Expressions;
 namespace CodeM.Common.Orm.Serialize
 {
     [Serializable]
-    public class ModelObject : ICollection<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>, IEnumerable, IDictionary<string, object>, IDynamicMetaObjectProvider
+    public class ModelObject : ICloneable, ICollection<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>, IEnumerable, IDictionary<string, object>, IDynamicMetaObjectProvider
     {
         private Model mModel;
         private bool mCheckValue;
 
-        private ModelObject(Model m, bool checkValue=true)
+        private ModelObject(Model m, bool checkValue = true)
         {
             mModel = m;
             mCheckValue = checkValue;
@@ -278,5 +278,19 @@ namespace CodeM.Common.Orm.Serialize
 
         #endregion
 
+        #region ICloneable
+        
+        public object Clone()
+        {
+            ModelObject cloneObj = New(mModel, mCheckValue);
+            Dictionary<string, object>.Enumerator e = mValues.GetEnumerator();
+            while (e.MoveNext())
+            {
+                cloneObj.SetValue(e.Current.Key, e.Current.Value);
+            }
+            return cloneObj;
+        }
+
+        #endregion
     }
 }

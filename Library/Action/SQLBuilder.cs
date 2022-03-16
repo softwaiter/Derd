@@ -92,6 +92,7 @@ namespace CodeM.Common.Orm
             {
                 result.SQL += string.Concat(" WHERE ", where.SQL);
                 result.Params.AddRange(where.Params);
+                result.FilterProperties = where.FilterProperties;
             }
 
             return result;

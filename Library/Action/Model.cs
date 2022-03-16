@@ -829,19 +829,19 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private void _CalcBeforeSaveProcessor()
+        private void _CalcBeforeSaveProcessor(string type, ModelObject obj)
         {
             if (!string.IsNullOrWhiteSpace(BeforeSaveProcessor))
             {
-                Processor.Call(BeforeSaveProcessor, this, null, mSetValues);
+                Processor.Call(BeforeSaveProcessor, this, type, obj);
             }
         }
 
-        private void _CalcAfterSaveProcessor()
+        private void _CalcAfterSaveProcessor(string type, ModelObject obj)
         {
             if (!string.IsNullOrWhiteSpace(AfterSaveProcessor))
             {
-                Processor.Call(AfterSaveProcessor, this, null, mSetValues);
+                Processor.Call(AfterSaveProcessor, this, type, obj);
             }
         }
 
@@ -880,7 +880,7 @@ namespace CodeM.Common.Orm
                 OrmUtils.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
                 bool bRet = false;
-                _CalcBeforeSaveProcessor();
+                _CalcBeforeSaveProcessor("beforeCreate", mSetValues);
                 if (trans == null)
                 {
                     bRet = CommandUtils.ExecuteNonQuery(this, Path, cmd.SQL, cmd.Params.ToArray()) == 1;
@@ -889,13 +889,27 @@ namespace CodeM.Common.Orm
                 {
                     bRet = CommandUtils.ExecuteNonQuery(this, trans, cmd.SQL, cmd.Params.ToArray()) == 1;
                 }
-                _CalcAfterSaveProcessor();
+                _CalcAfterSaveProcessor("afterCreate", mSetValues);
                 return bRet;
             }
             finally
             {
                 Reset();
             }
+        }
+
+        private ModelObject MixActionValues(Dictionary<string, object> filterProperties)
+        {
+            ModelObject result = mSetValues != null ? (ModelObject)mSetValues.Clone() : ModelObject.New(this);
+            Dictionary<string, object>.Enumerator e = filterProperties.GetEnumerator();
+            while (e.MoveNext())
+            {
+                if (!result.ContainsKey(e.Current.Key))
+                { 
+                    result.SetValue(e.Current.Key, e.Current.Value);
+                }
+            }
+            return result;
         }
 
         public bool Update(bool updateAll = false)
@@ -933,7 +947,8 @@ namespace CodeM.Common.Orm
                 OrmUtils.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
                 bool bRet = false;
-                _CalcBeforeSaveProcessor();
+                ModelObject mixedValues = MixActionValues(cmd.FilterProperties);
+                _CalcBeforeSaveProcessor("beforeUpdate", mixedValues);
                 if (trans == null)
                 {
                     bRet = CommandUtils.ExecuteNonQuery(this, Path, cmd.SQL, cmd.Params.ToArray()) > 0;
@@ -942,7 +957,7 @@ namespace CodeM.Common.Orm
                 {
                     bRet = CommandUtils.ExecuteNonQuery(this, trans, cmd.SQL, cmd.Params.ToArray()) > 0;
                 }
-                _CalcAfterSaveProcessor();
+                _CalcAfterSaveProcessor("afterUpdate", mixedValues);
                 return bRet;
             }
             finally
@@ -951,19 +966,19 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private void _CalcBeforeDeleteProcessor()
+        private void _CalcBeforeDeleteProcessor(string type, ModelObject obj)
         {
             if (!string.IsNullOrWhiteSpace(BeforeDeleteProcessor))
             {
-                Processor.Call(BeforeDeleteProcessor, this, null, mSetValues);
+                Processor.Call(BeforeDeleteProcessor, this, type, obj);
             }
         }
 
-        private void _CalcAfterDeleteProcessor()
+        private void _CalcAfterDeleteProcessor(string type, ModelObject obj)
         {
             if (!string.IsNullOrWhiteSpace(AfterDeleteProcessor))
             {
-                Processor.Call(AfterDeleteProcessor, this, null, mSetValues);
+                Processor.Call(AfterDeleteProcessor, this, type, obj);
             }
         }
 
@@ -1002,7 +1017,8 @@ namespace CodeM.Common.Orm
                 OrmUtils.PrintSQL(sql, where.Params.ToArray());
 
                 bool bRet = false;
-                _CalcBeforeDeleteProcessor();
+                ModelObject mixedValues = MixActionValues(where.FilterProperties);
+                _CalcBeforeDeleteProcessor("beforeDelete", mixedValues);
                 if (trans == null)
                 {
                     bRet = CommandUtils.ExecuteNonQuery(this, Path, sql, where.Params.ToArray()) > 0;
@@ -1011,7 +1027,7 @@ namespace CodeM.Common.Orm
                 {
                     bRet = CommandUtils.ExecuteNonQuery(this, trans, sql, where.Params.ToArray()) > 0;
                 }
-                _CalcAfterDeleteProcessor();
+                _CalcAfterDeleteProcessor("afterDelete", mixedValues);
                 return bRet;
             }
             finally
