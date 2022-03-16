@@ -38,7 +38,7 @@ nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作框�
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.6.1
+Install-Package CodeM.Common.Orm -Version 1.6.5
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.6.1
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.6.1
+dotnet add package CodeM.Common.Orm --version 1.6.5
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.6.1
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.6.1" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.6.5" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.6.1
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.6.1
+paket add CodeM.Common.Orm --version 1.6.5
 ```
 
 
@@ -386,7 +386,7 @@ namespace CodeM.Common.Orm
 {
     public interface IProcessor
     {
-        object Execute(Model model, string prop, dynamic obj);
+        object Execute(Model model, string key, dynamic value);
     }
 }
 ```
@@ -395,9 +395,9 @@ namespace CodeM.Common.Orm
 
 model: 当前Model定义对象
 
-prop: 当Processor用在property之上时，值为当前属性的名称；当Processor用在model之上时，该值为null。
+key: 当Processor用在property之上时，值为当前属性的名称；当Processor用在model之上时，该值为当前触发时机，如：beforeSave、afterSave、beforeDelete、afterDelete等。
 
-obj: 当Processor用在property之上时，值为当前属性的最新内容；当Processor用在model之上时，该值为model的内容对象。
+value: 当Processor用在property之上时，值为当前属性的最新内容；当Processor用在model之上时，该值为当前操作的内容对象。
 
 
 
@@ -410,7 +410,7 @@ namespace CodeM.Common.Orm.Processors
 {
     public class CurrentDateTime: IProcessor
     {
-        public object Execute(Model model, string prop, dynamic obj)
+        public object Execute(Model model, string key, dynamic value)
         {
             return DateTime.Now;
         }
@@ -435,7 +435,17 @@ OrmUtils.RegisterProcessor("CurrentDateTime",
 
 
 
-在Model定义中，有3个属性可以使用Processor写法，分别是defaultValue、beforeSave和afterQuery，3个属性中执行逻辑各自不同。
+在Model定义中，有4个属性可以使用Processor写法，分别是beforeSave、afterSave、beforeDelete和afterDelete，4个属性中执行逻辑各自不同。
+
+beforeSave: 当该模型的实例数据进行新增或修改保存时，会触发该Processor；用户可根据参数进行适当的业务处理。
+
+afterSave: 当该模型的实例数据进行新增或修改保存成功后，会触发该Processor；用户可根据参数进行适当的业务处理。
+
+beforeDelete: 当该模型的实例数据进行删除操作时，会触发该Processor；用户可根据参数进行适当的业务处理。
+
+afterDelete: 当该模型的实例数据进行删除成功后，会触发该Processor；用户可根据参数进行适当的业务处理。
+
+在Property定义中，有3个属性可以使用Processor写法，分别是defaultValue、beforeSave和afterQuery，3个属性中执行逻辑各自不同。
 
 defaultValue: 当在defaultValue中使用Processor时，该值只在Model新建时起作用。在Model新建保存时，会对未设置属性值得属性用Processor处理器进行计算，如果计算结果为Undefined.Value，则放弃处理；否则，用计算结果为属性进行赋值，然后进行保存。
 
@@ -443,7 +453,7 @@ beforeSave: 在Model进行新建保存或修改保存前，调用当前设置的
 
 afterQuery: afterQuery是在查询数据之后，调用当前设置的Processor处理器进行计算，如果计算结果为Undefined.Value，则放弃处理；否则，用计算结果为属性进行赋值，然后进行返回。
 
-举例说明，有如下Model定义：
+举例说明，有如下Property定义：
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
