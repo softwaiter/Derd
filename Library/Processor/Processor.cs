@@ -14,6 +14,10 @@ namespace CodeM.Common.Orm
             if (!sInited)
             {
                 Register("CurrentDateTime", "CodeM.Common.Orm.Processors.CurrentDateTime");
+                Register("CurrentDate", "CodeM.Common.Orm.Processors.CurrentDate");
+                Register("CurrentTime", "CodeM.Common.Orm.Processors.CurrentTime");
+                Register("Upper", "CodeM.Common.Orm.Processors.Upper");
+                Register("Lower", "CodeM.Common.Orm.Processors.Lower");
 
                 sInited = true;
             }
