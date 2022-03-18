@@ -106,7 +106,17 @@ namespace UnitTest
         [Description("查看User模型物理表记录条数，应为2。")]
         public void Test7()
         {
-            Assert.IsTrue(OrmUtils.Model("User").Count() == 2);
+            dynamic newuser = ModelObject.New("User");
+            newuser.Name = "wangss";
+            newuser.Age = 18;
+            newuser.Birthday = new DateTime(1947, 10, 1);
+            newuser.Deposit = 10000000.58;
+            newuser.IsAdmin = true;
+            bool ret = OrmUtils.Model("User").SetValues(newuser).Save();
+            Assert.IsTrue(ret);
+
+            Assert.IsTrue(OrmUtils.Model("User").Count() == 3);
+            Assert.IsTrue(OrmUtils.Model("User").GetValue(Model.AggregateType.DISTINCT, "Age").Count() == 2);
         }
 
         [Description("User模型属性Org真实数据类型应为String，应成功。")]

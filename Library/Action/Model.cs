@@ -1299,26 +1299,20 @@ namespace CodeM.Common.Orm
 
             try
             {
-                CommandSQL where = mFilter.Build(this);
+                mSorts.Clear();
+                CommandSQL cmd = SQLBuilder.BuildQuerySQL(this);
+                string sql = string.Concat("SELECT COUNT(1) FROM (", cmd.SQL, ")");
 
-                string joinSql = SQLBuilder.BuildJoinTableSQL(this, where.ForeignTables);
-                string[] quotes = Features.GetObjectQuotes(this);
-                string sql = string.Concat("SELECT COUNT(1) FROM ", quotes[0], this.Table, quotes[1], joinSql);
-                if (!string.IsNullOrWhiteSpace(where.SQL))
-                {
-                    sql += string.Concat(" WHERE ", where.SQL);
-                }
-
-                OrmUtils.PrintSQL(sql, where.Params.ToArray());
+                OrmUtils.PrintSQL(sql, cmd.Params.ToArray());
 
                 object count;
                 if (trans == null)
                 {
-                    count = DbUtils.ExecuteScalar(this.Path, sql, where.Params.ToArray());
+                    count = DbUtils.ExecuteScalar(Path, sql, cmd.Params.ToArray());
                 }
                 else
                 {
-                    count = DbUtils.ExecuteScalar(trans, sql, where.Params.ToArray());
+                    count = DbUtils.ExecuteScalar(trans, sql, cmd.Params.ToArray());
                 }
 
                 return Convert.ToInt64(count);
