@@ -90,7 +90,7 @@ namespace UnitTest
                 .Equals("Age", 18)
                 .GetValue(Model.AggregateType.COUNT, "Id")
                 .QueryFirst();
-            Assert.AreEqual(2, result.Id_Count);
+            Assert.AreEqual(2, result.Id);
         }
 
         [Description("获取所有人中最大的年龄，应为18。")]
@@ -125,21 +125,21 @@ namespace UnitTest
         {
             List<dynamic> result = OrmUtils.Model("User")
                 .GetValue("Age")
-                .GetValue(Model.AggregateType.COUNT, "Id")
+                .GetValue(Model.AggregateType.COUNT, "Id", "UserCount")
                 .GroupBy("Age")
                 .Query();
 
             dynamic obj18 = result.Find(item => item.Age == 18);
             Assert.IsNotNull(obj18);
-            Assert.AreEqual(2, obj18.Id_Count);
+            Assert.AreEqual(2, obj18.UserCount);
 
             dynamic obj14 = result.Find(item => item.Age == 14);
             Assert.IsNotNull(obj14);
-            Assert.AreEqual(1, obj14.Id_Count);
+            Assert.AreEqual(1, obj14.UserCount);
 
             dynamic obj10 = result.Find(item => item.Age == 10);
             Assert.IsNotNull(obj10);
-            Assert.AreEqual(1, obj10.Id_Count);
+            Assert.AreEqual(1, obj10.UserCount);
         }
     }
 }

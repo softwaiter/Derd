@@ -36,9 +36,59 @@ namespace CodeM.Common.Orm
                 this.Type = type;
             }
 
+            public GetValueSetting(string name, AggregateType type, string alias)
+                : this(name)
+            {
+                this.Type = type;
+                if (!string.IsNullOrWhiteSpace(alias))
+                {
+                    this.Alias = alias;
+                }
+            }
+
             public AggregateType Type { get; set; } = AggregateType.NONE;
 
             public string Name { get; set; }
+
+            public string Alias { get; set; } = null;
+
+            /// <summary>
+            /// 拼接SQL使用的名称
+            /// </summary>
+            public string FieldName
+            {
+                get
+                {
+                    if (!string.IsNullOrWhiteSpace(this.Alias))
+                    {
+                        return this.Alias;
+                    }
+
+                    if (this.Name.Contains("."))
+                    {
+                        return this.Name.Replace(".", "_");
+                    }
+
+                    return this.Name;
+                }
+            }
+
+            /// <summary>
+            /// 输出JSON对象使用的名称
+            /// </summary>
+            public string OutputName
+            {
+                get
+                {
+                    if (!string.IsNullOrWhiteSpace(this.Alias))
+                    {
+                        return this.Alias;
+                    }
+
+                    int index = this.Name.LastIndexOf('.');
+                    return index == -1 ? this.Name : this.Name.Substring(index + 1);
+                }
+            }
         }
 
         #region ISetValue
@@ -90,53 +140,54 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public Model GetValue(AggregateType aggType, params string[] names)
+        public Model GetValue(AggregateType aggType, string name, string alias = null)
         {
-            foreach (string name in names)
+            string compactName = name.Trim();
+            if (!mGetValues.Exists(item => item.Name == name))
             {
-                string compactName = name.Trim();
-                if (!mGetValues.Exists(item => item.Name == name))
+                if (!compactName.Contains("."))
                 {
-                    if (!compactName.Contains("."))
+                    Property p = GetProperty(compactName);
+                    if (p == null)
                     {
-                        Property p = GetProperty(compactName);
+                        throw new Exception(string.Concat("未找到属性：", compactName));
+                    }
+                }
+                else
+                {
+                    string[] typeItems = compactName.Split(".");
+                    Model currM = this;
+                    for (int i = 0; i < typeItems.Length; i++)
+                    {
+                        Property p = currM.GetProperty(typeItems[i]);
                         if (p == null)
                         {
                             throw new Exception(string.Concat("未找到属性：", compactName));
                         }
-                    }
-                    else
-                    {
-                        string[] typeItems = compactName.Split(".");
-                        Model currM = this;
-                        for (int i = 0; i < typeItems.Length; i++)
-                        {
-                            Property p = currM.GetProperty(typeItems[i]);
-                            if (p == null)
-                            {
-                                throw new Exception(string.Concat("未找到属性：", compactName));
-                            }
 
-                            if (i < typeItems.Length - 1)
+                        if (i < typeItems.Length - 1)
+                        {
+                            currM = ModelUtils.GetModel(p.TypeValue);
+                            if (currM == null)
                             {
-                                currM = ModelUtils.GetModel(p.TypeValue);
-                                if (currM == null)
-                                {
-                                    throw new Exception(string.Concat("非法的Model引用：", p.TypeValue));
-                                }
+                                throw new Exception(string.Concat("非法的Model引用：", p.TypeValue));
                             }
                         }
                     }
-
-                    mGetValues.Add(new GetValueSetting(compactName, aggType));
                 }
+
+                mGetValues.Add(new GetValueSetting(compactName, aggType, alias));
             }
             return this;
         }
 
         public Model GetValue(params string[] names)
         {
-            return GetValue(AggregateType.NONE, names);
+            foreach (string name in names)
+            {
+                GetValue(AggregateType.NONE, name);
+            }
+            return this;
         }
         #endregion
 
@@ -1096,11 +1147,6 @@ namespace CodeM.Common.Orm
             return result.Count > 0 ? result[0] : null;
         }
 
-        private string GetCountPropName(string name)
-        {
-            return string.Concat(name, "_Count");
-        }
-
         public List<dynamic> Query(int? transCode = null)
         {
             DbTransaction trans = null;
@@ -1150,27 +1196,27 @@ namespace CodeM.Common.Orm
                             if (!gvs.Name.Contains("."))
                             {
                                 Property p = GetProperty(gvs.Name);
-                                if (dr.IsDBNull(gvs.Name))
+                                if (dr.IsDBNull(gvs.FieldName))
                                 {
                                     if (gvs.Type == AggregateType.COUNT)
                                     {
-                                        obj.SetValue(GetCountPropName(gvs.Name), 0);
+                                        obj.SetValue(gvs.OutputName, 0);
                                     }
                                     else
                                     {
-                                        obj.SetValue(gvs.Name, null);
+                                        obj.SetValue(gvs.OutputName, null);
                                     }
                                 }
                                 else
                                 {
                                     if (gvs.Type == AggregateType.COUNT)
                                     {
-                                        object countObj = dr.GetValue(gvs.Name);
-                                        obj.SetValue(GetCountPropName(gvs.Name), Convert.ToInt64(countObj));
+                                        object countObj = dr.GetValue(gvs.FieldName);
+                                        obj.SetValue(gvs.OutputName, Convert.ToInt64(countObj));
                                     }
                                     else
                                     {
-                                        SetPropertyValueFromDB(obj, p, gvs.Name, dr);
+                                        SetPropertyValueFromDB(obj, p, gvs.OutputName, dr, gvs.FieldName);
                                     }
                                 }
 
@@ -1178,16 +1224,16 @@ namespace CodeM.Common.Orm
                                     !string.IsNullOrWhiteSpace(p.AfterQueryProcessor))
                                 {
                                     dynamic value = Processor.Call(p.AfterQueryProcessor, this, gvs.Name, 
-                                        obj.Has(gvs.Name) ? obj[gvs.Name] : null);
+                                        obj.Has(gvs.OutputName) ? obj[gvs.OutputName] : null);
                                     if (!Undefined.IsUndefinedValue(value))
                                     {
                                         if (value != null)
                                         {
-                                            obj.SetValue(gvs.Name, Convert.ChangeType(value, p.RealType));
+                                            obj.SetValue(gvs.OutputName, Convert.ChangeType(value, p.RealType));
                                         }
                                         else
                                         {
-                                            obj.SetValue(gvs.Name, null);
+                                            obj.SetValue(gvs.OutputName, null);
                                         }
                                     }
                                 }
@@ -1219,29 +1265,27 @@ namespace CodeM.Common.Orm
                                     {
                                         string lastName = subNames[subNames.Length - 1];
                                         Property lastProp = currM.GetProperty(lastName);
-
-                                        string fieldName = gvs.Name.Replace(".", "_");
-                                        if (dr.IsDBNull(fieldName))
+                                        if (dr.IsDBNull(gvs.FieldName))
                                         {
                                             if (gvs.Type == AggregateType.COUNT)
                                             {
-                                                currObj.SetValue(GetCountPropName(lastName), 0);
+                                                currObj.SetValue(gvs.OutputName, 0);
                                             }
                                             else
                                             {
-                                                currObj.SetValue(lastName, null);
+                                                currObj.SetValue(gvs.OutputName, null);
                                             }
                                         }
                                         else
                                         {
                                             if (gvs.Type == AggregateType.COUNT)
                                             {
-                                                object countObj = dr.GetValue(fieldName);
-                                                currObj.SetValue(GetCountPropName(lastName), Convert.ToInt64(countObj));
+                                                object countObj = dr.GetValue(gvs.FieldName);
+                                                currObj.SetValue(gvs.OutputName, Convert.ToInt64(countObj));
                                             }
                                             else
                                             {
-                                                SetPropertyValueFromDB(currObj, lastProp, lastName, dr, fieldName);
+                                                SetPropertyValueFromDB(currObj, lastProp, gvs.OutputName, dr, gvs.FieldName);
                                             }
                                         }
 
@@ -1249,16 +1293,16 @@ namespace CodeM.Common.Orm
                                             !string.IsNullOrWhiteSpace(lastProp.AfterQueryProcessor))
                                         {
                                             object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName,
-                                                currObj.Has(lastName) ? currObj[lastName] : null);
+                                                currObj.Has(gvs.OutputName) ? currObj[gvs.OutputName] : null);
                                             if (!Undefined.IsUndefinedValue(value))
                                             {
                                                 if (value != null)
                                                 {
-                                                    currObj.SetValue(lastName, Convert.ChangeType(value, lastProp.RealType));
+                                                    currObj.SetValue(gvs.OutputName, Convert.ChangeType(value, lastProp.RealType));
                                                 }
                                                 else
                                                 {
-                                                    currObj.SetValue(lastName, null);
+                                                    currObj.SetValue(gvs.OutputName, null);
                                                 }
                                             }
                                         }

@@ -267,7 +267,7 @@ namespace CodeM.Common.Orm
                     }
                     sbFields.Append(string.Concat(
                         GenQueryField(gvs, string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1])),
-                        " AS ", aliasQuotes[0], gvs.Name, aliasQuotes[1]));
+                        " AS ", aliasQuotes[0], gvs.FieldName, aliasQuotes[1]));
                 }
                 else    //Model属性引用
                 {
@@ -288,10 +288,9 @@ namespace CodeM.Common.Orm
                             }
 
                             Property lastProp = currM.GetProperty(subNames[i + 1]); 
-                            string fieldName = gvs.Name.Replace(".", "_");
                             sbFields.Append(string.Concat(
                                 GenQueryField(gvs, string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1])),
-                                " AS ", aliasQuotes[0], fieldName, aliasQuotes[1]));
+                                " AS ", aliasQuotes[0], gvs.FieldName, aliasQuotes[1]));
 
                             break;
                         }
