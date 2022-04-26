@@ -161,7 +161,7 @@ namespace CodeM.Common.Orm
 
         internal static string GenQueryField(GetValueSetting gvs, string field)
         {
-            switch (gvs.Type)
+            switch (gvs.AggregateType)
             {
                 case AggregateType.COUNT:
                     return string.Concat("COUNT(", field, ")");

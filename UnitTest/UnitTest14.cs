@@ -72,14 +72,14 @@ namespace UnitTest
         [Description("使用Distinct去重同年龄的人，应查询得到2人。")]
         public void Test2()
         {
-            List<dynamic> result = OrmUtils.Model("User").GetValue(Model.AggregateType.DISTINCT, "Age").Query();
+            List<dynamic> result = OrmUtils.Model("User").GetValue(AggregateType.DISTINCT, "Age").Query();
             Assert.AreEqual(3, result.Count);
         }
 
         [Description("计算所有人的年龄之和，应为60。")]
         public void Test3()
         {
-            dynamic result = OrmUtils.Model("User").GetValue(Model.AggregateType.SUM, "Age").QueryFirst();
+            dynamic result = OrmUtils.Model("User").GetValue(AggregateType.SUM, "Age").QueryFirst();
             Assert.AreEqual(60, result.Age);
         }
 
@@ -88,7 +88,7 @@ namespace UnitTest
         {
             dynamic result = OrmUtils.Model("User")
                 .Equals("Age", 18)
-                .GetValue(Model.AggregateType.COUNT, "Id")
+                .GetValue(AggregateType.COUNT, "Id")
                 .QueryFirst();
             Assert.AreEqual(2, result.Id);
         }
@@ -97,7 +97,7 @@ namespace UnitTest
         public void Test5()
         {
             dynamic result = OrmUtils.Model("User")
-                .GetValue(Model.AggregateType.MAX, "Age")
+                .GetValue(AggregateType.MAX, "Age")
                 .QueryFirst();
             Assert.AreEqual(18, result.Age);
         }
@@ -106,7 +106,7 @@ namespace UnitTest
         public void Test6()
         {
             dynamic result = OrmUtils.Model("User")
-                .GetValue(Model.AggregateType.MIN, "Age")
+                .GetValue(AggregateType.MIN, "Age")
                 .QueryFirst();
             Assert.AreEqual(10, result.Age);
         }
@@ -115,7 +115,7 @@ namespace UnitTest
         public void Test7()
         {
             dynamic result = OrmUtils.Model("User")
-                .GetValue(Model.AggregateType.AVG, "Age")
+                .GetValue(AggregateType.AVG, "Age")
                 .QueryFirst();
             Assert.AreEqual(15, result.Age);
         }
@@ -125,7 +125,7 @@ namespace UnitTest
         {
             List<dynamic> result = OrmUtils.Model("User")
                 .GetValue("Age")
-                .GetValue(Model.AggregateType.COUNT, "Id", "UserCount")
+                .GetValue(AggregateType.COUNT, "Id", "UserCount")
                 .GroupBy("Age")
                 .Query();
 

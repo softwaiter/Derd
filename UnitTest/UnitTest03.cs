@@ -116,7 +116,7 @@ namespace UnitTest
             Assert.IsTrue(ret);
 
             Assert.IsTrue(OrmUtils.Model("User").Count() == 3);
-            Assert.IsTrue(OrmUtils.Model("User").GetValue(Model.AggregateType.DISTINCT, "Age").Count() == 2);
+            Assert.IsTrue(OrmUtils.Model("User").GetValue(AggregateType.DISTINCT, "Age").Count() == 2);
         }
 
         [Description("User模型属性Org真实数据类型应为String，应成功。")]

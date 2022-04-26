@@ -10,19 +10,19 @@ using System.Text;
 
 namespace CodeM.Common.Orm
 {
+    public enum AggregateType
+    {
+        NONE = 0,
+        COUNT = 1,
+        SUM = 2,
+        DISTINCT = 3,
+        MAX = 4,
+        MIN = 5,
+        AVG = 6
+    }
+
     public partial class Model : ISetValue, IGetValue, IPaging, ISort, ICommand, IAssist
     {
-        public enum AggregateType
-        {
-            NONE = 0,
-            COUNT = 1,
-            SUM = 2,
-            DISTINCT = 3,
-            MAX = 4,
-            MIN = 5,
-            AVG = 6
-        }
-
         internal class GetValueSetting
         {
             public GetValueSetting(string name)
@@ -31,22 +31,22 @@ namespace CodeM.Common.Orm
             }
 
             public GetValueSetting(string name, AggregateType type)
-                :this(name)
+                : this(name)
             {
-                this.Type = type;
+                this.AggregateType = type;
             }
 
             public GetValueSetting(string name, AggregateType type, string alias)
                 : this(name)
             {
-                this.Type = type;
+                this.AggregateType = type;
                 if (!string.IsNullOrWhiteSpace(alias))
                 {
                     this.Alias = alias;
                 }
             }
 
-            public AggregateType Type { get; set; } = AggregateType.NONE;
+            public AggregateType AggregateType { get; set; } = AggregateType.NONE;
 
             public string Name { get; set; }
 
@@ -143,7 +143,7 @@ namespace CodeM.Common.Orm
         public Model GetValue(AggregateType aggType, string name, string alias = null)
         {
             string compactName = name.Trim();
-            if (!mGetValues.Exists(item => item.Name == name))
+            if (!mGetValues.Exists(item => item.Name == name && item.AggregateType == aggType))
             {
                 if (!compactName.Contains("."))
                 {
@@ -1198,7 +1198,7 @@ namespace CodeM.Common.Orm
                                 Property p = GetProperty(gvs.Name);
                                 if (dr.IsDBNull(gvs.FieldName))
                                 {
-                                    if (gvs.Type == AggregateType.COUNT)
+                                    if (gvs.AggregateType == AggregateType.COUNT)
                                     {
                                         obj.SetValue(gvs.OutputName, 0);
                                     }
@@ -1209,7 +1209,7 @@ namespace CodeM.Common.Orm
                                 }
                                 else
                                 {
-                                    if (gvs.Type == AggregateType.COUNT)
+                                    if (gvs.AggregateType == AggregateType.COUNT)
                                     {
                                         object countObj = dr.GetValue(gvs.FieldName);
                                         obj.SetValue(gvs.OutputName, Convert.ToInt64(countObj));
@@ -1220,7 +1220,7 @@ namespace CodeM.Common.Orm
                                     }
                                 }
 
-                                if (gvs.Type == AggregateType.NONE &&
+                                if (gvs.AggregateType == AggregateType.NONE &&
                                     !string.IsNullOrWhiteSpace(p.AfterQueryProcessor))
                                 {
                                     dynamic value = Processor.Call(p.AfterQueryProcessor, this, gvs.Name, 
@@ -1267,7 +1267,7 @@ namespace CodeM.Common.Orm
                                         Property lastProp = currM.GetProperty(lastName);
                                         if (dr.IsDBNull(gvs.FieldName))
                                         {
-                                            if (gvs.Type == AggregateType.COUNT)
+                                            if (gvs.AggregateType == AggregateType.COUNT)
                                             {
                                                 currObj.SetValue(gvs.OutputName, 0);
                                             }
@@ -1278,7 +1278,7 @@ namespace CodeM.Common.Orm
                                         }
                                         else
                                         {
-                                            if (gvs.Type == AggregateType.COUNT)
+                                            if (gvs.AggregateType == AggregateType.COUNT)
                                             {
                                                 object countObj = dr.GetValue(gvs.FieldName);
                                                 currObj.SetValue(gvs.OutputName, Convert.ToInt64(countObj));
@@ -1289,7 +1289,7 @@ namespace CodeM.Common.Orm
                                             }
                                         }
 
-                                        if (gvs.Type == AggregateType.NONE &&
+                                        if (gvs.AggregateType == AggregateType.NONE &&
                                             !string.IsNullOrWhiteSpace(lastProp.AfterQueryProcessor))
                                         {
                                             object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName,
