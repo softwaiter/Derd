@@ -38,7 +38,7 @@ nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作框�
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.6.5
+Install-Package CodeM.Common.Orm -Version 1.7.0
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.6.5
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.6.5
+dotnet add package CodeM.Common.Orm --version 1.7.0
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.6.5
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.6.5" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.7.0" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.6.5
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.6.5
+paket add CodeM.Common.Orm --version 1.7.0
 ```
 
 
@@ -91,7 +91,7 @@ paket add CodeM.Common.Orm --version 1.6.5
 
 支持多数据源定义，数据库连接和模型存储目录相对应，模型存储根目录及其下面的子目录都可以通过数据库配置文件设置自己的数据库连接，如果当前目录没有数据库连接配置文件，将继续向上寻找父目录的数据库连接配置文件，直到找到为止；基于此设计逻辑，根目录必须有数据库连接配置文件。
 
-数据库连接配置文件命必须为.connection.xml，格式如下：
+数据库连接配置文件必须命名为.connection.xml，格式如下：
 
 ```xml
 <!--SQLite数据库-->
@@ -216,7 +216,7 @@ User模型定义
 
 ###### table
 
-对应模型的物理表名称，如果未设置，将采用name属性值；可选。
+对应模型的物理表名称，如果未设置，将采用name属性值生成，生成规则为：t_+小写的name属性值（不包括加号）；可选。
 
 ###### beforeSave
 
@@ -250,7 +250,7 @@ User模型定义
 
 ###### field
 
-对应模型的物理表字段的名称，如果未设置，将采用name属性值；可选。
+对应模型的物理表字段的名称，如果未设置，将采用name属性值生成，生成规则为：f_+小写的name属性值（不包括加号）；可选。
 
 ###### type
 
@@ -334,6 +334,10 @@ type属性转换表：
 ###### unsigned
 
 布尔型，指定属性是否为无符号数，属性type类型必须为数值型，默认为False；可选。
+
+###### indexGroup
+
+字符串，指定模型的索引，该属性值相同的属性将组合成一个联合索引，可选。
 
 ###### uniqueGroup
 
@@ -1247,21 +1251,11 @@ OrmUtils.Model("User").SetValues(newuser).Save();
 
 #### 设置查询返回属性方法
 
-##### public Model GetValue(AggregateType aggType, params string[] names)
+##### public Model GetValue(params string[] names)
 
 设置Query查询方法返回对象的属性，如果不设置，默认返回模型的所有属性。
 
 ###### 参数
-
-aggType：指定要使用的聚合函数，具体可使用类型如下：
-
-- NONE：不适用聚合函数。
-- COUNT：根据条件进行计数操作，当对字段使用该操作时，返回属性名为指定属性名+“_Count”后缀。
-- SUM：对指定字段进行求和操作。
-- DISTINCT：对指定字段进行去重操作。
-- MAX：对指定字段进行求最大值操作。
-- MIN：对指定字段进行求最小值操作。
-- AVG：对指定字段进行求平均值操作。
 
 names：设置要返回的属性数组。
 
@@ -1277,13 +1271,76 @@ if (result.Count > 0)
 }
 ```
 
-注：返回属性可以使用主从模型属性，返回格式按照模型自动嵌套，如或去用户所属机构的名称：
+注：返回属性可以使用主从模型属性，返回格式按照模型自动嵌套，如获取用户所属机构的名称：
 
 ```c#
 List<dynamic> result = OrmUtils.Model("User").GetValue("Name", "OrgId.Name").Query();
 if (result.Count > 0)
 {
     Console.WriteLine("所属机构名称：{0}", result[0].OrgId.Name);
+}
+```
+
+
+
+##### public Model GetValue(AggregateType aggType, string name, string alias=null)
+
+返回通过聚合方法处理的属性值。
+
+###### 参数
+
+aggType：指定要使用的聚合函数，具体可使用类型如下：
+
+- NONE：不使用聚合函数。
+- COUNT：根据条件进行计数操作。
+- SUM：对指定字段进行求和操作。
+- DISTINCT：对指定字段进行去重操作。
+- MAX：对指定字段进行求最大值操作。
+- MIN：对指定字段进行求最小值操作。
+- AVG：对指定字段进行求平均值操作。
+
+name：要通过聚合方法处理的属性。
+
+alias：查询别名，可选。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+List<dynamic> result = OrmUtils.Model("User").GetValue(AggregateType.MAX, "Age").Query();
+if (result.Count > 0)
+{
+    Console.WriteLine("最大年龄：{0}", result[0].Age);
+}
+```
+
+
+
+##### public Model GetValue(FunctionType funcType, string name, string alias=null)
+
+返回通过指定函数处理后的属性值。
+
+###### 参数
+
+funcType：指定要使用的处理函数，具体可使用类型如下：
+
+- NONE：不使用任何函数。
+- DATE：将指定属性的日期时间值转换为“YYYY-MM-DD”格式的字符串。
+
+name：要通过函数处理的属性。
+
+alias：查询别名，可选。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+List<dynamic> result = OrmUtils.Model("User").GetValue(FunctionType.DATE, "CreateTime").Query();
+if (result.Count > 0)
+{
+    Console.WriteLine("创建日期：{0}", result[0].CreateTime);   // 2022-04-02
 }
 ```
 
@@ -1587,6 +1644,35 @@ OrmUtils.Model("User")
     .GetValue("Org")
     .GetValue(AggregateType.Max, "Age")
     .Query(); // 查询每个机构内最大的人员年龄
+```
+
+
+
+##### public Model GroupBy(FunctionType funcType, string name)
+
+设置根据一个指定函数处理后的属性值对查询结果进行分组
+
+###### 参数
+
+funcType：指定要使用的处理函数，具体可使用类型如下：
+
+- NONE：不使用任何函数。
+- DATE：将指定属性的日期时间值转换为“YYYY-MM-DD”格式的字符串。
+
+name：要通过函数处理的属性。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+OrmUtils.Model("User")
+    .GroupBy("Org")
+    .GroupBy(FunctionType.DATE, "CreateTime")
+    .GetValue("Org")
+    .GetValue(FunctionType.DATE, "CreateTime")
+    .GetValue(AggregateType.Count, "Id", "Count")
+    .Query(); // 查询每个机构每天注册的人数
 ```
 
 
