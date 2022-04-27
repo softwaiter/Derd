@@ -115,6 +115,24 @@ namespace CodeM.Common.Orm
             }
         }
 
+        internal class GroupBySetting
+        {
+            public GroupBySetting(string name)
+            {
+                this.Name = name;
+            }
+
+            public GroupBySetting(string name, FunctionType type)
+                : this(name)
+            {
+                this.FunctionType = type;
+            }
+
+            public string Name { get; set; }
+
+            public FunctionType FunctionType { get; set; } = FunctionType.NONE;
+        }
+
         #region ISetValue
         ModelObject mSetValues;
 
@@ -167,7 +185,7 @@ namespace CodeM.Common.Orm
         public Model GetValue(AggregateType aggType, string name, string alias = null)
         {
             string compactName = name.Trim();
-            if (!mGetValues.Exists(item => item.Name == name && item.AggregateType == aggType))
+            if (!mGetValues.Exists(item => item.Name == compactName && item.AggregateType == aggType))
             {
                 if (!compactName.Contains("."))
                 {
@@ -208,7 +226,7 @@ namespace CodeM.Common.Orm
         public Model GetValue(FunctionType funcType, string name, string alias = null)
         {
             string compactName = name.Trim();
-            if (!mGetValues.Exists(item => item.Name == name && item.FunctionType == funcType))
+            if (!mGetValues.Exists(item => item.Name == compactName && item.FunctionType == funcType))
             {
                 if (!compactName.Contains("."))
                 {
@@ -568,13 +586,22 @@ namespace CodeM.Common.Orm
             }
         }
 
-        List<string> mGroupByNames = new List<string>();
+        List<GroupBySetting> mGroupByNames = new List<GroupBySetting>();
+
+        internal List<GroupBySetting> GroupByNames
+        {
+            get
+            {
+                return mGroupByNames;
+            }
+        }
+
         public Model GroupBy(params string[] names)
         {
             foreach (string name in names)
             {
                 string compactName = name.Trim();
-                if (!mGroupByNames.Exists(item => item == name))
+                if (!mGroupByNames.Exists(item => item.Name == compactName && item.FunctionType == FunctionType.NONE))
                 {
                     if (!compactName.Contains("."))
                     {
@@ -606,18 +633,50 @@ namespace CodeM.Common.Orm
                             }
                         }
                     }
-                    mGroupByNames.Add(compactName);
+                    mGroupByNames.Add(new GroupBySetting(compactName, FunctionType.NONE));
                 }
             }
             return this;
         }
 
-        internal List<string> GroupByNames
+        public Model GroupBy(FunctionType funcType, string name)
         {
-            get
+            string compactName = name.Trim();
+            if (!mGroupByNames.Exists(item => item.Name == compactName && item.FunctionType == funcType))
             {
-                return mGroupByNames;
+                if (!compactName.Contains("."))
+                {
+                    Property p = GetProperty(compactName);
+                    if (p == null)
+                    {
+                        throw new Exception(string.Concat("未找到属性：", compactName));
+                    }
+                }
+                else
+                {
+                    string[] typeItems = compactName.Split(".");
+                    Model currM = this;
+                    for (int i = 0; i < typeItems.Length; i++)
+                    {
+                        Property p = currM.GetProperty(typeItems[i]);
+                        if (p == null)
+                        {
+                            throw new Exception(string.Concat("未找到属性：", compactName));
+                        }
+
+                        if (i < typeItems.Length - 1)
+                        {
+                            currM = ModelUtils.GetModel(p.TypeValue);
+                            if (currM == null)
+                            {
+                                throw new Exception(string.Concat("非法的Model引用：", p.TypeValue));
+                            }
+                        }
+                    }
+                }
+                mGroupByNames.Add(new GroupBySetting(compactName, funcType));
             }
+            return this;
         }
         #endregion
 

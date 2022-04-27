@@ -201,21 +201,32 @@ namespace CodeM.Common.Orm
             if (m.GroupByNames.Count > 0)
             {
                 sbResult.Append("GROUP BY ");
-                foreach (string name in m.GroupByNames)
+                foreach (GroupBySetting gbs in m.GroupByNames)
                 {
-                    if (!name.Contains("."))    //直接属性
+                    if (!gbs.Name.Contains("."))    //直接属性
                     {
-                        Property p = m.GetProperty(name);
+                        Property p = m.GetProperty(gbs.Name);
                         if (sbResult.Length > 9)
                         {
                             sbResult.Append(",");
                         }
-                        sbResult.Append(string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1]));
+
+                        string groupField = string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1]);
+                        if (gbs.FunctionType != FunctionType.NONE)
+                        {
+                            string funcName = Enum.GetName(typeof(FunctionType), gbs.FunctionType);
+                            string groupFuncField = Features.GetFunctionCommand(m, funcName, groupField);
+                            sbResult.Append(groupFuncField);
+                        }
+                        else
+                        {
+                            sbResult.Append(groupField);
+                        }
                     }
                     else    //Model属性引用
                     {
                         Model currM = m;
-                        string[] subNames = name.Split(".");
+                        string[] subNames = gbs.Name.Split(".");
                         for (int i = 0; i < subNames.Length; i++)
                         {
                             Property subProp = currM.GetProperty(subNames[i]);
@@ -229,7 +240,17 @@ namespace CodeM.Common.Orm
                                 }
 
                                 Property lastProp = currM.GetProperty(subNames[i + 1]);
-                                sbResult.Append(string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1]));
+                                string groupField = string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1]);
+                                if (gbs.FunctionType != FunctionType.NONE)
+                                {
+                                    string funcName = Enum.GetName(typeof(FunctionType), gbs.FunctionType);
+                                    string groupFuncField = Features.GetFunctionCommand(m, funcName, groupField);
+                                    sbResult.Append(groupFuncField);
+                                }
+                                else
+                                {
+                                    sbResult.Append(groupField);
+                                }
 
                                 break;
                             }

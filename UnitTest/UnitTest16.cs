@@ -2,6 +2,7 @@
 using CodeM.Common.Orm.Serialize;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace UnitTest
@@ -31,6 +32,7 @@ namespace UnitTest
             Test2();
             Test3();
             Test4();
+            Test5();
         }
 
         [Description("创建Shopping模型的物理表，应成功。")]
@@ -71,6 +73,26 @@ namespace UnitTest
                 .QueryFirst();
             Assert.IsNotNull(result);
             Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), result.CDate);
+        }
+
+        public void Test5()
+        {
+            dynamic newshopping = ModelObject.New("Shopping");
+            newshopping.Code = "iPhone 12";
+            newshopping.Name = "苹果手机12";
+            newshopping.Order = "S202100812085255000";
+            bool ret = OrmUtils.Model("Shopping").SetValues(newshopping).Save();
+            Assert.IsTrue(ret);
+
+            List<dynamic> result = OrmUtils.Model("Shopping")
+                .GetValue(FunctionType.DATE, "CreateTime")
+                .GetValue("Code")
+                .GetValue(AggregateType.COUNT, "Id", "Count")
+                .GroupBy(FunctionType.DATE, "CreateTime")
+                .GroupBy("Code")
+                .Query();
+            Assert.AreEqual(1, result.Count);
+            Assert.IsTrue(2 == result[0].Count);
         }
     }
 }

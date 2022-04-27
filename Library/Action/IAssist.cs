@@ -7,5 +7,7 @@
         Model NoWait();
 
         Model GroupBy(params string[] names);
+
+        Model GroupBy(FunctionType funcType, string name);
     }
 }
