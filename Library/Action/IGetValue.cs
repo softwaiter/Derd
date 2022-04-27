@@ -6,6 +6,8 @@ namespace CodeM.Common.Orm
     {
         Model GetValue(AggregateType aggType, string name, string alias = null);
 
+        Model GetValue(FunctionType funcType, string name, string alias = null);
+
         Model GetValue(params string[] names);
 
     }

@@ -30,7 +30,7 @@ namespace UnitTest
             Test1();
         }
 
-        [Description("创建User模型的物理表。")]
+        [Description("创建Animal模型的物理表。")]
         public void Test1()
         {
             bool ret = OrmUtils.Model("Animal").TryCreateTable(true);

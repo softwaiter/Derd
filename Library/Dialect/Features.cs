@@ -163,6 +163,12 @@
             return string.Format(pagingStr, sql, pagesize, pageindex, (pageindex - 1) * pagesize, pageindex * pagesize);
         }
 
+        internal static string GetFunctionCommand(Model model, string funcName, params string[] args)
+        {
+            string funcCmd = Config.GetConfigValue<string>("function", model, funcName.Trim().ToUpper());
+            return string.Format(funcCmd, args);
+        }
+
         internal static bool IsSupportMultiCommand(Model model)
         {
             return Config.GetConfigValue<bool>("feature", model, "exec_multi_command");

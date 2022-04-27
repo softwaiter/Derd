@@ -99,7 +99,7 @@ namespace UnitTest
             dynamic result = OrmUtils.Model("User")
                 .GetValue(AggregateType.MAX, "Age")
                 .QueryFirst();
-            Assert.AreEqual(18, result.Age);
+            Assert.IsTrue(18 == result.Age);
         }
 
         [Description("获取所有人中最小的年龄，应为10。")]
@@ -108,7 +108,7 @@ namespace UnitTest
             dynamic result = OrmUtils.Model("User")
                 .GetValue(AggregateType.MIN, "Age")
                 .QueryFirst();
-            Assert.AreEqual(10, result.Age);
+            Assert.IsTrue(10 == result.Age);
         }
 
         [Description("获取人员平均年龄，应为15。")]
@@ -117,7 +117,7 @@ namespace UnitTest
             dynamic result = OrmUtils.Model("User")
                 .GetValue(AggregateType.AVG, "Age")
                 .QueryFirst();
-            Assert.AreEqual(15, result.Age);
+            Assert.IsTrue(15 == result.Age);
         }
 
         [Description("使用GroupBy计算每个年龄段的人数，应该18岁2人，14岁1人，10岁1人。")]

@@ -21,6 +21,12 @@ namespace CodeM.Common.Orm
         AVG = 6
     }
 
+    public enum FunctionType
+    {
+        NONE = 0,
+        DATE = 1
+    }
+
     public partial class Model : ISetValue, IGetValue, IPaging, ISort, ICommand, IAssist
     {
         internal class GetValueSetting
@@ -46,7 +52,25 @@ namespace CodeM.Common.Orm
                 }
             }
 
+            public GetValueSetting(string name, FunctionType type)
+                : this(name)
+            {
+                this.FunctionType = type;
+            }
+
+            public GetValueSetting(string name, FunctionType type, string alias)
+                : this(name)
+            {
+                this.FunctionType = type;
+                if (!string.IsNullOrWhiteSpace(alias))
+                {
+                    this.Alias = alias;
+                }
+            }
+
             public AggregateType AggregateType { get; set; } = AggregateType.NONE;
+
+            public FunctionType FunctionType { get; set; } = FunctionType.NONE;
 
             public string Name { get; set; }
 
@@ -177,6 +201,47 @@ namespace CodeM.Common.Orm
                 }
 
                 mGetValues.Add(new GetValueSetting(compactName, aggType, alias));
+            }
+            return this;
+        }
+
+        public Model GetValue(FunctionType funcType, string name, string alias = null)
+        {
+            string compactName = name.Trim();
+            if (!mGetValues.Exists(item => item.Name == name && item.FunctionType == funcType))
+            {
+                if (!compactName.Contains("."))
+                {
+                    Property p = GetProperty(compactName);
+                    if (p == null)
+                    {
+                        throw new Exception(string.Concat("未找到属性：", compactName));
+                    }
+                }
+                else
+                {
+                    string[] typeItems = compactName.Split(".");
+                    Model currM = this;
+                    for (int i = 0; i < typeItems.Length; i++)
+                    {
+                        Property p = currM.GetProperty(typeItems[i]);
+                        if (p == null)
+                        {
+                            throw new Exception(string.Concat("未找到属性：", compactName));
+                        }
+
+                        if (i < typeItems.Length - 1)
+                        {
+                            currM = ModelUtils.GetModel(p.TypeValue);
+                            if (currM == null)
+                            {
+                                throw new Exception(string.Concat("非法的Model引用：", p.TypeValue));
+                            }
+                        }
+                    }
+                }
+
+                mGetValues.Add(new GetValueSetting(compactName, funcType, alias));
             }
             return this;
         }
@@ -1198,21 +1263,19 @@ namespace CodeM.Common.Orm
                                 Property p = GetProperty(gvs.Name);
                                 if (dr.IsDBNull(gvs.FieldName))
                                 {
-                                    if (gvs.AggregateType == AggregateType.COUNT)
-                                    {
-                                        obj.SetValue(gvs.OutputName, 0);
-                                    }
-                                    else
-                                    {
-                                        obj.SetValue(gvs.OutputName, null);
-                                    }
+                                    obj.SetValue(gvs.OutputName, null);
                                 }
                                 else
                                 {
-                                    if (gvs.AggregateType == AggregateType.COUNT)
+                                    if (gvs.AggregateType != AggregateType.NONE)
                                     {
-                                        object countObj = dr.GetValue(gvs.FieldName);
-                                        obj.SetValue(gvs.OutputName, Convert.ToInt64(countObj));
+                                        object aggValue = dr.GetValue(gvs.FieldName);
+                                        obj.SetValue(gvs.OutputName, aggValue);
+                                    }
+                                    else if (gvs.FunctionType != FunctionType.NONE)
+                                    {
+                                        object funcValue = dr.GetValue(gvs.FieldName);
+                                        obj.SetValue(gvs.OutputName, funcValue);
                                     }
                                     else
                                     {
@@ -1229,7 +1292,7 @@ namespace CodeM.Common.Orm
                                     {
                                         if (value != null)
                                         {
-                                            obj.SetValue(gvs.OutputName, Convert.ChangeType(value, p.RealType));
+                                            obj.SetValue(gvs.OutputName, value);
                                         }
                                         else
                                         {
@@ -1267,21 +1330,19 @@ namespace CodeM.Common.Orm
                                         Property lastProp = currM.GetProperty(lastName);
                                         if (dr.IsDBNull(gvs.FieldName))
                                         {
-                                            if (gvs.AggregateType == AggregateType.COUNT)
-                                            {
-                                                currObj.SetValue(gvs.OutputName, 0);
-                                            }
-                                            else
-                                            {
-                                                currObj.SetValue(gvs.OutputName, null);
-                                            }
+                                            currObj.SetValue(gvs.OutputName, null);
                                         }
                                         else
                                         {
-                                            if (gvs.AggregateType == AggregateType.COUNT)
+                                            if (gvs.AggregateType != AggregateType.NONE)
                                             {
-                                                object countObj = dr.GetValue(gvs.FieldName);
-                                                currObj.SetValue(gvs.OutputName, Convert.ToInt64(countObj));
+                                                object aggValue = dr.GetValue(gvs.FieldName);
+                                                currObj.SetValue(gvs.OutputName, aggValue);
+                                            }
+                                            else if (gvs.FunctionType != FunctionType.NONE)
+                                            {
+                                                object funcValue = dr.GetValue(gvs.FieldName);
+                                                currObj.SetValue(gvs.OutputName, funcValue);
                                             }
                                             else
                                             {
@@ -1298,7 +1359,7 @@ namespace CodeM.Common.Orm
                                             {
                                                 if (value != null)
                                                 {
-                                                    currObj.SetValue(gvs.OutputName, Convert.ChangeType(value, lastProp.RealType));
+                                                    currObj.SetValue(gvs.OutputName, value);
                                                 }
                                                 else
                                                 {
@@ -1345,7 +1406,7 @@ namespace CodeM.Common.Orm
             {
                 mSorts.Clear();
                 CommandSQL cmd = SQLBuilder.BuildQuerySQL(this);
-                string sql = string.Concat("SELECT COUNT(1) FROM (", cmd.SQL, ")");
+                string sql = string.Concat("SELECT COUNT(1) FROM (", cmd.SQL, ") ", this.Table);
 
                 OrmUtils.PrintSQL(sql, cmd.Params.ToArray());
 

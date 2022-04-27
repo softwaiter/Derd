@@ -254,6 +254,16 @@ namespace CodeM.Common.Orm.Dialect
             }}
         });
 
+        static Hashtable sFunctions = Hashtable.Synchronized(new Hashtable()
+        {
+            { "DATE", new Hashtable() {
+                { "default", "TO_CHAR({0}, 'YYYY-MM-DD')" },
+                { "sqlite", "DATE({0})" },
+                { "mysql", "DATE_FORMAT({0}, '%Y-%m-%d')" },
+                { "sqlserver", "CONVERT(VARCHAR(10), {0}, 120)" }
+            }}
+        });
+
         /// <summary>
         /// 配置项汇总访问入口
         /// </summary>
@@ -262,7 +272,8 @@ namespace CodeM.Common.Orm.Dialect
             { "feature", sFeaturesSupported },
             { "fieldtype", sFieldTypes },
             { "fieldlength", sFieldDefaultLengths },
-            { "autoincrtag", sFieldAutoIncrementTags }
+            { "autoincrtag", sFieldAutoIncrementTags },
+            { "function", sFunctions }
         });
 
         internal static object GetConfigValue(string config, Model model, object key)

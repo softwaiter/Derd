@@ -1,5 +1,6 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.Dialect;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -159,25 +160,36 @@ namespace CodeM.Common.Orm
             return sbJoins.ToString();
         }
 
-        internal static string GenQueryField(GetValueSetting gvs, string field)
+        internal static string GenQueryField(Model m, GetValueSetting gvs, string field)
         {
-            switch (gvs.AggregateType)
+            if (gvs.AggregateType != AggregateType.NONE)
             {
-                case AggregateType.COUNT:
-                    return string.Concat("COUNT(", field, ")");
-                case AggregateType.DISTINCT:
-                    return string.Concat("DISTINCT(", field, ")");
-                case AggregateType.SUM:
-                    return string.Concat("SUM(", field, ")");
-                case AggregateType.MAX:
-                    return string.Concat("MAX(", field, ")");
-                case AggregateType.MIN:
-                    return string.Concat("MIN(", field, ")");
-                case AggregateType.AVG:
-                    return string.Concat("AVG(", field, ")");
-                default:
-                    return field;
+                switch (gvs.AggregateType)
+                {
+                    case AggregateType.COUNT:
+                        return string.Concat("COUNT(", field, ")");
+                    case AggregateType.DISTINCT:
+                        return string.Concat("DISTINCT(", field, ")");
+                    case AggregateType.SUM:
+                        return string.Concat("SUM(", field, ")");
+                    case AggregateType.MAX:
+                        return string.Concat("MAX(", field, ")");
+                    case AggregateType.MIN:
+                        return string.Concat("MIN(", field, ")");
+                    case AggregateType.AVG:
+                        return string.Concat("AVG(", field, ")");
+                }
             }
+            else if (gvs.FunctionType != FunctionType.NONE)
+            {
+                switch (gvs.FunctionType)
+                {
+                    case FunctionType.DATE:
+                        string funcName = Enum.GetName(typeof(FunctionType), gvs.FunctionType);
+                        return Features.GetFunctionCommand(m, funcName, field);
+                }
+            }
+            return field;
         }
 
         internal static string BuildGroupBySQL(Model m)
@@ -266,7 +278,7 @@ namespace CodeM.Common.Orm
                         sbFields.Append(",");
                     }
                     sbFields.Append(string.Concat(
-                        GenQueryField(gvs, string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1])),
+                        GenQueryField(m, gvs, string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1])),
                         " AS ", aliasQuotes[0], gvs.FieldName, aliasQuotes[1]));
                 }
                 else    //Model属性引用
@@ -289,7 +301,7 @@ namespace CodeM.Common.Orm
 
                             Property lastProp = currM.GetProperty(subNames[i + 1]); 
                             sbFields.Append(string.Concat(
-                                GenQueryField(gvs, string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1])),
+                                GenQueryField(currM, gvs, string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1])),
                                 " AS ", aliasQuotes[0], gvs.FieldName, aliasQuotes[1]));
 
                             break;
