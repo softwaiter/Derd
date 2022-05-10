@@ -33,15 +33,16 @@ namespace CodeM.Common.Orm.Serialize
         {
             return new ModelObject(model);
         }
-        internal static ModelObject New(string modelName, bool checkValue)
+
+        public static ModelObject New(string modelName, bool checkProp)
         {
             Model model = ModelUtils.GetModel(modelName);
-            return New(model, checkValue);
+            return New(model, checkProp);
         }
 
-        internal static ModelObject New(Model model, bool checkValue)
+        public static ModelObject New(Model model, bool checkProp)
         {
-            return new ModelObject(model, checkValue);
+            return new ModelObject(model, checkProp);
         }
 
         private void _CheckProperyValue(string name, object value)
