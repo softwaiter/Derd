@@ -39,38 +39,89 @@ namespace CodeM.Common.Orm
             public GetValueSetting(string name, AggregateType type)
                 : this(name)
             {
-                this.AggregateType = type;
+                mOperations.Add(type);
             }
 
             public GetValueSetting(string name, AggregateType type, string alias)
-                : this(name)
+                : this(name, type)
             {
-                this.AggregateType = type;
                 if (!string.IsNullOrWhiteSpace(alias))
                 {
                     this.Alias = alias;
                 }
+            }
+
+            public GetValueSetting(string name, AggregateType aggType,
+                FunctionType funcType) : this(name, aggType)
+            {
+                mOperations.Add(funcType);
+            }
+
+            public GetValueSetting(string name, AggregateType aggType,
+                FunctionType funcType, string alias) : this(name, aggType, alias)
+            {
+                mOperations.Add(funcType);
+            }
+
+            public GetValueSetting(string name, AggregateType aggType,
+                AggregateType aggType2) : this(name, aggType)
+            {
+                mOperations.Add(aggType2);
+            }
+
+            public GetValueSetting(string name, AggregateType aggType,
+                AggregateType aggType2, string alias) : this(name, aggType, alias)
+            {
+                mOperations.Add(aggType2);
             }
 
             public GetValueSetting(string name, FunctionType type)
                 : this(name)
             {
-                this.FunctionType = type;
+                mOperations.Add(type);
             }
 
             public GetValueSetting(string name, FunctionType type, string alias)
-                : this(name)
+                : this(name, type)
             {
-                this.FunctionType = type;
                 if (!string.IsNullOrWhiteSpace(alias))
                 {
                     this.Alias = alias;
                 }
             }
 
-            public AggregateType AggregateType { get; set; } = AggregateType.NONE;
+            public GetValueSetting(string name, FunctionType funcType, 
+                AggregateType aggType) : this(name, funcType)
+            {
+                mOperations.Add(aggType);
+            }
 
-            public FunctionType FunctionType { get; set; } = FunctionType.NONE;
+            public GetValueSetting(string name, FunctionType funcType,
+                AggregateType aggType, string alias) : this(name, funcType, alias)
+            {
+                mOperations.Add(aggType);
+            }
+
+            public GetValueSetting(string name, FunctionType funcType,
+                FunctionType funcType2) : this(name, funcType)
+            {
+                mOperations.Add(funcType2);
+            }
+
+            public GetValueSetting(string name, FunctionType funcType,
+                FunctionType funcType2, string alias) : this(name, funcType, alias)
+            {
+                mOperations.Add(funcType2);
+            }
+
+            private List<dynamic> mOperations = new List<dynamic>();
+            public List<dynamic> Operations
+            {
+                get
+                {
+                    return mOperations;
+                }
+            }
 
             public string Name { get; set; }
 
@@ -182,85 +233,81 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public Model GetValue(AggregateType aggType, string name, string alias = null)
+        private string CheckGetValuePropName(string name)
         {
             string compactName = name.Trim();
-            if (!mGetValues.Exists(item => item.Name == compactName && item.AggregateType == aggType))
+            if (!compactName.Contains("."))
             {
-                if (!compactName.Contains("."))
+                Property p = GetProperty(compactName);
+                if (p == null)
                 {
-                    Property p = GetProperty(compactName);
+                    throw new Exception(string.Concat("未找到属性：", compactName));
+                }
+            }
+            else
+            {
+                string[] typeItems = compactName.Split(".");
+                Model currM = this;
+                for (int i = 0; i < typeItems.Length; i++)
+                {
+                    Property p = currM.GetProperty(typeItems[i]);
                     if (p == null)
                     {
                         throw new Exception(string.Concat("未找到属性：", compactName));
                     }
-                }
-                else
-                {
-                    string[] typeItems = compactName.Split(".");
-                    Model currM = this;
-                    for (int i = 0; i < typeItems.Length; i++)
-                    {
-                        Property p = currM.GetProperty(typeItems[i]);
-                        if (p == null)
-                        {
-                            throw new Exception(string.Concat("未找到属性：", compactName));
-                        }
 
-                        if (i < typeItems.Length - 1)
+                    if (i < typeItems.Length - 1)
+                    {
+                        currM = ModelUtils.GetModel(p.TypeValue);
+                        if (currM == null)
                         {
-                            currM = ModelUtils.GetModel(p.TypeValue);
-                            if (currM == null)
-                            {
-                                throw new Exception(string.Concat("非法的Model引用：", p.TypeValue));
-                            }
+                            throw new Exception(string.Concat("非法的Model引用：", p.TypeValue));
                         }
                     }
                 }
-
-                mGetValues.Add(new GetValueSetting(compactName, aggType, alias));
             }
+            return compactName;
+        }
+
+        public Model GetValue(AggregateType aggType, string name, string alias = null)
+        {
+            string compactName = CheckGetValuePropName(name);
+            mGetValues.Add(new GetValueSetting(compactName, aggType, alias));
+            return this;
+        }
+
+        public Model GetValue(AggregateType aggType, FunctionType funcType, string name, string alias = null)
+        {
+            string compactName = CheckGetValuePropName(name);
+            mGetValues.Add(new GetValueSetting(compactName, aggType, funcType, alias));
+            return this;
+        }
+
+        public Model GetValue(AggregateType aggType, AggregateType aggType2, string name, string alias = null)
+        {
+            string compactName = CheckGetValuePropName(name);
+            mGetValues.Add(new GetValueSetting(compactName, aggType, aggType2, alias));
             return this;
         }
 
         public Model GetValue(FunctionType funcType, string name, string alias = null)
         {
-            string compactName = name.Trim();
-            if (!mGetValues.Exists(item => item.Name == compactName && item.FunctionType == funcType))
-            {
-                if (!compactName.Contains("."))
-                {
-                    Property p = GetProperty(compactName);
-                    if (p == null)
-                    {
-                        throw new Exception(string.Concat("未找到属性：", compactName));
-                    }
-                }
-                else
-                {
-                    string[] typeItems = compactName.Split(".");
-                    Model currM = this;
-                    for (int i = 0; i < typeItems.Length; i++)
-                    {
-                        Property p = currM.GetProperty(typeItems[i]);
-                        if (p == null)
-                        {
-                            throw new Exception(string.Concat("未找到属性：", compactName));
-                        }
+            string compactName = CheckGetValuePropName(name);
+            mGetValues.Add(new GetValueSetting(compactName, funcType, alias));
+            return this;
+        }
 
-                        if (i < typeItems.Length - 1)
-                        {
-                            currM = ModelUtils.GetModel(p.TypeValue);
-                            if (currM == null)
-                            {
-                                throw new Exception(string.Concat("非法的Model引用：", p.TypeValue));
-                            }
-                        }
-                    }
-                }
+        public Model GetValue(FunctionType funcType, AggregateType aggType, string name, string alias = null)
+        {
+            string compactName = CheckGetValuePropName(name);
+            mGetValues.Add(new GetValueSetting(compactName, funcType, aggType, alias));
+            return this;
+        }
 
-                mGetValues.Add(new GetValueSetting(compactName, funcType, alias));
-            }
+        public Model GetValue(FunctionType funcType, FunctionType funcType2, string name, string alias = null)
+        {
+            string compactName = CheckGetValuePropName(name);
+            mGetValues.Add(new GetValueSetting(compactName, funcType, funcType2, alias));
             return this;
         }
 
@@ -1326,15 +1373,10 @@ namespace CodeM.Common.Orm
                                 }
                                 else
                                 {
-                                    if (gvs.AggregateType != AggregateType.NONE)
+                                    if (gvs.Operations.Count > 0)
                                     {
-                                        object aggValue = dr.GetValue(gvs.FieldName);
-                                        obj.SetValue(gvs.OutputName, aggValue);
-                                    }
-                                    else if (gvs.FunctionType != FunctionType.NONE)
-                                    {
-                                        object funcValue = dr.GetValue(gvs.FieldName);
-                                        obj.SetValue(gvs.OutputName, funcValue);
+                                        object processedValue = dr.GetValue(gvs.FieldName);
+                                        obj.SetValue(gvs.OutputName, processedValue);
                                     }
                                     else
                                     {
@@ -1342,7 +1384,7 @@ namespace CodeM.Common.Orm
                                     }
                                 }
 
-                                if (gvs.AggregateType == AggregateType.NONE &&
+                                if (gvs.Operations.Count == 0 &&
                                     !string.IsNullOrWhiteSpace(p.AfterQueryProcessor))
                                 {
                                     dynamic value = Processor.Call(p.AfterQueryProcessor, this, gvs.Name, 
@@ -1393,15 +1435,10 @@ namespace CodeM.Common.Orm
                                         }
                                         else
                                         {
-                                            if (gvs.AggregateType != AggregateType.NONE)
+                                            if (gvs.Operations.Count > 0)
                                             {
-                                                object aggValue = dr.GetValue(gvs.FieldName);
-                                                currObj.SetValue(gvs.OutputName, aggValue);
-                                            }
-                                            else if (gvs.FunctionType != FunctionType.NONE)
-                                            {
-                                                object funcValue = dr.GetValue(gvs.FieldName);
-                                                currObj.SetValue(gvs.OutputName, funcValue);
+                                                object processedValue = dr.GetValue(gvs.FieldName);
+                                                currObj.SetValue(gvs.OutputName, processedValue);
                                             }
                                             else
                                             {
@@ -1409,7 +1446,7 @@ namespace CodeM.Common.Orm
                                             }
                                         }
 
-                                        if (gvs.AggregateType == AggregateType.NONE &&
+                                        if (gvs.Operations.Count == 0 &&
                                             !string.IsNullOrWhiteSpace(lastProp.AfterQueryProcessor))
                                         {
                                             object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName,

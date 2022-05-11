@@ -160,36 +160,53 @@ namespace CodeM.Common.Orm
             return sbJoins.ToString();
         }
 
-        internal static string GenQueryField(Model m, GetValueSetting gvs, string field)
+        private static string GenAggregateTypeField(AggregateType type, string field)
         {
-            if (gvs.AggregateType != AggregateType.NONE)
+            switch (type)
             {
-                switch (gvs.AggregateType)
-                {
-                    case AggregateType.COUNT:
-                        return string.Concat("COUNT(", field, ")");
-                    case AggregateType.DISTINCT:
-                        return string.Concat("DISTINCT(", field, ")");
-                    case AggregateType.SUM:
-                        return string.Concat("SUM(", field, ")");
-                    case AggregateType.MAX:
-                        return string.Concat("MAX(", field, ")");
-                    case AggregateType.MIN:
-                        return string.Concat("MIN(", field, ")");
-                    case AggregateType.AVG:
-                        return string.Concat("AVG(", field, ")");
-                }
-            }
-            else if (gvs.FunctionType != FunctionType.NONE)
-            {
-                switch (gvs.FunctionType)
-                {
-                    case FunctionType.DATE:
-                        string funcName = Enum.GetName(typeof(FunctionType), gvs.FunctionType);
-                        return Features.GetFunctionCommand(m, funcName, field);
-                }
+                case AggregateType.COUNT:
+                    return string.Concat("COUNT(", field, ")");
+                case AggregateType.DISTINCT:
+                    return string.Concat("DISTINCT(", field, ")");
+                case AggregateType.SUM:
+                    return string.Concat("SUM(", field, ")");
+                case AggregateType.MAX:
+                    return string.Concat("MAX(", field, ")");
+                case AggregateType.MIN:
+                    return string.Concat("MIN(", field, ")");
+                case AggregateType.AVG:
+                    return string.Concat("AVG(", field, ")");
             }
             return field;
+        }
+
+        private static string GenFunctionTypeField(Model m, FunctionType type, string field)
+        {
+            switch (type)
+            {
+                case FunctionType.DATE:
+                    string funcName = Enum.GetName(typeof(FunctionType), type);
+                    return Features.GetFunctionCommand(m, funcName, field);
+            }
+            return field;
+        }
+
+        internal static string GenQueryField(Model m, GetValueSetting gvs, string field)
+        {
+            string qryField = field;
+            for (int i = gvs.Operations.Count - 1; i >= 0; i--)
+            {
+                dynamic _typ = gvs.Operations[i];
+                if (_typ is AggregateType)
+                {
+                    qryField = GenAggregateTypeField(_typ, qryField);
+                }
+                else if (_typ is FunctionType)
+                {
+                    qryField = GenFunctionTypeField(m, _typ, qryField);
+                }
+            }
+            return qryField;
         }
 
         internal static string BuildGroupBySQL(Model m)

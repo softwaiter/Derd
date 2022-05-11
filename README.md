@@ -38,7 +38,7 @@ nercoreORM是一个基于.net core开发的跨平台轻量级数据库操作框�
 #### Package Manager
 
 ```shell
-Install-Package CodeM.Common.Orm -Version 1.7.1
+Install-Package CodeM.Common.Orm -Version 1.7.2
 ```
 
 
@@ -46,7 +46,7 @@ Install-Package CodeM.Common.Orm -Version 1.7.1
 #### .NET CLI
 
 ```shell
-dotnet add package CodeM.Common.Orm --version 1.7.1
+dotnet add package CodeM.Common.Orm --version 1.7.2
 ```
 
 
@@ -54,7 +54,7 @@ dotnet add package CodeM.Common.Orm --version 1.7.1
 #### PackageReference
 
 ```xml
-<PackageReference Include="CodeM.Common.Orm" Version="1.7.1" />
+<PackageReference Include="CodeM.Common.Orm" Version="1.7.2" />
 ```
 
 
@@ -62,7 +62,7 @@ dotnet add package CodeM.Common.Orm --version 1.7.1
 #### Paket CLI
 
 ```shell
-paket add CodeM.Common.Orm --version 1.7.1
+paket add CodeM.Common.Orm --version 1.7.2
 ```
 
 
@@ -1343,6 +1343,80 @@ if (result.Count > 0)
     Console.WriteLine("创建日期：{0}", result[0].CreateTime);   // 2022-04-02
 }
 ```
+
+
+
+##### public Model GetValue(AggregateType aggType, AggregateType aggType2, string name, string alias=null)
+
+返回通过组合方法处理的属性值。
+
+###### 参数
+
+aggType：指定要使用的聚合函数。
+
+aggType2：指定要使用的聚合函数。
+
+###### 返回
+
+当前Model模型。
+
+```c#
+dynamic userCounts = OrmUtils.Model("User").GetValue(AggregateType.Count, AggregateType.Distinct, "Age", "Count").QueryFist();
+if (userCounts != null)
+{
+    Console.WriteLine("年龄分布范围统计：" + userCounts.Count);
+}
+```
+
+<b>注：</b>处理顺序为先处理aggType2指定的函数，再处理aggType指定的函数。
+
+
+
+##### public Model GetValue(AggregateType aggType, FunctionType funcType, string name, string alias=null)
+
+返回通过组合方法处理的属性值。
+
+###### 参数
+
+aggType：指定要使用的聚合函数。
+
+funcType：指定要使用的处理函数。
+
+###### 返回
+
+当前Model模型。
+
+
+
+##### public Model GetValue(FunctionType funcType, AggregateType aggType, string name, string alias=null)
+
+返回通过组合方法处理的属性值。
+
+###### 参数
+
+funcType：指定要使用的处理函数。
+
+aggType：指定要使用的聚合函数。
+
+###### 返回
+
+当前Model模型。
+
+
+
+##### public Model GetValue(FunctionType funcType, FunctionType funcType2, string name, string alias=null)
+
+返回通过组合方法处理的属性值。
+
+###### 参数
+
+funcType：指定要使用的处理函数。
+
+funcType2：指定要使用的处理函数。
+
+###### 返回
+
+当前Model模型。
 
 
 
