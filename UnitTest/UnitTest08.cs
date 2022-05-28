@@ -30,6 +30,7 @@ namespace UnitTest
             Test2();
             Test3();
             Test4();
+            Test5();
         }
 
         [Description("根据User模型创建物理表，应成功")]
@@ -69,6 +70,19 @@ namespace UnitTest
             List<dynamic> result = OrmUtils.Model("User").NotIn("Name", "User1", "User5", "User32").AscendingSort("Name").Query();
             Assert.AreEqual<int>(result.Count, 9997);
             Assert.AreEqual<string>(result[0].Name, "User10");
+        }
+
+        [Description("根据年龄分类统计各年龄段人数，返回人数最多的5各年龄段。")]
+        public void Test5()
+        {
+            List<dynamic> result = OrmUtils.Model("User")
+                .GroupBy("Age")
+                .GetValue(AggregateType.COUNT, "Id", "Count")
+                .GetValue("Age")
+                .DescendingSort("Count")
+                .Top(5)
+                .Query();
+            Assert.AreEqual<int>(result.Count, 5);
         }
     }
 }

@@ -486,7 +486,7 @@ namespace CodeM.Common.Orm
                 throw new Exception("最小返回数据数量至少为1。");
             }
 
-            mPageSize = 1;
+            mPageSize = num;
             mPageIndex = 1;
             mUsePaging = true;
             return this;
@@ -500,68 +500,83 @@ namespace CodeM.Common.Orm
 
         public Model AscendingSort(string name)
         {
-            if (!name.Contains("."))
+            if (mGetValues.Exists(item => item.Alias == name))
             {
-                Property p = GetProperty(name);
-                if (p == null)
-                {
-                    throw new Exception(string.Concat("未找到属性：", name));
-                }
-                mSorts.Add(string.Concat(p.Owner.Table, ".", p.Field, " ASC"));
+                mSorts.Add(string.Concat(name, " ASC"));
             }
             else
             {
-                Model currM = this;
-                string[] subNames = name.Split(".");
-                for (int i = 0; i < subNames.Length; i++)
+                if (!name.Contains("."))
                 {
-                    Property subProp = currM.GetProperty(subNames[0]);
-                    Model subM = ModelUtils.GetModel(subProp.TypeValue);
-                    currM = subM;
-
-                    if (i == subNames.Length - 2)
+                    Property p = GetProperty(name);
+                    if (p == null)
                     {
-                        Property lastProp = subM.GetProperty(subNames[i + 1]);
-                        mSorts.Add(string.Concat(subM.Table, ".", lastProp.Field, " ASC"));
-                        break;
+                        throw new Exception(string.Concat("未找到属性：", name));
                     }
+                    mSorts.Add(string.Concat(p.Owner.Table, ".", p.Field, " ASC"));
                 }
+                else
+                {
+                    Model currM = this;
+                    string[] subNames = name.Split(".");
+                    for (int i = 0; i < subNames.Length; i++)
+                    {
+                        Property subProp = currM.GetProperty(subNames[0]);
+                        Model subM = ModelUtils.GetModel(subProp.TypeValue);
+                        currM = subM;
 
-                mForeignSortNames.Add(name);
+                        if (i == subNames.Length - 2)
+                        {
+                            Property lastProp = subM.GetProperty(subNames[i + 1]);
+                            mSorts.Add(string.Concat(subM.Table, ".", lastProp.Field, " ASC"));
+                            break;
+                        }
+                    }
+
+                    mForeignSortNames.Add(name);
+                }
             }
             return this;
         }
 
         public Model DescendingSort(string name)
         {
-            if (!name.Contains("."))
+            if (mGetValues.Exists(item => item.Alias == name))
             {
-                Property p = GetProperty(name);
-                if (p == null)
-                {
-                    throw new Exception(string.Concat("未找到属性：", name));
-                }
-                mSorts.Add(string.Concat(p.Owner.Table, ".", p.Field, " DESC"));
+                mSorts.Add(string.Concat(name, " DESC"));
             }
             else
             {
-                Model currM = this;
-                string[] subNames = name.Split(".");
-                for (int i = 0; i < subNames.Length; i++)
+
+                if (!name.Contains("."))
                 {
-                    Property subProp = currM.GetProperty(subNames[0]);
-                    Model subM = ModelUtils.GetModel(subProp.TypeValue);
-                    currM = subM;
-
-                    if (i == subNames.Length - 2)
+                    Property p = GetProperty(name);
+                    if (p == null)
                     {
-                        Property lastProp = subM.GetProperty(subNames[i + 1]);
-                        mSorts.Add(string.Concat(subM.Table, ".", lastProp.Field, " DESC"));
-                        break;
+                        throw new Exception(string.Concat("未找到属性：", name));
                     }
+                    mSorts.Add(string.Concat(p.Owner.Table, ".", p.Field, " DESC"));
                 }
+                else
+                {
+                    Model currM = this;
+                    string[] subNames = name.Split(".");
+                    for (int i = 0; i < subNames.Length; i++)
+                    {
+                        Property subProp = currM.GetProperty(subNames[0]);
+                        Model subM = ModelUtils.GetModel(subProp.TypeValue);
+                        currM = subM;
 
-                mForeignSortNames.Add(name);
+                        if (i == subNames.Length - 2)
+                        {
+                            Property lastProp = subM.GetProperty(subNames[i + 1]);
+                            mSorts.Add(string.Concat(subM.Table, ".", lastProp.Field, " DESC"));
+                            break;
+                        }
+                    }
+
+                    mForeignSortNames.Add(name);
+                }
             }
             return this;
         }
