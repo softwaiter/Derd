@@ -1345,6 +1345,19 @@ namespace CodeM.Common.Orm
             return result.Count > 0 ? result[0] : null;
         }
 
+        private bool HaveOperation(GetValueSetting gvs)
+        {
+            if (gvs.Operations.Count > 0)
+            {
+                if (!(gvs.Operations.Count == 1 &&
+                    gvs.Operations[0] == AggregateType.NONE))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public List<dynamic> Query(int? transCode = null)
         {
             DbTransaction trans = null;
@@ -1400,7 +1413,7 @@ namespace CodeM.Common.Orm
                                 }
                                 else
                                 {
-                                    if (gvs.Operations.Count > 0)
+                                    if (HaveOperation(gvs))
                                     {
                                         object processedValue = dr.GetValue(gvs.FieldName);
                                         obj.SetValue(gvs.OutputName, processedValue);
@@ -1410,9 +1423,8 @@ namespace CodeM.Common.Orm
                                         SetPropertyValueFromDB(obj, p, gvs.OutputName, dr, gvs.FieldName);
                                     }
                                 }
-
-                                if (gvs.Operations.Count == 0 &&
-                                    !string.IsNullOrWhiteSpace(p.AfterQueryProcessor))
+                                
+                                if (!HaveOperation(gvs) && p.NeedCalcAfterQuery)
                                 {
                                     dynamic value = Processor.Call(p.AfterQueryProcessor, this, gvs.Name, 
                                         obj.Has(gvs.OutputName) ? obj[gvs.OutputName] : null);
@@ -1462,7 +1474,7 @@ namespace CodeM.Common.Orm
                                         }
                                         else
                                         {
-                                            if (gvs.Operations.Count > 0)
+                                            if (HaveOperation(gvs))
                                             {
                                                 object processedValue = dr.GetValue(gvs.FieldName);
                                                 currObj.SetValue(gvs.OutputName, processedValue);
@@ -1473,8 +1485,7 @@ namespace CodeM.Common.Orm
                                             }
                                         }
 
-                                        if (gvs.Operations.Count == 0 &&
-                                            !string.IsNullOrWhiteSpace(lastProp.AfterQueryProcessor))
+                                        if (!HaveOperation(gvs) && lastProp.NeedCalcAfterQuery)
                                         {
                                             object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName,
                                                 currObj.Has(gvs.OutputName) ? currObj[gvs.OutputName] : null);
