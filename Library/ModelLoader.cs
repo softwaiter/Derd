@@ -1,5 +1,6 @@
 ﻿using CodeM.Common.Orm.Dialect;
 using CodeM.Common.Tools;
+using CodeM.Common.Tools.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -285,6 +286,10 @@ namespace CodeM.Common.Orm
                     return null;
                 }
             }
+            else if ("json".Equals(typeStr, StringComparison.OrdinalIgnoreCase))
+            {
+                return typeof(DynamicObjectExt);
+            }
             else
             {
                 return typeof(Model);
@@ -365,7 +370,8 @@ namespace CodeM.Common.Orm
         /// <returns></returns>
         private static DbType Type2DbType(Type type)
         {
-            if (type == typeof(string))
+            if (type == typeof(string) ||
+                type == typeof(DynamicObjectExt))
             {
                 return DbType.String;
             }
@@ -566,7 +572,8 @@ namespace CodeM.Common.Orm
                             {
                                 throw new Exception("type属性非法。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
-                            else if (type == typeof(Model))
+                            else if (type == typeof(Model) ||
+                                type == typeof(DynamicObjectExt))
                             {
                                 p.TypeValue = typeStr;
 
@@ -609,6 +616,11 @@ namespace CodeM.Common.Orm
                         string fieldTypeStr = nodeInfo.GetAttribute("fieldType");
                         if (fieldTypeStr != null)
                         {
+                            if (type == typeof(DynamicObjectExt))
+                            {
+                                throw new Exception(typeStr + "类型的Property禁止设置fieldType。" + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+
                             try
                             {
                                 p.FieldType = Enum.Parse<DbType>(fieldTypeStr, true);
@@ -646,7 +658,11 @@ namespace CodeM.Common.Orm
                         else
                         {
                             p.Length = FieldUtils.GetFieldLength(model, p.FieldType);
-                            if (p.Type == typeof(Model))
+                            if (p.Type == typeof(DynamicObjectExt))
+                            {
+                                p.Length = 512;
+                            } 
+                            else if (p.Type == typeof(Model))
                             {
                                 dcps.LengthNotSet = true;
                             }

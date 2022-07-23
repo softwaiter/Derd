@@ -1,5 +1,6 @@
 ﻿using CodeM.Common.Orm;
 using CodeM.Common.Orm.Serialize;
+using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
@@ -38,6 +39,10 @@ namespace UnitTest
 
             dynamic newanimal = ModelObject.New("Animal");
             newanimal.Name = "panda";
+            newanimal.Feature = new DynamicObjectExt();
+            newanimal.Feature.Food = "竹子";
+            newanimal.Feature.Color = "黑白";
+            newanimal.Feature.Life = 30;
             bool ret2 = OrmUtils.Model("Animal").SetValues(newanimal).Save();
             Assert.IsTrue(ret2);
 
@@ -45,6 +50,8 @@ namespace UnitTest
             Assert.IsNotNull(result);
             Assert.AreNotEqual("panda", result.Name);
             Assert.AreEqual("PANDA", result.Name);
+            Assert.AreEqual("黑白", result.Feature.Color);
+            Assert.AreEqual(30, result.Feature.Life);
             Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), result.DiscDate);
         }
 

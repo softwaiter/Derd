@@ -1,5 +1,6 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Tools.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,6 +31,11 @@ namespace CodeM.Common.Orm
                     {
                         if (value != null)
                         {
+                            if (p.RealType == typeof(DynamicObjectExt))
+                            {
+                                value = value.ToString();
+                            }
+
                             DbType dbType = CommandUtils.GetDbParamType(p);
                             string paramName = CommandUtils.GenParamName(p);
                             DbParameter dp = DbUtils.CreateParam(m.Path, paramName,

@@ -2,6 +2,8 @@
 using CodeM.Common.Orm.Action;
 using CodeM.Common.Orm.Dialect;
 using CodeM.Common.Orm.Serialize;
+using CodeM.Common.Tools;
+using CodeM.Common.Tools.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -500,9 +502,11 @@ namespace CodeM.Common.Orm
 
         public Model AscendingSort(string name)
         {
+            string[] quotes = Features.GetObjectQuotes(this);
+
             if (mGetValues.Exists(item => item.Alias == name))
             {
-                mSorts.Add(string.Concat(name, " ASC"));
+                mSorts.Add(string.Concat(quotes[0], name, quotes[1], " ASC"));
             }
             else
             {
@@ -513,7 +517,7 @@ namespace CodeM.Common.Orm
                     {
                         throw new Exception(string.Concat("未找到属性：", name));
                     }
-                    mSorts.Add(string.Concat(p.Owner.Table, ".", p.Field, " ASC"));
+                    mSorts.Add(string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " ASC"));
                 }
                 else
                 {
@@ -528,7 +532,7 @@ namespace CodeM.Common.Orm
                         if (i == subNames.Length - 2)
                         {
                             Property lastProp = subM.GetProperty(subNames[i + 1]);
-                            mSorts.Add(string.Concat(subM.Table, ".", lastProp.Field, " ASC"));
+                            mSorts.Add(string.Concat(quotes[0], subM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1], " ASC"));
                             break;
                         }
                     }
@@ -541,9 +545,11 @@ namespace CodeM.Common.Orm
 
         public Model DescendingSort(string name)
         {
+            string[] quotes = Features.GetObjectQuotes(this);
+
             if (mGetValues.Exists(item => item.Alias == name))
             {
-                mSorts.Add(string.Concat(name, " DESC"));
+                mSorts.Add(string.Concat(quotes[0], name, quotes[1], " DESC"));
             }
             else
             {
@@ -555,7 +561,7 @@ namespace CodeM.Common.Orm
                     {
                         throw new Exception(string.Concat("未找到属性：", name));
                     }
-                    mSorts.Add(string.Concat(p.Owner.Table, ".", p.Field, " DESC"));
+                    mSorts.Add(string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " DESC"));
                 }
                 else
                 {
@@ -570,7 +576,7 @@ namespace CodeM.Common.Orm
                         if (i == subNames.Length - 2)
                         {
                             Property lastProp = subM.GetProperty(subNames[i + 1]);
-                            mSorts.Add(string.Concat(subM.Table, ".", lastProp.Field, " DESC"));
+                            mSorts.Add(string.Concat(quotes[0], subM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1], " DESC"));
                             break;
                         }
                     }
@@ -1315,6 +1321,12 @@ namespace CodeM.Common.Orm
             else if (prop.RealType == typeof(DateTime))
             {
                 obj.SetValue(propName, dr.GetDateTime(fieldName));
+            }
+            else if (prop.RealType == typeof(DynamicObjectExt))
+            {
+                string fieldValue = dr.GetString(fieldName);
+                dynamic jsonObj = Xmtool.Json.ConfigParser().Parse(fieldValue);
+                obj.SetValue(propName, jsonObj);
             }
             else
             {

@@ -77,9 +77,9 @@ namespace UnitTest
         {
             List<dynamic> result = OrmUtils.Model("User")
                 .GroupBy("Age")
-                .GetValue(AggregateType.COUNT, "Id", "Count")
+                .GetValue(AggregateType.COUNT, "Id", "Id_Count")
                 .GetValue("Age")
-                .DescendingSort("Count")
+                .DescendingSort("Id_Count")
                 .Top(5)
                 .Query();
             Assert.AreEqual<int>(result.Count, 5);

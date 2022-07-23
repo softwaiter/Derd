@@ -22,7 +22,7 @@ namespace CodeM.Common.Orm.Dialect
             { "comment_ext_format", new Hashtable() {   //输入table、column、column-description
                 { "default", "" },
                 { "sqlserver", "execute sp_addextendedproperty N'MS_Description',N'{2}',N'SCHEMA',N'dbo',N'table',N'{0}',N'column',N'{1}'" },
-                { "oracle", "comment on column {0}.{1} is '{2}'" },
+                { "oracle", "comment on column \"{0}\".\"{1}\" is '{2}'" },
                 { "postgres", "comment on column {0}.{1} is '{2}'" }
             }},
             { "autoincrement", new Hashtable() {
@@ -34,7 +34,7 @@ namespace CodeM.Common.Orm.Dialect
             }},
             { "autoincrement_ext_format", new Hashtable() { //输入table、column
                 { "default", new string[] { } },
-                { "oracle", new string[] { "CREATE SEQUENCE SEQ_{0}_{1} INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE", "CREATE TRIGGER TIG_{0}_{1} BEFORE insert ON {0} FOR EACH ROW begin select SEQ_{0}_{1}.nextval into:New.{1} from dual;end;" } }
+                { "oracle", new string[] { "CREATE SEQUENCE SEQ_{0}_{1} INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE", "CREATE TRIGGER TIG_{0}_{1} BEFORE insert ON \"{0}\" FOR EACH ROW begin select SEQ_{0}_{1}.nextval into:New.\"{1}\" from dual;end;" } }
             }},
             { "autoincrement_gc_ext_format", new Hashtable() { //输入table、column
                 { "default", new string[] { } },
@@ -51,7 +51,7 @@ namespace CodeM.Common.Orm.Dialect
             { "exists_sql_format", new Hashtable() {    // 输入database、table
                 { "sqlite", "SELECT COUNT(*) AS c FROM Sqlite_master WHERE type ='table' AND name ='{1}'" },
                 { "mysql", "SELECT COUNT(*) FROM information_schema.TABLES t WHERE t.TABLE_SCHEMA ='{0}' AND t.TABLE_NAME ='{1}'" },
-                { "oracle", "SELECT COUNT(*) FROM user_tables t WHERE table_name=upper('{1}')" },
+                { "oracle", "SELECT COUNT(*) FROM user_tables t WHERE table_name='{1}'" },
                 { "sqlserver", "SELECT COUNT(*) FROM sysObjects WHERE Id=OBJECT_ID(N'{1}') and xtype='U'" },
                 { "postgres", "SELECT COUNT(*) FROM pg_class WHERE relname = '{1}'" }
             }},
@@ -63,7 +63,7 @@ namespace CodeM.Common.Orm.Dialect
             { "object_quote", new Hashtable() {
                 { "default", new string[] { "`", "`" } },
                 { "sqlserver", new string[] { "[", "]" } },
-                { "oracle", new string[] { "", "" } },
+                { "oracle", new string[] { "\"", "\"" } },
                 { "postgres", new string[] { "\"", "\"" } },
             }},
             { "field_alias_quote", new Hashtable() {
