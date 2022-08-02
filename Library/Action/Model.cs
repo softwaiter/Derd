@@ -1349,11 +1349,17 @@ namespace CodeM.Common.Orm
         {
             if (gvs.Operations.Count > 0)
             {
-                if (!(gvs.Operations.Count == 1 &&
-                    gvs.Operations[0] == AggregateType.NONE))
+                if (gvs.Operations.Count == 1)
                 {
-                    return true;
+                    if ((gvs.Operations[0] is AggregateType &&
+                        gvs.Operations[0] == AggregateType.NONE) ||
+                        (gvs.Operations[0] is FunctionType &&
+                        gvs.Operations[0] == FunctionType.NONE))
+                    {
+                        return false;
+                    }
                 }
+                return true;
             }
             return false;
         }
@@ -1402,7 +1408,7 @@ namespace CodeM.Common.Orm
                     while (dr.Read())
                     {
                         ModelObject obj = ModelObject.New(this, false);
-                        foreach (GetValueSetting gvs  in mGetValues)
+                        foreach (GetValueSetting gvs in mGetValues)
                         {
                             if (!gvs.Name.Contains("."))
                             {
@@ -1423,10 +1429,10 @@ namespace CodeM.Common.Orm
                                         SetPropertyValueFromDB(obj, p, gvs.OutputName, dr, gvs.FieldName);
                                     }
                                 }
-                                
+
                                 if (!HaveOperation(gvs) && p.NeedCalcAfterQuery)
                                 {
-                                    dynamic value = Processor.Call(p.AfterQueryProcessor, this, gvs.Name, 
+                                    dynamic value = Processor.Call(p.AfterQueryProcessor, this, gvs.Name,
                                         obj.Has(gvs.OutputName) ? obj[gvs.OutputName] : null);
                                     if (!Undefined.IsUndefinedValue(value))
                                     {
