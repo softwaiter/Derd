@@ -157,6 +157,7 @@ namespace UnitTest
             Assert.AreEqual(result.Count, 0);
         }
 
+        [Description("查询所有Name不为Null的数据，返回数量应为2。")]
         public void Test14()
         {
             List<dynamic> result = OrmUtils.Model("User").IsNotNull("name").Query();

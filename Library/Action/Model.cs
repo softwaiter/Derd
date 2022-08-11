@@ -161,9 +161,7 @@ namespace CodeM.Common.Orm
                     {
                         return this.Alias;
                     }
-
-                    int index = this.Name.LastIndexOf('.');
-                    return index == -1 ? this.Name : this.Name.Substring(index + 1);
+                    return this.Name;
                 }
             }
         }
@@ -1279,7 +1277,7 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private void SetPropertyValueFromDB(ModelObject obj, Property prop, string propName, DbDataReader dr, string fieldName = null)
+        private void SetPropertyValueFromDB(dynamic obj, Property prop, string propName, DbDataReader dr, string fieldName = null)
         {
             if (fieldName == null)
             {
@@ -1288,49 +1286,49 @@ namespace CodeM.Common.Orm
 
             if (prop.RealType == typeof(string))
             {
-                obj.SetValue(propName, dr.GetString(fieldName));
+                obj.SetValueByPath(propName, dr.GetString(fieldName));
             }
             else if (prop.RealType == typeof(Int16))
             {
-                obj.SetValue(propName, dr.GetInt16(fieldName));
+                obj.SetValueByPath(propName, dr.GetInt16(fieldName));
             }
             else if (prop.RealType == typeof(Int32))
             {
-                obj.SetValue(propName, dr.GetInt32(fieldName));
+                obj.SetValueByPath(propName, dr.GetInt32(fieldName));
             }
             else if (prop.RealType == typeof(Int64))
             {
-                obj.SetValue(propName, dr.GetInt64(fieldName));
+                obj.SetValueByPath(propName, dr.GetInt64(fieldName));
             }
             else if (prop.RealType == typeof(float))
             {
-                obj.SetValue(propName, dr.GetFloat(fieldName));
+                obj.SetValueByPath(propName, dr.GetFloat(fieldName));
             }
             else if (prop.RealType == typeof(decimal))
             {
-                obj.SetValue(propName, dr.GetDecimal(fieldName));
+                obj.SetValueByPath(propName, dr.GetDecimal(fieldName));
             }
             else if (prop.RealType == typeof(double))
             {
-                obj.SetValue(propName, dr.GetDouble(fieldName));
+                obj.SetValueByPath(propName, dr.GetDouble(fieldName));
             }
             else if (prop.RealType == typeof(bool))
             {
-                obj.SetValue(propName, dr.GetBoolean(fieldName));
+                obj.SetValueByPath(propName, dr.GetBoolean(fieldName));
             }
             else if (prop.RealType == typeof(DateTime))
             {
-                obj.SetValue(propName, dr.GetDateTime(fieldName));
+                obj.SetValueByPath(propName, dr.GetDateTime(fieldName));
             }
             else if (prop.RealType == typeof(DynamicObjectExt))
             {
                 string fieldValue = dr.GetString(fieldName);
                 dynamic jsonObj = Xmtool.Json.ConfigParser().Parse(fieldValue);
-                obj.SetValue(propName, jsonObj);
+                obj.SetValueByPath(propName, jsonObj);
             }
             else
             {
-                obj.SetValue(propName, Convert.ChangeType(dr.GetValue(fieldName), prop.RealType));
+                obj.SetValueByPath(propName, Convert.ChangeType(dr.GetValue(fieldName), prop.RealType));
             }
         }
 
@@ -1407,7 +1405,7 @@ namespace CodeM.Common.Orm
                 {
                     while (dr.Read())
                     {
-                        ModelObject obj = ModelObject.New(this, false);
+                        dynamic obj = new DynamicObjectExt();
                         foreach (GetValueSetting gvs in mGetValues)
                         {
                             if (!gvs.Name.Contains("."))
@@ -1415,14 +1413,14 @@ namespace CodeM.Common.Orm
                                 Property p = GetProperty(gvs.Name);
                                 if (dr.IsDBNull(gvs.FieldName))
                                 {
-                                    obj.SetValue(gvs.OutputName, null);
+                                    obj.SetValueByPath(gvs.OutputName, null);
                                 }
                                 else
                                 {
                                     if (HaveOperation(gvs))
                                     {
                                         object processedValue = dr.GetValue(gvs.FieldName);
-                                        obj.SetValue(gvs.OutputName, processedValue);
+                                        obj.SetValueByPath(gvs.OutputName, processedValue);
                                     }
                                     else
                                     {
@@ -1432,17 +1430,17 @@ namespace CodeM.Common.Orm
 
                                 if (!HaveOperation(gvs) && p.NeedCalcAfterQuery)
                                 {
-                                    dynamic value = Processor.Call(p.AfterQueryProcessor, this, gvs.Name,
-                                        obj.Has(gvs.OutputName) ? obj[gvs.OutputName] : null);
+                                    object input = obj.HasPath(gvs.OutputName) ? obj.GetValueByPath(gvs.OutputName) : null;
+                                    dynamic value = Processor.Call(p.AfterQueryProcessor, this, gvs.Name, input);
                                     if (!Undefined.IsUndefinedValue(value))
                                     {
                                         if (value != null)
                                         {
-                                            obj.SetValue(gvs.OutputName, value);
+                                            obj.SetValueByPath(gvs.OutputName, value);
                                         }
                                         else
                                         {
-                                            obj.SetValue(gvs.OutputName, null);
+                                            obj.SetValueByPath(gvs.OutputName, null);
                                         }
                                     }
                                 }
@@ -1450,25 +1448,13 @@ namespace CodeM.Common.Orm
                             else
                             {
                                 Model currM = this;
-                                ModelObject currObj = obj;
                                 string[] subNames = gvs.Name.Split(".");
                                 for (int i = 0; i < subNames.Length; i++)
                                 {
                                     string subName = subNames[i];
                                     Property subProp = currM.GetProperty(subName);
                                     Model subM = ModelUtils.GetModel(subProp.TypeValue);
-                                    ModelObject subObj;
-                                    if (!currObj.Has(subName))
-                                    {
-                                        subObj = ModelObject.New(subM, false);
-                                        currObj.SetValue(subName, subObj);
-                                    }
-                                    else
-                                    {
-                                        subObj = currObj.GetValue(subName) as ModelObject;
-                                    }
                                     currM = subM;
-                                    currObj = subObj;
 
                                     if (i == subNames.Length - 2)
                                     {
@@ -1476,34 +1462,34 @@ namespace CodeM.Common.Orm
                                         Property lastProp = currM.GetProperty(lastName);
                                         if (dr.IsDBNull(gvs.FieldName))
                                         {
-                                            currObj.SetValue(gvs.OutputName, null);
+                                            obj.SetValueByPath(gvs.OutputName, null);
                                         }
                                         else
                                         {
                                             if (HaveOperation(gvs))
                                             {
                                                 object processedValue = dr.GetValue(gvs.FieldName);
-                                                currObj.SetValue(gvs.OutputName, processedValue);
+                                                obj.SetValueByPath(gvs.OutputName, processedValue);
                                             }
                                             else
                                             {
-                                                SetPropertyValueFromDB(currObj, lastProp, gvs.OutputName, dr, gvs.FieldName);
+                                                SetPropertyValueFromDB(obj, lastProp, gvs.OutputName, dr, gvs.FieldName);
                                             }
                                         }
 
                                         if (!HaveOperation(gvs) && lastProp.NeedCalcAfterQuery)
                                         {
-                                            object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName,
-                                                currObj.Has(gvs.OutputName) ? currObj[gvs.OutputName] : null);
+                                            object input = obj.HasPath(gvs.OutputName) ? obj.GetValueByPath(gvs.OutputName) : null;
+                                            object value = Processor.Call(lastProp.AfterQueryProcessor, currM, lastName, input);
                                             if (!Undefined.IsUndefinedValue(value))
                                             {
                                                 if (value != null)
                                                 {
-                                                    currObj.SetValue(gvs.OutputName, value);
+                                                    obj.SetValueByPath(gvs.OutputName, value);
                                                 }
                                                 else
                                                 {
-                                                    currObj.SetValue(gvs.OutputName, null);
+                                                    obj.SetValueByPath(gvs.OutputName, null);
                                                 }
                                             }
                                         }

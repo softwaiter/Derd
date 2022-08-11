@@ -36,37 +36,51 @@ namespace UnitTest
             Test6();
             Test7();
             Test8();
+            Test9();
         }
 
         [Description("创建User模型的物理表。")]
         public void Test1()
         {
-            bool ret = OrmUtils.Model("User").TryCreateTable(true);
+            bool ret = OrmUtils.Model("Org").TryCreateTable(true);
             Assert.IsTrue(ret);
+
+            dynamic neworg = OrmUtils.Model("Org").NewObject();
+            neworg.Code = "xxtech";
+            neworg.Name = "XX科技";
+            bool ret2 = OrmUtils.Model("Org").SetValues(neworg).Save();
+            Assert.IsTrue(ret2);
+
+            bool ret3 = OrmUtils.Model("User").TryCreateTable(true);
+            Assert.IsTrue(ret3);
 
             dynamic newuser = ModelObject.New("User");
             newuser.Name = "wangxm";
             newuser.Age = 18;
-            bool ret2 = OrmUtils.Model("User").SetValues(newuser).Save();
-            Assert.IsTrue(ret2);
+            newuser.Org = neworg.Code;
+            bool ret4 = OrmUtils.Model("User").SetValues(newuser).Save();
+            Assert.IsTrue(ret4);
 
             dynamic newuser2 = ModelObject.New("User");
             newuser2.Name = "hxy";
             newuser2.Age = 14;
-            bool ret3 = OrmUtils.Model("User").SetValues(newuser2).Save();
-            Assert.IsTrue(ret3);
+            newuser2.Org = neworg.Code;
+            bool ret5 = OrmUtils.Model("User").SetValues(newuser2).Save();
+            Assert.IsTrue(ret5);
 
             dynamic newuser3 = ModelObject.New("User");
             newuser3.Name = "zhangsan";
             newuser3.Age = 18;
-            bool ret4 = OrmUtils.Model("User").SetValues(newuser3).Save();
-            Assert.IsTrue(ret4);
+            newuser3.Org = neworg.Code;
+            bool ret6 = OrmUtils.Model("User").SetValues(newuser3).Save();
+            Assert.IsTrue(ret6);
 
             dynamic newuser4 = ModelObject.New("User");
             newuser4.Name = "lisi";
             newuser4.Age = 10;
-            bool ret5 = OrmUtils.Model("User").SetValues(newuser4).Save();
-            Assert.IsTrue(ret5);
+            newuser4.Org = neworg.Code;
+            bool ret7 = OrmUtils.Model("User").SetValues(newuser4).Save();
+            Assert.IsTrue(ret7);
         }
 
         [Description("使用Distinct去重同年龄的人，应查询得到2人。")]
@@ -140,6 +154,20 @@ namespace UnitTest
             dynamic obj10 = result.Find(item => item.Age == 10);
             Assert.IsNotNull(obj10);
             Assert.AreEqual(1, obj10.UserCount);
+        }
+
+        [Description("获取关联对象属性，并设置别名，应成功。")]
+        public void Test9()
+        {
+            List<dynamic> result = OrmUtils.Model("User")
+                .GetValue(AggregateType.NONE, "Org.Code", "OrgCode")
+                .GetValue(AggregateType.NONE, "Name", "Person.Name")
+                .GetValue(AggregateType.NONE, "Org.Name", "Person.OrgName")
+                .Query();
+            Assert.AreEqual(4, result.Count);
+            Assert.IsTrue(result[0].Has("OrgCode"));
+            Assert.IsTrue(result[0].HasPath("Person.Name"));
+            Assert.IsTrue(result[0].HasPath("Person.OrgName"));
         }
     }
 }
