@@ -1,5 +1,5 @@
 ﻿using CodeM.Common.Orm;
-using CodeM.Common.Orm.Serialize;
+using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace UnitTest
             Random r = new Random();
             for (int i = 0; i < 10000; i++)
             {
-                dynamic newuser = ModelObject.New("User");
+                dynamic newuser = new DynamicObjectExt();
                 newuser.Name = "User" + (i + 1);
                 newuser.Age = r.Next(18, 150);
                 newuser.Birthday = new DateTime(1980, 1, 16);

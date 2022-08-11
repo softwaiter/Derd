@@ -1,12 +1,10 @@
-﻿using CodeM.Common.Orm.Serialize;
-
-namespace CodeM.Common.Orm
+﻿namespace CodeM.Common.Orm
 {
     public interface ISetValue
     {
-        Model SetValue(string name, object value);
+        Model SetValue(string name, object value, bool validate = false);
 
-        Model SetValues(ModelObject obj);
+        Model SetValues(dynamic obj, bool validate = false);
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CodeM.Common.Orm;
+using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -48,11 +49,11 @@ namespace UnitTest
         [Description("使用事务新建机构和用户，用户新建失败，新建机构信息也回滚")]
         public void Test3()
         {
-            dynamic neworg = OrmUtils.Model("Org").NewObject();
+            dynamic neworg = new DynamicObjectExt();
             neworg.Code = "Trans_Org";
             neworg.Name = "事务测试-机构01";
 
-            dynamic newuser = OrmUtils.Model("User").NewObject();
+            dynamic newuser = new DynamicObjectExt();
             newuser.Age = 18;
 
             int trans = OrmUtils.GetTransaction();
@@ -74,11 +75,11 @@ namespace UnitTest
         [Description("使用事务新建机构和用户，应成功")]
         public void Test4()
         {
-            dynamic neworg = OrmUtils.Model("Org").NewObject();
+            dynamic neworg = new DynamicObjectExt();
             neworg.Code = "Trans_Org";
             neworg.Name = "事务测试-机构01";
 
-            dynamic newuser = OrmUtils.Model("User").NewObject();
+            dynamic newuser = new DynamicObjectExt();
             newuser.Name = "事务测试-用户01";
 
             int trans = OrmUtils.GetTransaction();

@@ -1,5 +1,5 @@
 ﻿using CodeM.Common.Orm;
-using CodeM.Common.Orm.Serialize;
+using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
@@ -45,13 +45,13 @@ namespace UnitTest
             bool ret;
             try
             {
-                dynamic newuser = ModelObject.New("User");
+                dynamic newuser = new DynamicObjectExt();
                 newuser.Name = "wangxm";
                 newuser.Age = 18;
                 newuser.Birthday = "test";
                 newuser.Deposit = 10000000.58;
                 newuser.IsAdmin = true;
-                ret = OrmUtils.Model("User").SetValues(newuser).Save();
+                ret = OrmUtils.Model("User").SetValues(newuser, true).Save();
             }
             catch
             {
@@ -66,13 +66,13 @@ namespace UnitTest
             bool ret;
             try
             {
-                dynamic newuser = ModelObject.New("User");
+                dynamic newuser = new DynamicObjectExt();
                 newuser.Name = "wangxm";
                 newuser.Age = -1;
                 newuser.Birthday = new DateTime(1980, 6, 14);
                 newuser.Deposit = 10000000.58;
                 newuser.IsAdmin = true;
-                ret = OrmUtils.Model("User").SetValues(newuser).Save();
+                ret = OrmUtils.Model("User").SetValues(newuser, true).Save();
             }
             catch
             {
@@ -87,13 +87,13 @@ namespace UnitTest
             bool ret;
             try
             {
-                dynamic newuser = ModelObject.New("User");
+                dynamic newuser = new DynamicObjectExt();
                 newuser.Name = "wangxm";
                 newuser.Age = 250;
                 newuser.Birthday = new DateTime(1980, 6, 14);
                 newuser.Deposit = 10000000.58;
                 newuser.IsAdmin = true;
-                ret = OrmUtils.Model("User").SetValues(newuser).Save();
+                ret = OrmUtils.Model("User").SetValues(newuser, true).Save();
             }
             catch
             {

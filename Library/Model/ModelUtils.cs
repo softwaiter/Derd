@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CodeM.Common.Tools.Json;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
@@ -159,7 +160,7 @@ namespace CodeM.Common.Orm
         internal static bool SetVersion(int newVer, int? transCode = null)
         {
             Model m = ModelUtils.GetModel(sVerModelName);
-            dynamic newobj = m.NewObject();
+            dynamic newobj = new DynamicObjectExt();
             newobj.Version = newVer;
             return m.SetValues(newobj).Save(transCode);
         }

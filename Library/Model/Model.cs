@@ -1,5 +1,4 @@
 ﻿using CodeM.Common.Orm.Dialect;
-using CodeM.Common.Orm.Serialize;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -187,11 +186,6 @@ namespace CodeM.Common.Orm
             {
                 return mPrimaryKeys.Count;
             }
-        }
-
-        public dynamic NewObject()
-        {
-            return ModelObject.New(this);
         }
 
         private string BuildCommentSQL()

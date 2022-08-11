@@ -27,7 +27,7 @@ namespace CodeM.Common.Orm
                 Property p = m.GetProperty(i);
                 if (p.JoinInsert)
                 {
-                    if (m.Values.TryGetValue(p.Name, out value))
+                    if (m.TryGetValue(p, out value))
                     {
                         if (value != null)
                         {
@@ -69,30 +69,32 @@ namespace CodeM.Common.Orm
 
             CommandSQL result = new CommandSQL();
 
-            string updateContent = string.Empty;
+            object value;
+            StringBuilder sbUpdateContent = new StringBuilder();
             for (int i = 0; i < m.PropertyCount; i++)
             {
                 Property p = m.GetProperty(i);
                 if (p.JoinUpdate)
                 {
-                    if (m.Values.Has(p.Name))
+                    if (m.TryGetValue(p, out value, false))
                     {
                         DbType dbType = CommandUtils.GetDbParamType(p);
                         string paramName = CommandUtils.GenParamName(p);
                         DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
-                            m.Values[p.Name], dbType, ParameterDirection.Input);
+                            value, dbType, ParameterDirection.Input);
                         result.Params.Add(dp);
 
-                        if (updateContent.Length > 0)
+                        if (sbUpdateContent.Length > 0)
                         {
-                            updateContent += ",";
+                            sbUpdateContent.Append(",");
                         }
                         string paramPlaceholder = Features.GetCommandParamName(m, paramName);
-                        updateContent += string.Concat(quotes[0], p.Field, quotes[1], "=", paramPlaceholder);
+                        sbUpdateContent.Append(quotes[0]).Append(p.Field)
+                            .Append(quotes[1]).Append("=").Append(paramPlaceholder);
                     }
                 }
             }
-            result.SQL = string.Concat("UPDATE ", quotes[0], m.Table, quotes[1], " SET ", updateContent);
+            result.SQL = string.Concat("UPDATE ", quotes[0], m.Table, quotes[1], " SET ", sbUpdateContent);
 
             CommandSQL where = m.Where.Build(m);
             if (!string.IsNullOrEmpty(where.SQL))

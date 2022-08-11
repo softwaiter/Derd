@@ -20,9 +20,7 @@ namespace CodeM.Common.Orm
 
         int GetTransaction();
 
-        bool Save(bool validate = false);
-
-        bool Save(int? transCode, bool validate = false);
+        bool Save(int? transCode = null);
 
         bool Delete(bool deleteAll = false);
 

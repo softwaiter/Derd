@@ -1,5 +1,5 @@
 ﻿using CodeM.Common.Orm;
-using CodeM.Common.Orm.Serialize;
+using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -50,7 +50,7 @@ namespace UnitTest
         [Description("向User模型的物理表写入一条数据，应成功。")]
         public void Test2()
         {
-            dynamic newuser = ModelObject.New("User");
+            dynamic newuser = new DynamicObjectExt();
             newuser.Name = "wangxm";
             newuser.Age = 18;
             newuser.Birthday = new DateTime(1980, 6, 14);
@@ -93,7 +93,7 @@ namespace UnitTest
         [Description("向User模型的物理表写入一条合法新数据，应成功。")]
         public void Test6()
         {
-            dynamic newuser = ModelObject.New("User");
+            dynamic newuser = new DynamicObjectExt();
             newuser.Name = "jishuwen";
             newuser.Age = 18;
             newuser.Birthday = new DateTime(1947, 1, 16);
@@ -106,7 +106,7 @@ namespace UnitTest
         [Description("查看User模型物理表记录条数，应为2。")]
         public void Test7()
         {
-            dynamic newuser = ModelObject.New("User");
+            dynamic newuser = new DynamicObjectExt();
             newuser.Name = "wangss";
             newuser.Age = 18;
             newuser.Birthday = new DateTime(1947, 10, 1);

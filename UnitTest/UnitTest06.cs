@@ -1,5 +1,5 @@
 ﻿using CodeM.Common.Orm;
-using CodeM.Common.Orm.Serialize;
+using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -45,7 +45,7 @@ namespace UnitTest
         [Description("向机构表插入一条数据，CreateTime和UpdateTime值应一致。")]
         public void Test2()
         {
-            dynamic neworg = ModelObject.New("Org");
+            dynamic neworg = new DynamicObjectExt();
             neworg.Code = "XXTech";
             neworg.Name = "XX科技";
             bool ret = OrmUtils.Model("Org").SetValues(neworg).Save();
@@ -68,7 +68,7 @@ namespace UnitTest
         {
             List<dynamic> result = OrmUtils.Model("Org").Equals("Name", "YY科技").Top(1).Query();
 
-            dynamic newuser = ModelObject.New("User");
+            dynamic newuser = new DynamicObjectExt();
             newuser.Name = "wangxm";
             newuser.Age = 18;
             newuser.Org = result[0].Code;

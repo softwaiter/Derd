@@ -1,5 +1,4 @@
 ﻿using CodeM.Common.Orm;
-using CodeM.Common.Orm.Serialize;
 using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -21,8 +20,6 @@ namespace UnitTest
             OrmUtils.Load();
 
             OrmUtils.RemoveTables();
-
-            OrmUtils.EnableDebug(true);
         }
 
         [TestMethod]
@@ -37,7 +34,7 @@ namespace UnitTest
             bool ret = OrmUtils.Model("Animal").TryCreateTable(true);
             Assert.IsTrue(ret);
 
-            dynamic newanimal = ModelObject.New("Animal");
+            dynamic newanimal = new DynamicObjectExt();
             newanimal.Name = "panda";
             newanimal.Feature = new DynamicObjectExt();
             newanimal.Feature.Food = "竹子";

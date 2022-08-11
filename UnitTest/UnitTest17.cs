@@ -1,5 +1,5 @@
 ﻿using CodeM.Common.Orm;
-using CodeM.Common.Orm.Serialize;
+using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -21,8 +21,6 @@ namespace UnitTest
             OrmUtils.Load();
 
             OrmUtils.RemoveTables();
-
-            OrmUtils.EnableDebug(true);
         }
 
         [TestMethod]
@@ -43,7 +41,7 @@ namespace UnitTest
         [Description("初始化测试数据")]
         public void Test2()
         {
-            dynamic newuser = ModelObject.New("User");
+            dynamic newuser = new DynamicObjectExt();
             newuser.Name = "wangxm";
             newuser.Age = 30;
             newuser.Birthday = new DateTime(1992, 6, 14);
@@ -52,7 +50,7 @@ namespace UnitTest
             bool ret = OrmUtils.Model("User").SetValues(newuser).Save();
             Assert.IsTrue(ret);
 
-            dynamic newuser2 = ModelObject.New("User");
+            dynamic newuser2 = new DynamicObjectExt();
             newuser2.Name = "huxy";
             newuser2.Age = 23;
             newuser2.Birthday = new DateTime(1999, 4, 29);
@@ -61,7 +59,7 @@ namespace UnitTest
             bool ret2 = OrmUtils.Model("User").SetValues(newuser2).Save();
             Assert.IsTrue(ret2);
 
-            dynamic newuser3 = ModelObject.New("User");
+            dynamic newuser3 = new DynamicObjectExt();
             newuser3.Name = "jisw";
             newuser3.Age = 50;
             newuser3.Birthday = new DateTime(1972, 1, 16);
@@ -70,7 +68,7 @@ namespace UnitTest
             bool ret3 = OrmUtils.Model("User").SetValues(newuser3).Save();
             Assert.IsTrue(ret3);
 
-            dynamic newuser4 = ModelObject.New("User");
+            dynamic newuser4 = new DynamicObjectExt();
             newuser4.Name = "wangss";
             newuser4.Age = 50;
             newuser4.Birthday = new DateTime(1972, 10, 1);

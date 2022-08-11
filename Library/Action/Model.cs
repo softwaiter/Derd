@@ -1,7 +1,6 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.Action;
 using CodeM.Common.Orm.Dialect;
-using CodeM.Common.Orm.Serialize;
 using CodeM.Common.Tools;
 using CodeM.Common.Tools.Json;
 using System;
@@ -185,27 +184,212 @@ namespace CodeM.Common.Orm
         }
 
         #region ISetValue
-        ModelObject mSetValues;
+        dynamic mSetValues;
 
-        internal ModelObject Values
+        internal bool TryGetValue(Property p, out object value, bool useDefaultValue = true)
         {
-            get
+            if (mSetValues.Has(p.Name))
             {
-                return mSetValues;
+                value = mSetValues[p.Name];
+                return true;
+            }
+            else if (useDefaultValue)
+            {
+                try
+                {
+                    if (p.DefaultValue != null)
+                    {
+                        value = p.CalcDefaultValue(mSetValues);
+                        return true;
+                    }
+                }
+                catch
+                {
+                    ;
+                }
+            }
+
+            value = null;
+            return false;
+        }
+
+        private void _CheckPropertyType(Property p, object value)
+        {
+            if (value != null)
+            {
+                Type type = p.RealType;
+                if (type == typeof(bool))
+                {
+                    bool result;
+                    if (!bool.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：Boolean，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(byte))
+                {
+                    byte result;
+                    if (!byte.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：Byte，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(sbyte))
+                {
+                    sbyte result;
+                    if (!sbyte.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：SByte，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(decimal))
+                {
+                    decimal result;
+                    if (!decimal.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：Decimal，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(double))
+                {
+                    double result;
+                    if (!double.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：Double，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(Int16))
+                {
+                    Int16 result;
+                    if (!Int16.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：Int16，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(Int32))
+                {
+                    Int32 result;
+                    if (!Int32.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：Int32，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(Int64))
+                {
+                    Int64 result;
+                    if (!Int64.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：Int64，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(Single))
+                {
+                    Single result;
+                    if (!Single.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：Single，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(UInt16))
+                {
+                    UInt16 result;
+                    if (!UInt16.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：UInt16，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(UInt32))
+                {
+                    UInt32 result;
+                    if (!UInt32.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：UInt32，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(UInt64))
+                {
+                    UInt64 result;
+                    if (!UInt64.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：UInt64，实际类型为：", value.GetType().Name));
+                    }
+                }
+                else if (type == typeof(DateTime))
+                {
+                    DateTime result;
+                    if (!DateTime.TryParse("" + value, out result))
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值期待类型：DateTime，实际类型为：", value.GetType().Name));
+                    }
+                }
             }
         }
 
-        public Model SetValue(string name, object value)
+        private void _CheckPropertyValue(Property p, object value)
+        {
+            if (value == null)
+            {
+                if (p.IsNotNull && !p.AutoIncrement &&
+                    string.IsNullOrWhiteSpace(p.DefaultValue) &&
+                    !p.NeedCalcBeforeSave)
+                {
+                    throw new Exception("属性值不允许为空：" + p.Name);
+                }
+            }
+            else
+            {
+                if (p.RealType == typeof(string) && p.Length > 0)
+                {
+                    if (value.ToString().Length > p.Length)
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值最大长度不能超过", p.Length));
+                    }
+                }
+                else if (FieldUtils.IsNumeric(p.FieldType))
+                {
+                    double dValue = double.Parse(value.ToString());
+                    if (p.MinValue != null)
+                    {
+                        if (dValue < p.MinValue)
+                        {
+                            throw new Exception(string.Concat(p.Name, "属性值取值限制范围：", p.MinValue, "-", p.MaxValue));
+                        }
+                    }
+                    if (p.MaxValue != null)
+                    {
+                        if (dValue > p.MaxValue)
+                        {
+                            throw new Exception(string.Concat(p.Name, "属性值取值限制范围：", p.MinValue, "-", p.MaxValue));
+                        }
+                    }
+                }
+            }
+        }
+
+        private void _CheckModelConstraint(string name, object value)
+        {
+            Property p = GetProperty(name);
+            _CheckPropertyType(p, value);
+            _CheckPropertyValue(p, value);
+        }
+
+        public Model SetValue(string name, object value, bool validate = false)
         {
             if (mSetValues == null)
             {
-                mSetValues = ModelObject.New(this);
+                mSetValues = new DynamicObjectExt();
+            }
+
+            if (validate)
+            {
+                _CheckModelConstraint(name, value);
             }
             mSetValues.SetValue(name, value);
+
             return this;
         }
 
-        public Model SetValues(ModelObject obj)
+        public Model SetValues(dynamic obj, bool validate = false)
         {
             if (obj != null)
             {
@@ -214,7 +398,7 @@ namespace CodeM.Common.Orm
                     Property p = GetProperty(i);
                     if (obj.Has(p.Name))
                     {
-                        SetValue(p.Name, obj[p.Name]);
+                        SetValue(p.Name, obj[p.Name], validate);
                     }
                 }
             }
@@ -920,144 +1104,6 @@ namespace CodeM.Common.Orm
             return OrmUtils.GetTransaction(this.Path);
         }
 
-        private bool _CheckPropertyType(Property p, object value)
-        {
-            Type type = p.RealType;
-            if (type == typeof(bool))
-            {
-                bool result;
-                if (!bool.TryParse("" + value, out result))
-                {
-                    throw new Exception("无效的bool数据：" + value);
-                }
-            }
-            else if (type == typeof(byte))
-            {
-                byte result;
-                if (!byte.TryParse("" + value, out result))
-                {
-                    throw new Exception("无效的byte数据：" + value);
-                }
-            }
-            else if (type == typeof(sbyte))
-            {
-                sbyte result;
-                if (!sbyte.TryParse("" + value, out result))
-                {
-                    throw new Exception("无效的sbyte数据：" + value);
-                }
-            }
-            else if (type == typeof(decimal))
-            {
-                decimal result;
-                if (!decimal.TryParse("" + value, out result))
-                {
-                    throw new Exception("无效的decimal数据：" + value);
-                }
-            }
-            else if (type == typeof(double))
-            {
-                double result;
-                if (!double.TryParse("" + value, out result))
-                {
-                    throw new Exception("无效的double数据：" + value);
-                }
-            }
-            else if (type == typeof(Int16))
-            {
-                Int16 result;
-                if (!Int16.TryParse("" + value, out result))
-                {
-                    throw new Exception(p.Name + "属性值类型必须是Int16数据：" + value);
-                }
-            }
-            else if (type == typeof(Int32))
-            {
-                Int32 result;
-                if (!Int32.TryParse("" + value, out result))
-                {
-                    throw new Exception(p.Name + "属性值类型必须是Int32：" + value);
-                }
-            }
-            else if (type == typeof(Int64))
-            {
-                Int64 result;
-                if (!Int64.TryParse("" + value, out result))
-                {
-                    throw new Exception(p.Name + "属性值类型必须是Int64：" + value);
-                }
-            }
-            else if (type == typeof(Single))
-            {
-                Single result;
-                if (!Single.TryParse("" + value, out result))
-                {
-                    throw new Exception(p.Name + "属性值类型必须是Single：" + value);
-                }
-            }
-            else if (type == typeof(UInt16))
-            {
-                UInt16 result;
-                if (!UInt16.TryParse("" + value, out result))
-                {
-                    throw new Exception(p.Name + "属性值类型必须是UInt16：" + value);
-                }
-            }
-            else if (type == typeof(UInt32))
-            {
-                UInt32 result;
-                if (!UInt32.TryParse("" + value, out result))
-                {
-                    throw new Exception(p.Name + "属性值类型必须是UInt32：" + value);
-                }
-            }
-            else if (type == typeof(UInt64))
-            {
-                UInt64 result;
-                if (!UInt64.TryParse("" + value, out result))
-                {
-                    throw new Exception(p.Name + "属性值类型必须是UInt64：" + value);
-                }
-            }
-            else if (type == typeof(DateTime))
-            {
-                DateTime result;
-                if (!DateTime.TryParse("" + value, out result))
-                {
-                    throw new Exception(p.Name + "属性值类型必须是DateTime：" + value);
-                }
-            }
-
-            return true;
-        }
-
-        private void _CheckModelConstraint()
-        {
-            object value;
-            int count = PropertyCount;
-            for (int i = 0; i < count; i++)
-            {
-                Property p = GetProperty(i);
-                mSetValues.TryGetValue(p.Name, out value);
-
-                if (p.IsNotNull && !p.AutoIncrement &&
-                    string.IsNullOrWhiteSpace(p.DefaultValue) &&
-                    !p.NeedCalcBeforeSave)
-                {
-                    if (!mSetValues.Has(p.Name) || 
-                        value == null)
-                    {
-                        throw new Exception("属性值不允许为空：" + p.Name);
-                    }
-                }
-
-                if (value != null)
-                {
-                    _CheckPropertyType(p, value);
-                } 
-            }
-        }
-
         private void _CalcBeforeSaveProperties()
         {
             foreach (Property p in mBeforeSavePropeties)
@@ -1070,7 +1116,7 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private void _CalcBeforeSaveProcessor(string type, ModelObject obj)
+        private void _CalcBeforeSaveProcessor(string type, dynamic obj)
         {
             if (!string.IsNullOrWhiteSpace(BeforeSaveProcessor))
             {
@@ -1078,7 +1124,7 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private void _CalcAfterSaveProcessor(string type, ModelObject obj)
+        private void _CalcAfterSaveProcessor(string type, dynamic obj)
         {
             if (!string.IsNullOrWhiteSpace(AfterSaveProcessor))
             {
@@ -1086,12 +1132,7 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public bool Save(bool validate = false)
-        {
-            return Save(null, validate);
-        }
-
-        public bool Save(int? transCode, bool validate = false)
+        public bool Save(int? transCode = null)
         {
             DbTransaction trans = null;
             if (transCode != null)
@@ -1108,11 +1149,6 @@ namespace CodeM.Common.Orm
                 if (mSetValues == null)
                 {
                     throw new Exception("没有任何要保存的内容，请通过SetValue设置内容。");
-                }
-
-                if (validate)
-                {
-                    _CheckModelConstraint();
                 }
 
                 _CalcBeforeSaveProperties();
@@ -1139,9 +1175,14 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private ModelObject MixActionValues(Dictionary<string, object> filterProperties)
+        /// <summary>
+        /// 将过滤条件的属性值混合到用户赋值对象上
+        /// </summary>
+        /// <param name="filterProperties"></param>
+        /// <returns></returns>
+        private dynamic MixActionValues(Dictionary<string, object> filterProperties)
         {
-            ModelObject result = mSetValues != null ? (ModelObject)mSetValues.Clone() : ModelObject.New(this);
+            dynamic result = mSetValues != null ? mSetValues.Clone() : new DynamicObjectExt();
             Dictionary<string, object>.Enumerator e = filterProperties.GetEnumerator();
             while (e.MoveNext())
             {
@@ -1188,7 +1229,7 @@ namespace CodeM.Common.Orm
                 OrmUtils.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
                 bool bRet = false;
-                ModelObject mixedValues = MixActionValues(cmd.FilterProperties);
+                dynamic mixedValues = MixActionValues(cmd.FilterProperties);
                 _CalcBeforeSaveProcessor("beforeUpdate", mixedValues);
                 if (trans == null)
                 {
@@ -1207,7 +1248,7 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private void _CalcBeforeDeleteProcessor(string type, ModelObject obj)
+        private void _CalcBeforeDeleteProcessor(string type, dynamic obj)
         {
             if (!string.IsNullOrWhiteSpace(BeforeDeleteProcessor))
             {
@@ -1215,7 +1256,7 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private void _CalcAfterDeleteProcessor(string type, ModelObject obj)
+        private void _CalcAfterDeleteProcessor(string type, dynamic obj)
         {
             if (!string.IsNullOrWhiteSpace(AfterDeleteProcessor))
             {
@@ -1258,7 +1299,7 @@ namespace CodeM.Common.Orm
                 OrmUtils.PrintSQL(sql, where.Params.ToArray());
 
                 bool bRet = false;
-                ModelObject mixedValues = MixActionValues(where.FilterProperties);
+                dynamic mixedValues = MixActionValues(where.FilterProperties);
                 _CalcBeforeDeleteProcessor("beforeDelete", mixedValues);
                 if (trans == null)
                 {
@@ -1343,6 +1384,11 @@ namespace CodeM.Common.Orm
             return result.Count > 0 ? result[0] : null;
         }
 
+        /// <summary>
+        /// 返回字段是否存在聚合操作或者函数计算
+        /// </summary>
+        /// <param name="gvs"></param>
+        /// <returns></returns>
         private bool HaveOperation(GetValueSetting gvs)
         {
             if (gvs.Operations.Count > 0)

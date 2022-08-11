@@ -1,5 +1,5 @@
 ﻿using CodeM.Common.Orm;
-using CodeM.Common.Orm.Serialize;
+using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace UnitTest
         [Description("向机构表插入一条数据。")]
         public void Test2()
         {
-            dynamic neworg = ModelObject.New("Org");
+            dynamic neworg = new DynamicObjectExt();
             neworg.Code = "XXTech";
             neworg.Name = "XX科技";
             bool ret = OrmUtils.Model("Org").SetValues(neworg).Save();
@@ -58,7 +58,7 @@ namespace UnitTest
         public void Test3()
         {
             List<dynamic> orgList = OrmUtils.Model("Org").Equals("Name", "XX科技").Query();
-            dynamic newuser = ModelObject.New("User");
+            dynamic newuser = new DynamicObjectExt();
             newuser.Name = "wangxm";
             newuser.Org = orgList[0].Code;
             bool ret = OrmUtils.Model("User").SetValues(newuser).Save();
@@ -75,7 +75,7 @@ namespace UnitTest
         [Description("向机构表插入一条数据。")]
         public void Test5()
         {
-            dynamic neworg = ModelObject.New("Org");
+            dynamic neworg = new DynamicObjectExt();
             neworg.Code = "YYTech";
             neworg.Name = "YY科技";
             bool ret = OrmUtils.Model("Org").SetValues(neworg).Save();
@@ -86,7 +86,7 @@ namespace UnitTest
         public void Test6()
         {
             List<dynamic> orgList = OrmUtils.Model("Org").Equals("Name", "YY科技").Query();
-            dynamic newuser = ModelObject.New("User");
+            dynamic newuser = new DynamicObjectExt();
             newuser.Name = "huxy";
             newuser.Org = orgList[0].Code;
             bool ret = OrmUtils.Model("User").SetValues(newuser).Save();

@@ -1,5 +1,5 @@
 ﻿using CodeM.Common.Orm;
-using CodeM.Common.Orm.Serialize;
+using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -21,8 +21,6 @@ namespace UnitTest
             OrmUtils.Load();
 
             OrmUtils.RemoveTables();
-
-            OrmUtils.EnableDebug(true);
         }
 
         [TestMethod]
@@ -45,7 +43,7 @@ namespace UnitTest
         [Description("创建一条Shopping记录，应成功。")]
         public void Test2()
         {
-            dynamic newshopping = ModelObject.New("Shopping");
+            dynamic newshopping = new DynamicObjectExt();
             newshopping.Code = "iPhone 12";
             newshopping.Name = "苹果12手机";
             newshopping.Order = "S202100812085255000";
@@ -77,7 +75,7 @@ namespace UnitTest
 
         public void Test5()
         {
-            dynamic newshopping = ModelObject.New("Shopping");
+            dynamic newshopping = new DynamicObjectExt();
             newshopping.Code = "iPhone 12";
             newshopping.Name = "苹果手机12";
             newshopping.Order = "S202100812085255000";

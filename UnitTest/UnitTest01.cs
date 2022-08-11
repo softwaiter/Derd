@@ -56,6 +56,7 @@ namespace UnitTest
         {
             Model m = OrmUtils.Model("User");
             Assert.IsNotNull(m);
+            Assert.AreEqual(9, m.PropertyCount);
             Assert.AreEqual<string>(m.Table, "t_user");
         }
 

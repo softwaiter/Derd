@@ -1,5 +1,5 @@
 ﻿using CodeM.Common.Orm;
-using CodeM.Common.Orm.Serialize;
+using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -21,8 +21,6 @@ namespace UnitTest
             OrmUtils.Load();
 
             OrmUtils.RemoveTables();
-
-            OrmUtils.EnableDebug(true);
         }
 
         [TestMethod]
@@ -45,7 +43,7 @@ namespace UnitTest
             bool ret = OrmUtils.Model("Org").TryCreateTable(true);
             Assert.IsTrue(ret);
 
-            dynamic neworg = OrmUtils.Model("Org").NewObject();
+            dynamic neworg = new DynamicObjectExt();
             neworg.Code = "xxtech";
             neworg.Name = "XX科技";
             bool ret2 = OrmUtils.Model("Org").SetValues(neworg).Save();
@@ -54,28 +52,28 @@ namespace UnitTest
             bool ret3 = OrmUtils.Model("User").TryCreateTable(true);
             Assert.IsTrue(ret3);
 
-            dynamic newuser = ModelObject.New("User");
+            dynamic newuser = new DynamicObjectExt();
             newuser.Name = "wangxm";
             newuser.Age = 18;
             newuser.Org = neworg.Code;
             bool ret4 = OrmUtils.Model("User").SetValues(newuser).Save();
             Assert.IsTrue(ret4);
 
-            dynamic newuser2 = ModelObject.New("User");
+            dynamic newuser2 = new DynamicObjectExt();
             newuser2.Name = "hxy";
             newuser2.Age = 14;
             newuser2.Org = neworg.Code;
             bool ret5 = OrmUtils.Model("User").SetValues(newuser2).Save();
             Assert.IsTrue(ret5);
 
-            dynamic newuser3 = ModelObject.New("User");
+            dynamic newuser3 = new DynamicObjectExt();
             newuser3.Name = "zhangsan";
             newuser3.Age = 18;
             newuser3.Org = neworg.Code;
             bool ret6 = OrmUtils.Model("User").SetValues(newuser3).Save();
             Assert.IsTrue(ret6);
 
-            dynamic newuser4 = ModelObject.New("User");
+            dynamic newuser4 = new DynamicObjectExt();
             newuser4.Name = "lisi";
             newuser4.Age = 10;
             newuser4.Org = neworg.Code;
