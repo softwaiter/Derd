@@ -3,6 +3,7 @@
     <property name="Id" field="f_id" notNull="true" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
     <property name="Code" field="f_code" notNull="true" length="32" uniqueGroup="uc_code" desc="机构编码" />
     <property name="Name" field="f_name" length="32" notNull="true" uniqueGroup="uc_name" joinInsert="true" joinUpdate="true" desc="机构名称" />
+	<property name="Count" type="Int32" defaultValue="0" desc="机构总人数" />
     <property name="CreateTime" type="DateTime" field="f_createtime" defaultValue="{{CurrentDateTime}}" joinUpdate="false" desc="创建时间" />
     <property name="UpdateTime" type="DateTime" field="f_updatetime" defaultValue="{{CurrentDateTime}}" desc="更新时间" />
 </model>

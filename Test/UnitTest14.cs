@@ -49,56 +49,56 @@ namespace UnitTest
             bool ret2 = Derd.Model("Org").SetValues(neworg).Save();
             Assert.IsTrue(ret2);
 
-            bool ret3 = Derd.Model("User").TryCreateTable(true);
+            bool ret3 = Derd.Model("Person").TryCreateTable(true);
             Assert.IsTrue(ret3);
 
             dynamic newuser = new DynamicObjectExt();
             newuser.Name = "wangxm";
             newuser.Age = 18;
             newuser.Org = neworg.Code;
-            bool ret4 = Derd.Model("User").SetValues(newuser).Save();
+            bool ret4 = Derd.Model("Person").SetValues(newuser).Save();
             Assert.IsTrue(ret4);
 
             dynamic newuser2 = new DynamicObjectExt();
             newuser2.Name = "hxy";
             newuser2.Age = 14;
             newuser2.Org = neworg.Code;
-            bool ret5 = Derd.Model("User").SetValues(newuser2).Save();
+            bool ret5 = Derd.Model("Person").SetValues(newuser2).Save();
             Assert.IsTrue(ret5);
 
             dynamic newuser3 = new DynamicObjectExt();
             newuser3.Name = "zhangsan";
             newuser3.Age = 18;
             newuser3.Org = neworg.Code;
-            bool ret6 = Derd.Model("User").SetValues(newuser3).Save();
+            bool ret6 = Derd.Model("Person").SetValues(newuser3).Save();
             Assert.IsTrue(ret6);
 
             dynamic newuser4 = new DynamicObjectExt();
             newuser4.Name = "lisi";
             newuser4.Age = 10;
             newuser4.Org = neworg.Code;
-            bool ret7 = Derd.Model("User").SetValues(newuser4).Save();
+            bool ret7 = Derd.Model("Person").SetValues(newuser4).Save();
             Assert.IsTrue(ret7);
         }
 
         [Description("使用Distinct去重同年龄的人，应查询得到2人。")]
         public void Test2()
         {
-            List<dynamic> result = Derd.Model("User").GetValue(AggregateType.DISTINCT, "Age").Query();
+            List<dynamic> result = Derd.Model("Person").GetValue(AggregateType.DISTINCT, "Age").Query();
             Assert.AreEqual(3, result.Count);
         }
 
         [Description("计算所有人的年龄之和，应为60。")]
         public void Test3()
         {
-            dynamic result = Derd.Model("User").GetValue(AggregateType.SUM, "Age").QueryFirst();
+            dynamic result = Derd.Model("Person").GetValue(AggregateType.SUM, "Age").QueryFirst();
             Assert.AreEqual(60, result.Age);
         }
 
         [Description("使用COUNT方式获取18岁年龄段的人员数量，应为2人。")]
         public void Test4()
         {
-            dynamic result = Derd.Model("User")
+            dynamic result = Derd.Model("Person")
                 .Equals("Age", 18)
                 .GetValue(AggregateType.COUNT, "Id")
                 .QueryFirst();
@@ -108,7 +108,7 @@ namespace UnitTest
         [Description("获取所有人中最大的年龄，应为18。")]
         public void Test5()
         {
-            dynamic result = Derd.Model("User")
+            dynamic result = Derd.Model("Person")
                 .GetValue(AggregateType.MAX, "Age")
                 .QueryFirst();
             Assert.IsTrue(18 == result.Age);
@@ -117,7 +117,7 @@ namespace UnitTest
         [Description("获取所有人中最小的年龄，应为10。")]
         public void Test6()
         {
-            dynamic result = Derd.Model("User")
+            dynamic result = Derd.Model("Person")
                 .GetValue(AggregateType.MIN, "Age")
                 .QueryFirst();
             Assert.IsTrue(10 == result.Age);
@@ -126,7 +126,7 @@ namespace UnitTest
         [Description("获取人员平均年龄，应为15。")]
         public void Test7()
         {
-            dynamic result = Derd.Model("User")
+            dynamic result = Derd.Model("Person")
                 .GetValue(AggregateType.AVG, "Age")
                 .QueryFirst();
             Assert.IsTrue(15 == result.Age);
@@ -135,7 +135,7 @@ namespace UnitTest
         [Description("使用GroupBy计算每个年龄段的人数，应该18岁2人，14岁1人，10岁1人。")]
         public void Test8()
         {
-            List<dynamic> result = Derd.Model("User")
+            List<dynamic> result = Derd.Model("Person")
                 .GetValue("Age")
                 .GetValue(AggregateType.COUNT, "Id", "UserCount")
                 .GroupBy("Age")
@@ -157,7 +157,7 @@ namespace UnitTest
         [Description("获取关联对象属性，并设置别名，应成功。")]
         public void Test9()
         {
-            List<dynamic> result = Derd.Model("User")
+            List<dynamic> result = Derd.Model("Person")
                 .GetValue(AggregateType.NONE, "Org.Code", "OrgCode")
                 .GetValue(AggregateType.NONE, "Name", "Person.Name")
                 .GetValue(AggregateType.NONE, "Org.Name", "Person.OrgName")

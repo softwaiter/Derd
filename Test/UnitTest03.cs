@@ -43,7 +43,7 @@ namespace UnitTest
         [Description("创建User模型的物理表。")]
         public void Test1()
         {
-            bool ret = Derd.Model("User").TryCreateTable(true);
+            bool ret = Derd.Model("Person").TryCreateTable(true);
             Assert.IsTrue(ret);
         }
 
@@ -56,7 +56,7 @@ namespace UnitTest
             newuser.Birthday = new DateTime(1980, 6, 14);
             newuser.Deposit = 10000000.58;
             newuser.IsAdmin = null;
-            bool ret = Derd.Model("User").SetValues(newuser).Save();
+            bool ret = Derd.Model("Person").SetValues(newuser).Save();
             Assert.IsTrue(ret);
         }
 
@@ -65,7 +65,7 @@ namespace UnitTest
         {
             try
             {
-                bool ret = Derd.Model("User").SetValue("Name", "wangxm").Save();
+                bool ret = Derd.Model("Person").SetValue("Name", "wangxm").Save();
                 Assert.IsFalse(ret);
             }
             catch (Exception exp)
@@ -79,14 +79,14 @@ namespace UnitTest
         [Description("根据名称更新Test3中写入的数据，修改对应Age为25，Deposit为99999999；应成功。")]
         public void Test4()
         {
-            bool ret = Derd.Model("User").Equals("Name", "wangxm").SetValue("Age", 25).SetValue("Deposit", 99999999).Update();
+            bool ret = Derd.Model("Person").Equals("Name", "wangxm").SetValue("Age", 25).SetValue("Deposit", 99999999).Update();
             Assert.IsTrue(ret);
         }
 
         [Description("查询Deposit为99999999的用户，应返回1条数据。")]
         public void Test5()
         {
-            List<dynamic> result = Derd.Model("User").Equals("Deposit", 99999999).Query();
+            List<dynamic> result = Derd.Model("Person").Equals("Deposit", 99999999).Query();
             Assert.AreEqual(result.Count, 1);
         }
 
@@ -99,7 +99,7 @@ namespace UnitTest
             newuser.Birthday = new DateTime(1947, 1, 16);
             newuser.Deposit = 10000000.58;
             newuser.IsAdmin = true;
-            bool ret = Derd.Model("User").SetValues(newuser).Save();
+            bool ret = Derd.Model("Person").SetValues(newuser).Save();
             Assert.IsTrue(ret);
         }
 
@@ -112,38 +112,38 @@ namespace UnitTest
             newuser.Birthday = new DateTime(1947, 10, 1);
             newuser.Deposit = 10000000.58;
             newuser.IsAdmin = true;
-            bool ret = Derd.Model("User").SetValues(newuser).Save();
+            bool ret = Derd.Model("Person").SetValues(newuser).Save();
             Assert.IsTrue(ret);
 
-            Assert.IsTrue(Derd.Model("User").Count() == 3);
-            Assert.IsTrue(Derd.Model("User").GetValue(AggregateType.DISTINCT, "Age").Count() == 2);
+            Assert.IsTrue(Derd.Model("Person").Count() == 3);
+            Assert.IsTrue(Derd.Model("Person").GetValue(AggregateType.DISTINCT, "Age").Count() == 2);
         }
 
         [Description("User模型属性Org真实数据类型应为String，应成功。")]
         public void Test8()
         {
-            Property p = Derd.Model("User").GetProperty("Org");
+            Property p = Derd.Model("Person").GetProperty("Org");
             Assert.AreEqual<Type>(p.RealType, typeof(string));
         }
 
         [Description("使用QueryFirst查询第一条用户对象，返回对象名应为wangxm")]
         public void Test9()
         {
-            dynamic user = Derd.Model("User").QueryFirst();
+            dynamic user = Derd.Model("Person").QueryFirst();
             Assert.AreEqual(user.Name, "wangxm");
         }
 
         [Description("查询IsAdmin为true的用户，返回对象名应为jishuwen")]
         public void Test10()
         {
-            dynamic user = Derd.Model("User").Equals("IsAdmin", true).QueryFirst();
+            dynamic user = Derd.Model("Person").Equals("IsAdmin", true).QueryFirst();
             Assert.AreEqual(user.Name, "jishuwen");
         }
 
         [Description("删除Test1测试中创建的User模型物理表，应成功。")]
         public void Test11()
         {
-            bool ret = Derd.Model("User").TryRemoveTable();
+            bool ret = Derd.Model("Person").TryRemoveTable();
             Assert.IsTrue(ret);
         }
     }

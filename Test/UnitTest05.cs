@@ -61,14 +61,14 @@ namespace UnitTest
             dynamic newuser = new DynamicObjectExt();
             newuser.Name = "wangxm";
             newuser.Org = orgList[0].Code;
-            bool ret = Derd.Model("User").SetValues(newuser).Save();
+            bool ret = Derd.Model("Person").SetValues(newuser).Save();
             Assert.IsTrue(ret);
         }
 
         [Description("查询名称为wangxm的所属机构Id和名称，应为1和XX科技")]
         public void Test4()
         {
-            List<dynamic> userList = Derd.Model("User").Equals("Name", "wangxm").GetValue("Name", "Org.Id", "Org.Name").Query();
+            List<dynamic> userList = Derd.Model("Person").Equals("Name", "wangxm").GetValue("Name", "Org.Id", "Org.Name").Query();
             Assert.AreEqual("1-XX科技", userList[0].Org.Id + "-" + userList[0].Org.Name);
         }
 
@@ -89,28 +89,28 @@ namespace UnitTest
             dynamic newuser = new DynamicObjectExt();
             newuser.Name = "huxy";
             newuser.Org = orgList[0].Code;
-            bool ret = Derd.Model("User").SetValues(newuser).Save();
+            bool ret = Derd.Model("Person").SetValues(newuser).Save();
             Assert.IsTrue(ret);
         }
 
         [Description("查询所属机构为YY科技的第一条用户的名称，应为huxy。")]
         public void Test7()
         {
-            List<dynamic> userList = Derd.Model("User").Equals("Org.Name", "YY科技").GetValue("Name").Top(1).Query();
+            List<dynamic> userList = Derd.Model("Person").Equals("Org.Name", "YY科技").GetValue("Name").Top(1).Query();
             Assert.AreEqual("huxy", userList[0].Name);
         }
 
         [Description("根据用户所属机构名称进行升序排序，第一条用户名应为wangxm。")]
         public void Test8()
         {
-            List<dynamic> userList = Derd.Model("User").GetValue("Name").AscendingSort("Org.Name").Top(1).Query();
+            List<dynamic> userList = Derd.Model("Person").GetValue("Name").AscendingSort("Org.Name").Top(1).Query();
             Assert.AreEqual("wangxm", userList[0].Name);
         }
 
         [Description("根据用户所属机构名称进行降序排序，第一条用户名应为huxy。")]
         public void Test9()
         {
-            List<dynamic> userList = Derd.Model("User").GetValue("Name").DescendingSort("Org.Name").Top(1).Query();
+            List<dynamic> userList = Derd.Model("Person").GetValue("Name").DescendingSort("Org.Name").Top(1).Query();
             Assert.AreEqual("huxy", userList[0].Name);
         }
     }

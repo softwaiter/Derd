@@ -2,9 +2,9 @@
 
 namespace CodeM.Common.Orm.Processors
 {
-    public class CurrentTime : IProcessor
+    public class CurrentTime : IPropertyProcessor
     {
-        public dynamic Execute(Model model, string key, dynamic value)
+        public object Process(Model modelDeine, string propName, dynamic propValue)
         {
             return DateTime.Now.ToString("HH:mm:ss");
         }

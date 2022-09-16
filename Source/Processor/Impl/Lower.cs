@@ -1,14 +1,14 @@
 ﻿namespace CodeM.Common.Orm.Processors
 {
-    public class Lower : IProcessor
+    public class Lower : IPropertyProcessor
     {
-        public dynamic Execute(Model model, string key, dynamic value)
+        public object Process(Model modelDefine, string propName, dynamic propValue)
         {
-            if (value != null && value.GetType() == typeof(string))
+            if (propValue != null && propValue.GetType() == typeof(string))
             {
-                return value.ToLower();
+                return propValue.ToLower();
             }
-            return value;
+            return propValue;
         }
     }
 }

@@ -1,13 +1,14 @@
 ﻿using CodeM.Common.Ioc;
 using System;
 using System.Collections.Concurrent;
+using System.Data.Common;
 
 namespace CodeM.Common.Orm
 {
     internal class Processor
     {
         private static bool sInited = false;
-        private static ConcurrentDictionary<string, IProcessor> sImpls = new ConcurrentDictionary<string, IProcessor>();
+        private static ConcurrentDictionary<string, object> sProcessorImpls = new ConcurrentDictionary<string, object>();
 
         public static void Init()
         {
@@ -25,26 +26,50 @@ namespace CodeM.Common.Orm
 
         public static void Register(string name, string classname)
         {
-            IProcessor inst = Wukong.GetSingleObject<IProcessor>(classname);
+            object inst = Wukong.GetSingleObject(classname);
             if (inst != null)
             {
-                sImpls.AddOrUpdate(name.ToLower(), inst, (key, value) =>
+                if (inst is IPropertyProcessor || inst is IModelProcessor)
                 {
-                    return inst;
-                });
-                return;
+                    sProcessorImpls.AddOrUpdate(name.ToLower(), inst, (key, value) =>
+                    {
+                        return inst;
+                    });
+                    return;
+                }
+                throw new Exception(string.Concat("无效的Processor：", classname));
             }
             throw new Exception(string.Concat("Processor实现未找到：", classname));
         }
 
-        public static object Call(string method, Model model, string prop, dynamic propValue)
+        public static object CallPropertyProcessor(string processorName, 
+            Model modelDefine, string propName, dynamic propValue)
         {
-            IProcessor inst;
-            if (sImpls.TryGetValue(method.ToLower(), out inst))
+            dynamic inst;
+            if (sProcessorImpls.TryGetValue(processorName.ToLower(), out inst))
             {
-                return inst.Execute(model, prop, propValue);
+                if (inst is IPropertyProcessor)
+                {
+                    return ((IPropertyProcessor)inst).Process(modelDefine, propName, propValue);
+                }
+                throw new Exception(string.Concat("无效的PropertyProcessor：", processorName));
             }
-            throw new Exception(string.Concat("Processor不存在：", method));
+            throw new Exception(string.Concat("Processor不存在：", processorName));
+        }
+
+        public static bool CallModelProcessor(string processorName,
+            Model modelDefine, dynamic modelObj, DbTransaction trans = null)
+        {
+            dynamic inst;
+            if (sProcessorImpls.TryGetValue(processorName.ToLower(), out inst))
+            {
+                if (inst is IModelProcessor)
+                {
+                    return ((IModelProcessor)inst).Process(modelDefine, modelObj, trans);
+                }
+                throw new Exception(string.Concat("无效的ModelProcessor：", processorName));
+            }
+            throw new Exception(string.Concat("Processor不存在：", processorName));
         }
     }
 }

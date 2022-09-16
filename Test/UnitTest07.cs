@@ -42,7 +42,7 @@ namespace UnitTest
         [Description("创建User模型的物理表。")]
         public void Test2()
         {
-            bool ret = Derd.Model("User").TryCreateTable(true);
+            bool ret = Derd.Model("Person").TryCreateTable(true);
             Assert.IsTrue(ret);
         }
 
@@ -60,7 +60,7 @@ namespace UnitTest
             try
             {
                 Derd.Model("Org").SetValues(neworg).Save(trans);
-                Derd.Model("User").SetValues(newuser).Save(trans);
+                Derd.Model("Person").SetValues(newuser).Save(trans);
                 Derd.CommitTransaction(trans);
             }
             catch
@@ -86,7 +86,7 @@ namespace UnitTest
             try
             {
                 Derd.Model("Org").SetValues(neworg).Save(trans);
-                Derd.Model("User").SetValues(newuser).Save(trans);
+                Derd.Model("Person").SetValues(newuser).Save(trans);
                 Derd.CommitTransaction(trans);
             }
             catch
@@ -97,7 +97,7 @@ namespace UnitTest
             List<dynamic> result = Derd.Model("Org").Equals("Name", "事务测试-机构01").Query();
             Assert.AreEqual<int>(result.Count, 1);
 
-            List<dynamic> result2 = Derd.Model("User").Equals("Name", "事务测试-用户01").Query();
+            List<dynamic> result2 = Derd.Model("Person").Equals("Name", "事务测试-用户01").Query();
             Assert.AreEqual<int>(result2.Count, 1);
         }
     }

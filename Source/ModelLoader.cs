@@ -466,35 +466,67 @@ namespace CodeM.Common.Orm
                             model.Table = model.Name;
                         }
 
-                        string beforeSaveProcStr = nodeInfo.GetAttribute("beforeSave");
-                        if (beforeSaveProcStr != null)
+                        string beforeNewProcStr = nodeInfo.GetAttribute("beforeNew");
+                        if (beforeNewProcStr != null)
                         {
-                            beforeSaveProcStr = beforeSaveProcStr.Trim();
-                            if (beforeSaveProcStr.Length > 4 &&
-                                beforeSaveProcStr.StartsWith("{{") &&
-                                beforeSaveProcStr.EndsWith("}}"))
+                            beforeNewProcStr = beforeNewProcStr.Trim();
+                            if (beforeNewProcStr.Length > 4 &&
+                                beforeNewProcStr.StartsWith("{{") &&
+                                beforeNewProcStr.EndsWith("}}"))
                             {
-                                model.BeforeSaveProcessor = beforeSaveProcStr.Substring(2, beforeSaveProcStr.Length - 4);
+                                model.BeforeNewProcessor = beforeNewProcStr.Substring(2, beforeNewProcStr.Length - 4);
                             }
                             else
                             {
-                                throw new Exception("beforeSave属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                throw new Exception("beforeNew属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
                         }
 
-                        string afterSaveProcStr = nodeInfo.GetAttribute("afterSave");
-                        if (afterSaveProcStr != null)
+                        string afterNewProcStr = nodeInfo.GetAttribute("afterNew");
+                        if (afterNewProcStr != null)
                         {
-                            afterSaveProcStr = afterSaveProcStr.Trim();
-                            if (afterSaveProcStr.Length > 4 &&
-                                afterSaveProcStr.StartsWith("{{") &&
-                                afterSaveProcStr.EndsWith("}}"))
+                            afterNewProcStr = afterNewProcStr.Trim();
+                            if (afterNewProcStr.Length > 4 &&
+                                afterNewProcStr.StartsWith("{{") &&
+                                afterNewProcStr.EndsWith("}}"))
                             {
-                                model.AfterSaveProcessor = afterSaveProcStr.Substring(2, afterSaveProcStr.Length - 4);
+                                model.AfterNewProcessor = afterNewProcStr.Substring(2, afterNewProcStr.Length - 4);
                             }
                             else
                             {
-                                throw new Exception("afterSave属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                throw new Exception("afterNew属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string beforeUpdateProcStr = nodeInfo.GetAttribute("beforeUpdate");
+                        if (beforeUpdateProcStr != null)
+                        {
+                            beforeUpdateProcStr = beforeUpdateProcStr.Trim();
+                            if (beforeUpdateProcStr.Length > 4 &&
+                                beforeUpdateProcStr.StartsWith("{{") &&
+                                beforeUpdateProcStr.EndsWith("}}"))
+                            {
+                                model.BeforeUpdateProcessor = beforeUpdateProcStr.Substring(2, beforeUpdateProcStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("beforeUpdate属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string afterUpdateProcStr = nodeInfo.GetAttribute("afterUpdate");
+                        if (afterUpdateProcStr != null)
+                        {
+                            afterUpdateProcStr = afterUpdateProcStr.Trim();
+                            if (afterUpdateProcStr.Length > 4 &&
+                                afterUpdateProcStr.StartsWith("{{") &&
+                                afterUpdateProcStr.EndsWith("}}"))
+                            {
+                                model.AfterUpdateProcessor = afterUpdateProcStr.Substring(2, afterUpdateProcStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("afterUpdate属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
                         }
 

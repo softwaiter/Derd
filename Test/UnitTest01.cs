@@ -48,16 +48,16 @@ namespace UnitTest
         [Description("加载模型定义，判断是否定义User模型应返回True")]
         public void Test1()
         {
-            Assert.IsTrue(Derd.IsDefind("User"));
+            Assert.IsTrue(Derd.IsDefind("Person"));
         }
 
         [Description("获取User模型，应该返回True")]
         public void Test2()
         {
-            Model m = Derd.Model("User");
+            Model m = Derd.Model("Person");
             Assert.IsNotNull(m);
             Assert.AreEqual(9, m.PropertyCount);
-            Assert.AreEqual<string>(m.Table, "t_user");
+            Assert.AreEqual<string>(m.Table, "t_person");
         }
 
         [Description("使用Orm方法直接执行sql语句创建数据表orm_test，应成功。")]

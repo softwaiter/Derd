@@ -35,7 +35,7 @@ namespace UnitTest
         [Description("创建User模型的物理表。")]
         public void Test1()
         {
-            bool ret = Derd.Model("User").TryCreateTable(true);
+            bool ret = Derd.Model("Person").TryCreateTable(true);
             Assert.IsTrue(ret);
         }
 
@@ -51,7 +51,7 @@ namespace UnitTest
                 newuser.Birthday = "test";
                 newuser.Deposit = 10000000.58;
                 newuser.IsAdmin = true;
-                ret = Derd.Model("User").SetValues(newuser, true).Save();
+                ret = Derd.Model("Person").SetValues(newuser, true).Save();
             }
             catch
             {
@@ -72,7 +72,7 @@ namespace UnitTest
                 newuser.Birthday = new DateTime(1980, 6, 14);
                 newuser.Deposit = 10000000.58;
                 newuser.IsAdmin = true;
-                ret = Derd.Model("User").SetValues(newuser, true).Save();
+                ret = Derd.Model("Person").SetValues(newuser, true).Save();
             }
             catch
             {
@@ -93,7 +93,7 @@ namespace UnitTest
                 newuser.Birthday = new DateTime(1980, 6, 14);
                 newuser.Deposit = 10000000.58;
                 newuser.IsAdmin = true;
-                ret = Derd.Model("User").SetValues(newuser, true).Save();
+                ret = Derd.Model("Person").SetValues(newuser, true).Save();
             }
             catch
             {
@@ -105,7 +105,7 @@ namespace UnitTest
         [Description("删除Test1测试中创建的User模型物理表，应成功。")]
         public void Test5()
         {
-            bool ret = Derd.Model("User").TryRemoveTable();
+            bool ret = Derd.Model("Person").TryRemoveTable();
             Assert.IsTrue(ret);
         }
 

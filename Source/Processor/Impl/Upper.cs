@@ -1,14 +1,14 @@
 ﻿namespace CodeM.Common.Orm.Processors
 {
-    public class Upper : IProcessor
+    public class Upper : IPropertyProcessor
     {
-        public dynamic Execute(Model model, string key, dynamic value)
+        public object Process(Model modelDefine, string propName, dynamic propValue)
         {
-            if (value != null && value.GetType() == typeof(string))
+            if (propValue != null && propValue.GetType() == typeof(string))
             {
-                return value.ToUpper();
+                return propValue.ToUpper();
             }
-            return value;
+            return propValue;
         }
     }
 }

@@ -2,15 +2,15 @@
 
 namespace UnitTest.Processors
 {
-    public class DecryptDeposit : IProcessor
+    public class DecryptDeposit : IPropertyProcessor
     {
-        public object Execute(Model model, string prop, dynamic propValue)
+        public object Process(Model modelDefine, string propName, dynamic propValue)
         {
             if (propValue != null)
             {
                 return propValue - 100000;
             }
-            return Undefined.Value;
+            return NotSet.Value;
         }
     }
 }

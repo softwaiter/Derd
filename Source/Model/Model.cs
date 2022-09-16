@@ -27,9 +27,13 @@ namespace CodeM.Common.Orm
 
         public string Table { get; set; }
 
-        internal string BeforeSaveProcessor { get; set; } = null;
+        internal string BeforeNewProcessor { get; set; } = null;
 
-        internal string AfterSaveProcessor { get; set; } = null;
+        internal string AfterNewProcessor { get; set; } = null;
+
+        internal string BeforeUpdateProcessor { get; set; } = null;
+
+        internal string AfterUpdateProcessor { get; set; } = null;
 
         internal string BeforeDeleteProcessor { get; set; } = null;
 
@@ -276,8 +280,10 @@ namespace CodeM.Common.Orm
             m.Path = this.Path;
             m.Name = this.Name;
             m.Table = this.Table;
-            m.BeforeSaveProcessor = this.BeforeSaveProcessor;
-            m.AfterSaveProcessor = this.AfterSaveProcessor;
+            m.BeforeNewProcessor = this.BeforeNewProcessor;
+            m.AfterNewProcessor = this.AfterNewProcessor;
+            m.BeforeUpdateProcessor = this.BeforeUpdateProcessor;
+            m.AfterUpdateProcessor = this.AfterUpdateProcessor;
             m.BeforeDeleteProcessor = this.BeforeDeleteProcessor;
             m.AfterDeleteProcessor = this.AfterDeleteProcessor;
 

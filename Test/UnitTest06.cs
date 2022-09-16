@@ -74,14 +74,14 @@ namespace UnitTest
             newuser.Org = result[0].Code;
             newuser.Deposit = 99999999;
             newuser.IsAdmin = true;
-            bool ret = Derd.Model("User").SetValues(newuser).Save();
+            bool ret = Derd.Model("Person").SetValues(newuser).Save();
             Assert.IsTrue(ret);
         }
 
         [Description("查询用户wangxm的Deposit属性，应为99999999。")]
         public void Test5()
         {
-            List<dynamic> result = Derd.Model("User").Equals("Name", "wangxm").Top(1).Query();
+            List<dynamic> result = Derd.Model("Person").Equals("Name", "wangxm").Top(1).Query();
             Assert.AreEqual(result[0].Deposit, 99999999);
         }
 
@@ -90,10 +90,10 @@ namespace UnitTest
         {
             Thread.Sleep(3000);
 
-            bool ret = Derd.Model("User").Equals("Name", "wangxm").SetValue("Age", 20).Update();
+            bool ret = Derd.Model("Person").Equals("Name", "wangxm").SetValue("Age", 20).Update();
             Assert.IsTrue(ret);
 
-            List<dynamic> result = Derd.Model("User").Equals("Name", "wangxm").Top(1).Query();
+            List<dynamic> result = Derd.Model("Person").Equals("Name", "wangxm").Top(1).Query();
             Assert.IsTrue(result[0].UpdateTime > result[0].CreateTime);
         }
     }
