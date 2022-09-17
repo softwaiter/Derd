@@ -1,5 +1,6 @@
 ﻿using CodeM.Common.Orm.Dialect;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Text;
 
@@ -113,6 +114,8 @@ namespace CodeM.Common.Orm
         /// 属性是否参与更新操作
         /// </summary>
         public bool JoinUpdate { get; set; } = true;
+
+        public List<PropertyRule> Rules { get; } = new List<PropertyRule>();
 
         /// <summary>
         /// 存储前处理Processor，在模型保存前会先调用该处理器对属性值进行处理
@@ -303,6 +306,7 @@ namespace CodeM.Common.Orm
             cloneObj.DefaultValueIsProcessor = this.DefaultValueIsProcessor;
             cloneObj.JoinInsert = this.JoinInsert;
             cloneObj.JoinUpdate = this.JoinUpdate;
+            cloneObj.Rules.AddRange(this.Rules);
             return cloneObj;
         }
 

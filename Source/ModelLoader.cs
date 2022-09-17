@@ -435,6 +435,8 @@ namespace CodeM.Common.Orm
             Model model = new Model();
             model.Path = parent.ToLower();
 
+            Property currProp = null;
+
             Xmtool.Xml().Iterate(modelFilePath, (nodeInfo) =>
             {
                 if (nodeInfo.Path == "/model")
@@ -693,7 +695,7 @@ namespace CodeM.Common.Orm
                             if (p.Type == typeof(DynamicObjectExt))
                             {
                                 p.Length = 512;
-                            } 
+                            }
                             else if (p.Type == typeof(Model))
                             {
                                 dcps.LengthNotSet = true;
@@ -949,9 +951,77 @@ namespace CodeM.Common.Orm
                         {
                             sDelayCheckProperties.TryAdd(p, dcps);
                         }
+
+                        currProp = p;
+                    }
+                    else
+                    {
+                        currProp = null;
                     }
                 }
+                else if (nodeInfo.Path == "/model/property/rule")
+                {
+                    if (!nodeInfo.IsEndNode)
+                    {
+                        PropertyRule rule = new PropertyRule();
 
+                        string patternStr = nodeInfo.GetAttribute("pattern");
+                        if (patternStr != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(patternStr))
+                            {
+                                throw new Exception("pattern属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+
+                            RulePattern pattern;
+                            if (Enum.TryParse<RulePattern>(patternStr, true, out pattern))
+                            {
+                                rule.Pattern = pattern;
+                            }
+                        }
+
+                        string regexStr = nodeInfo.GetAttribute("regex");
+                        if (regexStr != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(regexStr))
+                            {
+                                throw new Exception("regex属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+
+                            rule.Regex = new Regex(regexStr, RegexOptions.Compiled);
+                        }
+
+                        string validationStr = nodeInfo.GetAttribute("validation");
+                        if (validationStr != null)
+                        {
+                            validationStr = validationStr.Trim();
+                            if (validationStr.Length > 4 &&
+                                validationStr.StartsWith("{{") &&
+                                validationStr.EndsWith("}}"))
+                            {
+                                rule.ValidationProcessor = validationStr.Substring(2, validationStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("validation属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string messageStr = nodeInfo.GetAttribute("message");
+                        if (messageStr != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(messageStr))
+                            {
+                                throw new Exception("message属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+
+                            rule.Message = messageStr;
+                        }
+
+                        currProp.Rules.Add(rule);
+                    }
+                }
+                
                 return true;
             });
             return model;

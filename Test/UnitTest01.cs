@@ -56,7 +56,7 @@ namespace UnitTest
         {
             Model m = Derd.Model("Person");
             Assert.IsNotNull(m);
-            Assert.AreEqual(9, m.PropertyCount);
+            Assert.AreEqual(10, m.PropertyCount);
             Assert.AreEqual<string>(m.Table, "t_person");
         }
 
