@@ -1231,6 +1231,7 @@ namespace CodeM.Common.Orm
             }
             return result;
         }
+
         private bool _HasBeforeUpdateProcessor()
         {
             return !string.IsNullOrWhiteSpace(BeforeUpdateProcessor);
@@ -1339,20 +1340,32 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private void _CalcBeforeDeleteProcessor(string type, dynamic obj)
+        private bool _HasBeforeDeleteProcessor()
         {
-            if (!string.IsNullOrWhiteSpace(BeforeDeleteProcessor))
-            {
-                Processor.CallPropertyProcessor(BeforeDeleteProcessor, this, type, obj);
-            }
+            return !string.IsNullOrWhiteSpace(BeforeDeleteProcessor);
         }
 
-        private void _CalcAfterDeleteProcessor(string type, dynamic obj)
+        private bool _CalcBeforeDeleteProcessor(dynamic obj, DbTransaction trans)
         {
-            if (!string.IsNullOrWhiteSpace(AfterDeleteProcessor))
+            if (_HasBeforeDeleteProcessor())
             {
-                Processor.CallPropertyProcessor(AfterDeleteProcessor, this, type, obj);
+                return Processor.CallModelProcessor(BeforeDeleteProcessor, this, obj, trans);
             }
+            return true;
+        }
+
+        private bool _HasAfterDeleteProcessor()
+        {
+            return !string.IsNullOrWhiteSpace(AfterDeleteProcessor);
+        }
+
+        private bool _CalcAfterDeleteProcessor(dynamic obj, DbTransaction trans)
+        {
+            if (_HasAfterDeleteProcessor())
+            {
+                return Processor.CallModelProcessor(AfterDeleteProcessor, this, obj, trans);
+            }
+            return true;
         }
 
         public bool Delete(bool deleteAll = false)
@@ -1363,6 +1376,13 @@ namespace CodeM.Common.Orm
         public bool Delete(int? transCode, bool deleteAll = false)
         {
             DbTransaction trans = null;
+
+            bool haveUserTransCode = !(transCode == null);
+            if ((_HasBeforeDeleteProcessor() || _HasAfterDeleteProcessor()) && !haveUserTransCode)
+            {
+                transCode = Derd.GetTransaction(Path);
+            }
+
             if (transCode != null)
             {
                 trans = Derd.GetTransaction(transCode.Value);
@@ -1372,6 +1392,7 @@ namespace CodeM.Common.Orm
                 }
             }
 
+            bool bRet = true;
             try
             {
                 if (mFilter.IsEmpty() && !deleteAll)
@@ -1389,22 +1410,40 @@ namespace CodeM.Common.Orm
 
                 Derd.PrintSQL(sql, where.Params.ToArray());
 
-                bool bRet = false;
                 dynamic mixedValues = MixActionValues(where.FilterProperties);
-                _CalcBeforeDeleteProcessor("beforeDelete", mixedValues);
-                if (trans == null)
+                bRet = _CalcBeforeDeleteProcessor(mixedValues, trans);
+                if (bRet)
                 {
-                    bRet = CommandUtils.ExecuteNonQuery(this, Path, sql, where.Params.ToArray()) > 0;
+                    if (trans == null)
+                    {
+                        bRet = CommandUtils.ExecuteNonQuery(this, Path, sql, where.Params.ToArray()) > 0;
+                    }
+                    else
+                    {
+                        bRet = CommandUtils.ExecuteNonQuery(this, trans, sql, where.Params.ToArray()) > 0;
+                    }
+
+                    if (bRet)
+                    {
+                        _CalcAfterDeleteProcessor(mixedValues, trans);
+                    }
                 }
-                else
-                {
-                    bRet = CommandUtils.ExecuteNonQuery(this, trans, sql, where.Params.ToArray()) > 0;
-                }
-                _CalcAfterDeleteProcessor("afterDelete", mixedValues);
                 return bRet;
             }
             finally
             {
+                if (trans != null && !haveUserTransCode)
+                {
+                    if (bRet)
+                    {
+                        Derd.CommitTransaction(transCode.Value);
+                    }
+                    else
+                    {
+                        Derd.RollbackTransaction(transCode.Value);
+                    }
+                }
+
                 Reset();
             }
         }

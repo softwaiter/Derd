@@ -29,8 +29,8 @@
 
   <ItemGroup>
     <PackageReference Include="CodeM.Common.DbHelper" Version="1.1.0" />
-    <PackageReference Include="Wukong" Version="2.0.0" />
-    <PackageReference Include="Xmtool" Version="2.0.2" />
+    <PackageReference Include="Wukong" Version="2.0.5" />
+    <PackageReference Include="Xmtool" Version="2.0.3" />
   </ItemGroup>
 
   <ItemGroup>
