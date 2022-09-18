@@ -2,6 +2,6 @@
 {
     public interface IRuleProcessor
     {
-        public bool Validate(Model modelDefine, dynamic modelObj);
+        public void Validate(Property prop, dynamic value);
     }
 }

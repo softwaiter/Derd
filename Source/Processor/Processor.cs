@@ -29,7 +29,9 @@ namespace CodeM.Common.Orm
             object inst = Wukong.GetSingleObject(classname);
             if (inst != null)
             {
-                if (inst is IPropertyProcessor || inst is IModelProcessor)
+                if (inst is IRuleProcessor ||
+                    inst is IPropertyProcessor ||
+                    inst is IModelProcessor)
                 {
                     sProcessorImpls.AddOrUpdate(name.ToLower(), inst, (key, value) =>
                     {
@@ -40,6 +42,22 @@ namespace CodeM.Common.Orm
                 throw new Exception(string.Concat("无效的Processor：", classname));
             }
             throw new Exception(string.Concat("Processor实现未找到：", classname));
+        }
+
+        public static void CallRuleProcessor(string processorName,
+            Property prop, dynamic value)
+        {
+            dynamic inst;
+            if (sProcessorImpls.TryGetValue(processorName.ToLower(), out inst))
+            {
+                if (inst is IRuleProcessor)
+                {
+                    ((IRuleProcessor)inst).Validate(prop, value);
+                    return;
+                }
+                throw new Exception(string.Concat("无效的RuleProcessor：", processorName));
+            }
+            throw new Exception(string.Concat("Processor不存在：", processorName));
         }
 
         public static object CallPropertyProcessor(string processorName, 

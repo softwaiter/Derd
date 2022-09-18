@@ -366,11 +366,25 @@ namespace CodeM.Common.Orm
             }
         }
 
+        private void _CheckPropertyRules(Property p, object value)
+        {
+            if (p.Rules.Count > 0 && value != null &&
+                !string.IsNullOrWhiteSpace(value.ToString()))
+            {
+                string valueStr = value.ToString();
+                foreach (PropertyRule rule in p.Rules)
+                {
+                    rule.Validate(p, value);
+                }
+            }
+        }
+
         private void _CheckModelConstraint(string name, object value)
         {
             Property p = GetProperty(name);
             _CheckPropertyType(p, value);
             _CheckPropertyValue(p, value);
+            _CheckPropertyRules(p, value);
         }
 
         public Model SetValue(string name, object value, bool validate = false)

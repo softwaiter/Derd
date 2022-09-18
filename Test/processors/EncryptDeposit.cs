@@ -1,6 +1,6 @@
 ﻿using CodeM.Common.Orm;
 
-namespace UnitTest.Processors
+namespace Test.Processors
 {
     public class EncryptDeposit : IPropertyProcessor
     {
