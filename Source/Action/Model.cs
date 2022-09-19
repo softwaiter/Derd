@@ -352,7 +352,18 @@ namespace CodeM.Common.Orm
                 }
                 else if (FieldUtils.IsNumeric(p.FieldType))
                 {
-                    double dValue = double.Parse(value.ToString());
+                    string valueStr = value.ToString();
+
+                    if (FieldUtils.IsFloat(p.FieldType) && p.Precision > 0)
+                    {
+                        int pos = valueStr.IndexOf(".");
+                        if (valueStr.Length - pos - 1 > p.Precision)
+                        {
+                            throw new Exception(string.Concat(p.Name, "精度取值范围为小数点后2位小数：", valueStr));
+                        }
+                    }
+
+                    double dValue = double.Parse(valueStr);
                     if (p.MinValue != null)
                     {
                         if (dValue < p.MinValue)

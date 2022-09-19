@@ -1,6 +1,5 @@
 ﻿using CodeM.Common.Orm;
 using CodeM.Common.Tools.DynamicObject;
-using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -79,15 +78,35 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
-        [Description("查询用户wangxm的Deposit属性，应为99999999。")]
+        [Description("设置Deposit属性值为10000000.235，精度超过配置值2，应报错。")]
         public void Test5()
+        {
+            try
+            {
+                dynamic newuser = new DynamicObjectExt();
+                newuser.Name = "huxy";
+                newuser.Age = 18;
+                newuser.Org = "XXTech";
+                newuser.Deposit = 10000000.235;
+                newuser.IsAdmin = false;
+                Derd.Model("Person").SetValues(newuser, true).Save();
+                Assert.Fail();
+            }
+            catch
+            {
+                Assert.IsTrue(true);
+            }
+        }
+
+        [Description("查询用户wangxm的Deposit属性，应为99999999。")]
+        public void Test6()
         {
             List<dynamic> result = Derd.Model("Person").Equals("Name", "wangxm").Top(1).Query();
             Assert.AreEqual(result[0].Deposit, 99999999);
         }
 
         [Description("修改用户wangxm的年龄为20，beforeSave处理的作用，UpdateTime应更新，此时大于CreateTime。")]
-        public void Test6()
+        public void Test7()
         {
             Thread.Sleep(3000);
 
