@@ -702,6 +702,22 @@ namespace CodeM.Common.Orm
                             }
                         }
 
+                        string minLenStr = nodeInfo.GetAttribute("minLength");
+                        if (minLenStr != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(minLenStr))
+                            {
+                                throw new Exception("minLength属性不能为空。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+
+                            if (!Xmtool.Regex().IsPositiveInteger(minLenStr))
+                            {
+                                throw new Exception("minLength属性必须是有效正整数。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+
+                            p.MinLength = int.Parse(minLenStr);
+                        }
+
                         string lengthStr = nodeInfo.GetAttribute("length");
                         if (lengthStr != null)
                         {

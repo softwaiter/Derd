@@ -338,8 +338,13 @@ namespace CodeM.Common.Orm
             }
             else
             {
-                if (p.RealType == typeof(string) && p.Length > 0)
+                if (p.RealType == typeof(string))
                 {
+                    if (p.MinLength > 0 && value.ToString().Length < p.MinLength)
+                    {
+                        throw new Exception(string.Concat(p.Name, "属性值最小长度不能小于", p.Length));
+                    }
+
                     if (value.ToString().Length > p.Length)
                     {
                         throw new Exception(string.Concat(p.Name, "属性值最大长度不能超过", p.Length));

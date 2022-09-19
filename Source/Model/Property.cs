@@ -66,6 +66,11 @@ namespace CodeM.Common.Orm
         public bool IsNotNull { get; set; } = false;
 
         /// <summary>
+        /// 属性值的最小长度，默认为0，不限制
+        /// </summary>
+        public long MinLength { get; set; } = 0;
+
+        /// <summary>
         /// 属性值的最大长度，默认为0，不限制
         /// </summary>
         public long Length { get; set; } = 0;
@@ -290,6 +295,7 @@ namespace CodeM.Common.Orm
             cloneObj.Field = this.Field;
             cloneObj.FieldType = this.FieldType;
             cloneObj.Description = this.Description;
+            cloneObj.MinLength = this.MinLength;
             cloneObj.Length = this.Length;
             cloneObj.MinValue = this.MinValue;
             cloneObj.MaxValue = this.MaxValue;
