@@ -1,4 +1,5 @@
-﻿using CodeM.Common.Orm.Dialect;
+﻿using CodeM.Common.Ioc;
+using CodeM.Common.Orm.Dialect;
 using CodeM.Common.Tools;
 using CodeM.Common.Tools.DynamicObject;
 using System;
@@ -114,6 +115,12 @@ namespace CodeM.Common.Orm
                 throw new Exception("模型定义根目录必须配置数据库连接.connection.xml文件。");
             }
 
+            FileInfo fiProcessor = new FileInfo(Path.Combine(di.FullName, ".processor.xml"));
+            if (fiProcessor.Exists)
+            {
+                ParseProcessorFile(fiProcessor);
+            }
+
             IEnumerable<FileInfo> modelFiles = di.EnumerateFiles("*.model.xml", SearchOption.TopDirectoryOnly);
             IEnumerator<FileInfo> modelFilesEnumerator = modelFiles.GetEnumerator();
             while (modelFilesEnumerator.MoveNext())
@@ -132,14 +139,6 @@ namespace CodeM.Common.Orm
                     string.Concat(parent, subDirsEnumerator.Current.Name, "/"),
                     increment);
             }
-        }
-
-        private static void ParseConnectionFile(FileInfo connectionFile, string parent)
-        {
-            string connectionFilePath = connectionFile.FullName;
-            ConnectionSetting conn = ParseConnectionSetting(connectionFilePath);
-            conn.DataSource = parent.ToLower();
-            ConnectionUtils.AddConnection(parent, conn);
         }
 
         private static bool ModelFileIsModified(FileInfo modelFile)
@@ -184,6 +183,13 @@ namespace CodeM.Common.Orm
         private static Regex reBool = new Regex("^(true|false)$", RegexOptions.IgnoreCase);
 
         #region 解析Connection定义文件
+        private static void ParseConnectionFile(FileInfo connectionFile, string parent)
+        {
+            string connectionFilePath = connectionFile.FullName;
+            ConnectionSetting conn = ParseConnectionSetting(connectionFilePath);
+            conn.DataSource = parent.ToLower();
+            ConnectionUtils.AddConnection(parent, conn);
+        }
 
         private static ConnectionSetting ParseConnectionSetting(string connectionFilePath)
         {
@@ -263,6 +269,28 @@ namespace CodeM.Common.Orm
                 return true;
             });
             return result;
+        }
+        #endregion
+
+        #region 解析Processor定义文件
+        private static void ParseProcessorFile(FileInfo processorFile)
+        {
+            string processorFilePath = processorFile.FullName;
+            Wukong.LoadConfig(processorFilePath, "/processors/processor");
+            
+            Xmtool.Xml().Iterate(processorFilePath, (nodeInfo) =>
+            {
+                if (!nodeInfo.IsEndNode)
+                {
+                    if (nodeInfo.Path == "/processors/processor")
+                    {
+                        string processorId = nodeInfo.GetAttribute("id");
+                        object inst = Wukong.GetSingleObjectById(processorId);
+                        Processor.Register(processorId, inst);
+                    }
+                }
+                return true;
+            });
         }
         #endregion
 

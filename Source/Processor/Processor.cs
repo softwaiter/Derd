@@ -24,24 +24,29 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public static void Register(string name, string classname)
+        public static void Register(string name, object processorInst)
         {
-            object inst = Wukong.GetSingleObject(classname);
-            if (inst != null)
+            if (processorInst != null)
             {
-                if (inst is IRuleProcessor ||
-                    inst is IPropertyProcessor ||
-                    inst is IModelProcessor)
+                if (processorInst is IRuleProcessor ||
+                    processorInst is IPropertyProcessor ||
+                    processorInst is IModelProcessor)
                 {
-                    sProcessorImpls.AddOrUpdate(name.ToLower(), inst, (key, value) =>
+                    sProcessorImpls.AddOrUpdate(name.ToLower(), processorInst, (key, value) =>
                     {
-                        return inst;
+                        return processorInst;
                     });
                     return;
                 }
-                throw new Exception(string.Concat("无效的Processor：", classname));
+                throw new Exception(string.Concat("无效的Processor：", name));
             }
-            throw new Exception(string.Concat("Processor实现未找到：", classname));
+            throw new Exception(string.Concat("Processor实现未找到：", name));
+        }
+
+        public static void Register(string name, string classname)
+        {
+            object inst = Wukong.GetSingleObject(classname);
+            Register(name, inst);
         }
 
         public static void CallRuleProcessor(string processorName,

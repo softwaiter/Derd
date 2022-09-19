@@ -14,7 +14,6 @@ namespace Test
         {
             Derd.RegisterProcessor("EncryptDeposit", "Test.Processors.EncryptDeposit");
             Derd.RegisterProcessor("DecryptDeposit", "Test.Processors.DecryptDeposit");
-            Derd.RegisterProcessor("OrgExists", "Test.Processors.OrgExists");
 
             string modelPath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\models");
             Derd.ModelPath = modelPath;
