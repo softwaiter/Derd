@@ -13,13 +13,23 @@ namespace CodeM.Common.Orm
         public static string ModelPath { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "models");
 
         /// <summary>
-        /// 注册属性Processor
+        /// 使用类名称注册Processor
         /// </summary>
         /// <param name="name"></param>
         /// <param name="classname"></param>
         public static void RegisterProcessor(string name, string classname)
         {
             Processor.Register(name, classname);
+        }
+
+        /// <summary>
+        /// 使用类对象实例注册Processor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="inst"></param>
+        public static void RegisterProcessor(string name, object inst)
+        {
+            Processor.Register(name, inst);
         }
 
         /// <summary>

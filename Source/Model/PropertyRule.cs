@@ -12,7 +12,8 @@ namespace CodeM.Common.Orm
         Url = 3,
         Mobile = 4,
         Telephone = 5,
-        IDCard = 6
+        IDCard = 6,
+        Account = 7
     }
 
     [Serializable]
@@ -37,14 +38,22 @@ namespace CodeM.Common.Orm
                         bRet = Xmtool.Regex().IsEmail(value.ToString());
                         break;
                     case RulePattern.IP:
+                        bRet = Xmtool.Regex().IsIP(value.ToString());
                         break;
                     case RulePattern.Url:
+                        bRet = Xmtool.Regex().IsUrl(value.ToString());
                         break;
                     case RulePattern.Mobile:
+                        bRet = Xmtool.Regex().IsMobile(value.ToString());
                         break;
                     case RulePattern.Telephone:
+                        bRet = Xmtool.Regex().IsTelephone(value.ToString());
                         break;
                     case RulePattern.IDCard:
+                        bRet = Xmtool.Regex().IsIDCard(value.ToString());
+                        break;
+                    case RulePattern.Account:
+                        bRet = Xmtool.Regex().IsAccount(value.ToString());
                         break;
                     default:
                         break;
