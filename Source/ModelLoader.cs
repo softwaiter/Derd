@@ -1007,6 +1007,11 @@ namespace CodeM.Common.Orm
                             }
                         }
 
+                        if (patternStr == null && regexStr == null && validationStr == null)
+                        {
+                            throw new Exception("Rule必须设置至少一个规则：pattern、regex、validation。" + modelFilePath + " - Line " + nodeInfo.Line);
+                        }
+
                         string messageStr = nodeInfo.GetAttribute("message");
                         if (messageStr != null)
                         {
