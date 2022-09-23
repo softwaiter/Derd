@@ -925,31 +925,31 @@ namespace CodeM.Common.Orm
                             p.DefaultValue = defaultStr.Trim();
                         }
 
-                        string beforeProcStr = nodeInfo.GetAttribute("beforeSave");
-                        if (beforeProcStr != null)
+                        string preSaveStr = nodeInfo.GetAttribute("preSave");
+                        if (preSaveStr != null)
                         {
-                            beforeProcStr = beforeProcStr.Trim();
-                            if (beforeProcStr.Length > 4 &&
-                                beforeProcStr.StartsWith("{{") &&
-                                beforeProcStr.EndsWith("}}"))
+                            preSaveStr = preSaveStr.Trim();
+                            if (preSaveStr.Length > 4 &&
+                                preSaveStr.StartsWith("{{") &&
+                                preSaveStr.EndsWith("}}"))
                             {
-                                p.BeforeSaveProcessor = beforeProcStr.Substring(2, beforeProcStr.Length - 4);
+                                p.PreSaveProcessor = preSaveStr.Substring(2, preSaveStr.Length - 4);
                             }
                             else
                             {
-                                throw new Exception("beforeSave属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                                throw new Exception("preSave属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
                         }
 
-                        string afterProcStr = nodeInfo.GetAttribute("afterQuery");
-                        if (afterProcStr != null)
+                        string postQueryStr = nodeInfo.GetAttribute("postQuery");
+                        if (postQueryStr != null)
                         {
-                            afterProcStr = afterProcStr.Trim();
-                            if (afterProcStr.Length > 4 &&
-                                afterProcStr.StartsWith("{{") &&
-                                afterProcStr.EndsWith("}}"))
+                            postQueryStr = postQueryStr.Trim();
+                            if (postQueryStr.Length > 4 &&
+                                postQueryStr.StartsWith("{{") &&
+                                postQueryStr.EndsWith("}}"))
                             {
-                                p.AfterQueryProcessor = afterProcStr.Substring(2, afterProcStr.Length - 4);
+                                p.PostQueryProcessor = postQueryStr.Substring(2, postQueryStr.Length - 4);
                             }
                             else
                             {

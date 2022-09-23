@@ -1,7 +1,6 @@
 ﻿using CodeM.Common.Ioc;
 using System;
 using System.Collections.Concurrent;
-using System.Data.Common;
 
 namespace CodeM.Common.Orm
 {
@@ -81,7 +80,7 @@ namespace CodeM.Common.Orm
         }
 
         public static bool CallModelProcessor(string processorName,
-            Model modelDefine, dynamic modelObj, DbTransaction trans = null)
+            Model modelDefine, dynamic modelObj, int? trans = null)
         {
             dynamic inst;
             if (sProcessorImpls.TryGetValue(processorName.ToLower(), out inst))

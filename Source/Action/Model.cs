@@ -331,7 +331,7 @@ namespace CodeM.Common.Orm
             {
                 if (p.IsNotNull && !p.AutoIncrement &&
                     string.IsNullOrWhiteSpace(p.DefaultValue) &&
-                    !p.NeedCalcBeforeSave)
+                    !p.NeedCalcPreSaveProcessor)
                 {
                     throw new Exception("属性值不允许为空：" + p.Name);
                 }
@@ -1134,11 +1134,11 @@ namespace CodeM.Common.Orm
             return Derd.GetTransaction(this.Path);
         }
 
-        private void _CalcBeforeSaveProperties()
+        private void _CalcPreSaveProperties()
         {
-            foreach (Property p in mBeforeSavePropeties)
+            foreach (Property p in mPreSavePropeties)
             {
-                object value = p.DoBeforeSaveProcessor(mSetValues);
+                object value = p.DoPreSaveProcessor(mSetValues);
                 if (!NotSet.IsNotSetValue(value))
                 {
                     SetValue(p.Name, value);
@@ -1151,11 +1151,18 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(BeforeNewProcessor);
         }
 
-        private bool _CalcBeforeNewProcessor(dynamic obj, DbTransaction trans)
+        private bool _CalcBeforeNewProcessor(dynamic obj, int? transCode = null)
         {
             if (_HasBeforeNewProcessor())
             {
-                return Processor.CallModelProcessor(BeforeNewProcessor, this, obj, trans);
+                try
+                {
+                    return Processor.CallModelProcessor(BeforeNewProcessor, this, obj, transCode);
+                }
+                catch
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -1165,11 +1172,18 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(AfterNewProcessor);
         }
 
-        private bool _CalcAfterNewProcessor(dynamic obj, DbTransaction trans)
+        private bool _CalcAfterNewProcessor(dynamic obj, int? transCode = null)
         {
             if (_HasAfterNewProcessor())
             {
-                return Processor.CallModelProcessor(AfterNewProcessor, this, obj, trans);
+                try
+                {
+                    return Processor.CallModelProcessor(AfterNewProcessor, this, obj, transCode);
+                }
+                catch
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -1193,7 +1207,7 @@ namespace CodeM.Common.Orm
                 }
             }
 
-            bool bRet = true;
+            bool bRet = false;
             try
             {
                 if (mSetValues == null)
@@ -1201,12 +1215,12 @@ namespace CodeM.Common.Orm
                     throw new Exception("没有任何要保存的内容，请通过SetValue设置内容。");
                 }
 
-                _CalcBeforeSaveProperties();
+                _CalcPreSaveProperties();
 
                 CommandSQL cmd = SQLBuilder.BuildInsertSQL(this);
                 Derd.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
-                bRet = _CalcBeforeNewProcessor(mSetValues, trans);
+                bRet = _CalcBeforeNewProcessor(mSetValues, transCode);
                 if (bRet)
                 {
                     if (trans == null)
@@ -1220,7 +1234,7 @@ namespace CodeM.Common.Orm
 
                     if (bRet)
                     {
-                        bRet = _CalcAfterNewProcessor(mSetValues, trans);
+                        bRet = _CalcAfterNewProcessor(mSetValues, transCode);
                     }
                 }
                 return bRet;
@@ -1267,11 +1281,18 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(BeforeUpdateProcessor);
         }
 
-        private bool _CalcBeforeUpdateProcessor(dynamic obj, DbTransaction trans)
+        private bool _CalcBeforeUpdateProcessor(dynamic obj, int? transCode = null)
         {
             if (_HasBeforeUpdateProcessor())
             {
-                return Processor.CallModelProcessor(BeforeUpdateProcessor, this, obj, trans);
+                try
+                {
+                    return Processor.CallModelProcessor(BeforeUpdateProcessor, this, obj, transCode);
+                }
+                catch
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -1281,11 +1302,18 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(AfterUpdateProcessor);
         }
 
-        private bool _CalcAfterUpdateProcessor(dynamic obj, DbTransaction trans)
+        private bool _CalcAfterUpdateProcessor(dynamic obj, int? transCode = null)
         {
             if (_HasAfterUpdateProcessor())
             {
-                return Processor.CallModelProcessor(AfterUpdateProcessor, this, obj, trans);
+                try
+                {
+                    return Processor.CallModelProcessor(AfterUpdateProcessor, this, obj, transCode);
+                }
+                catch
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -1314,7 +1342,7 @@ namespace CodeM.Common.Orm
                 }
             }
 
-            bool bRet = true;
+            bool bRet = false;
             try
             {
                 if (mSetValues == null)
@@ -1327,13 +1355,13 @@ namespace CodeM.Common.Orm
                     throw new Exception("未设置更新的条件范围。");
                 }
 
-                _CalcBeforeSaveProperties();
+                _CalcPreSaveProperties();
 
                 CommandSQL cmd = SQLBuilder.BuildUpdateSQL(this);
                 Derd.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
                 dynamic mixedValues = MixActionValues(cmd.FilterProperties);
-                bRet = _CalcBeforeUpdateProcessor(mixedValues, trans);
+                bRet = _CalcBeforeUpdateProcessor(mixedValues, transCode);
                 if (bRet)
                 {
                     if (trans == null)
@@ -1347,7 +1375,7 @@ namespace CodeM.Common.Orm
 
                     if (bRet)
                     {
-                        bRet = _CalcAfterUpdateProcessor(mixedValues, trans);
+                        bRet = _CalcAfterUpdateProcessor(mixedValues, transCode);
                     }
                 }
                 return bRet;
@@ -1375,11 +1403,18 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(BeforeDeleteProcessor);
         }
 
-        private bool _CalcBeforeDeleteProcessor(dynamic obj, DbTransaction trans)
+        private bool _CalcBeforeDeleteProcessor(dynamic obj, int? transCode = null)
         {
             if (_HasBeforeDeleteProcessor())
             {
-                return Processor.CallModelProcessor(BeforeDeleteProcessor, this, obj, trans);
+                try
+                {
+                    return Processor.CallModelProcessor(BeforeDeleteProcessor, this, obj, transCode);
+                }
+                catch
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -1389,11 +1424,18 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(AfterDeleteProcessor);
         }
 
-        private bool _CalcAfterDeleteProcessor(dynamic obj, DbTransaction trans)
+        private bool _CalcAfterDeleteProcessor(dynamic obj, int? transCode)
         {
             if (_HasAfterDeleteProcessor())
             {
-                return Processor.CallModelProcessor(AfterDeleteProcessor, this, obj, trans);
+                try
+                {
+                    return Processor.CallModelProcessor(AfterDeleteProcessor, this, obj, transCode);
+                }
+                catch
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -1422,7 +1464,7 @@ namespace CodeM.Common.Orm
                 }
             }
 
-            bool bRet = true;
+            bool bRet = false;
             try
             {
                 if (mFilter.IsEmpty() && !deleteAll)
@@ -1441,7 +1483,7 @@ namespace CodeM.Common.Orm
                 Derd.PrintSQL(sql, where.Params.ToArray());
 
                 dynamic mixedValues = MixActionValues(where.FilterProperties);
-                bRet = _CalcBeforeDeleteProcessor(mixedValues, trans);
+                bRet = _CalcBeforeDeleteProcessor(mixedValues, transCode);
                 if (bRet)
                 {
                     if (trans == null)
@@ -1455,7 +1497,7 @@ namespace CodeM.Common.Orm
 
                     if (bRet)
                     {
-                        _CalcAfterDeleteProcessor(mixedValues, trans);
+                        _CalcAfterDeleteProcessor(mixedValues, transCode);
                     }
                 }
                 return bRet;
@@ -1634,10 +1676,10 @@ namespace CodeM.Common.Orm
                                     }
                                 }
 
-                                if (!HaveOperation(gvs) && p.NeedCalcAfterQuery)
+                                if (!HaveOperation(gvs) && p.NeedCalcPostQueryProcessor)
                                 {
                                     object input = obj.HasPath(gvs.OutputName) ? obj.GetValueByPath(gvs.OutputName) : null;
-                                    dynamic value = Processor.CallPropertyProcessor(p.AfterQueryProcessor, this, gvs.Name, input);
+                                    dynamic value = p.DoPostQueryProcessor(input);
                                     if (!NotSet.IsNotSetValue(value))
                                     {
                                         if (value != null)
@@ -1683,10 +1725,10 @@ namespace CodeM.Common.Orm
                                             }
                                         }
 
-                                        if (!HaveOperation(gvs) && lastProp.NeedCalcAfterQuery)
+                                        if (!HaveOperation(gvs) && lastProp.NeedCalcPostQueryProcessor)
                                         {
                                             object input = obj.HasPath(gvs.OutputName) ? obj.GetValueByPath(gvs.OutputName) : null;
-                                            object value = Processor.CallPropertyProcessor(lastProp.AfterQueryProcessor, currM, lastName, input);
+                                            object value = lastProp.DoPostQueryProcessor(input);
                                             if (!NotSet.IsNotSetValue(value))
                                             {
                                                 if (value != null)

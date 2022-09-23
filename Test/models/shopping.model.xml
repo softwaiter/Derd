@@ -6,5 +6,5 @@
     <property name="Desc" length="128" desc="商品说明" />
     <property name="Order" length="32" notNull="true" indexGroup="idx_order_code" desc="订单号" />
     <property name="CreateTime" type="DateTime" field="f_createtime" defaultValue="{{CurrentDateTime}}" joinUpdate="false" desc="创建时间" />
-    <property name="UpdateTime" type="DateTime" field="f_updatetime" beforeSave="{{CurrentDateTime}}" desc="更新时间" />
+    <property name="UpdateTime" type="DateTime" field="f_updatetime" preSave="{{CurrentDateTime}}" desc="更新时间" />
 </model>

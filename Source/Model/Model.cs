@@ -19,7 +19,7 @@ namespace CodeM.Common.Orm
         private ConcurrentDictionary<string, string> mUniqueConstraints = new ConcurrentDictionary<string, string>();
         private ConcurrentDictionary<string, string> mIndexSettings = new ConcurrentDictionary<string, string>();
 
-        private List<Property> mBeforeSavePropeties = new List<Property>();
+        private List<Property> mPreSavePropeties = new List<Property>();
 
         public string Path { get; set; }
 
@@ -83,9 +83,9 @@ namespace CodeM.Common.Orm
                     });
                 }
 
-                if (!string.IsNullOrWhiteSpace(p.BeforeSaveProcessor))
+                if (!string.IsNullOrWhiteSpace(p.PreSaveProcessor))
                 {
-                    mBeforeSavePropeties.Add(p);
+                    mPreSavePropeties.Add(p);
                 }
 
                 return true;

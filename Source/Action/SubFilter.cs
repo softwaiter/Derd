@@ -274,7 +274,7 @@ namespace CodeM.Common.Orm
                         result.ForeignTables.AddRange(orActionSQL.ForeignTables);
                         break;
                     case FilterOperator.Equals:
-                        if (!p.NeedCalcBeforeSave)
+                        if (!p.NeedCalcPreSaveProcessor)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 expr.Value, dbType, ParameterDirection.Input);
@@ -284,13 +284,13 @@ namespace CodeM.Common.Orm
                             dynamic inputObj = new DynamicObjectExt();
                             inputObj.SetValue(p.Name, expr.Value);
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "=", paramPlaceholder);
                         break;
                     case FilterOperator.NotEquals:
-                        if (!p.NeedCalcBeforeSave)
+                        if (!p.NeedCalcPreSaveProcessor)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 expr.Value, dbType, ParameterDirection.Input);
@@ -300,13 +300,13 @@ namespace CodeM.Common.Orm
                             dynamic inputObj = new DynamicObjectExt();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "<>", paramPlaceholder);
                         break;
                     case FilterOperator.Gt:
-                        if (!p.NeedCalcBeforeSave)
+                        if (!p.NeedCalcPreSaveProcessor)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 expr.Value, dbType, ParameterDirection.Input);
@@ -316,13 +316,13 @@ namespace CodeM.Common.Orm
                             dynamic inputObj = new DynamicObjectExt();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], ">", paramPlaceholder);
                         break;
                     case FilterOperator.Gte:
-                        if (!p.NeedCalcBeforeSave)
+                        if (!p.NeedCalcPreSaveProcessor)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 expr.Value, dbType, ParameterDirection.Input);
@@ -332,13 +332,13 @@ namespace CodeM.Common.Orm
                             dynamic inputObj = new DynamicObjectExt();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], ">=", paramPlaceholder);
                         break;
                     case FilterOperator.Lt:
-                        if (!p.NeedCalcBeforeSave)
+                        if (!p.NeedCalcPreSaveProcessor)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 expr.Value, dbType, ParameterDirection.Input);
@@ -348,13 +348,13 @@ namespace CodeM.Common.Orm
                             dynamic inputObj = new DynamicObjectExt();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "<", paramPlaceholder);
                         break;
                     case FilterOperator.Lte:
-                        if (!p.NeedCalcBeforeSave)
+                        if (!p.NeedCalcPreSaveProcessor)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 expr.Value, dbType, ParameterDirection.Input);
@@ -364,13 +364,13 @@ namespace CodeM.Common.Orm
                             dynamic inputObj = new DynamicObjectExt();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "<=", paramPlaceholder);
                         break;
                     case FilterOperator.Like:
-                        if (!p.NeedCalcBeforeSave)
+                        if (!p.NeedCalcPreSaveProcessor)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 expr.Value, DbType.String, ParameterDirection.Input);
@@ -380,13 +380,13 @@ namespace CodeM.Common.Orm
                             dynamic inputObj = new DynamicObjectExt();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
+                                p.DoPreSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " LIKE ", paramPlaceholder);
                         break;
                     case FilterOperator.NotLike:
-                        if (!p.NeedCalcBeforeSave)
+                        if (!p.NeedCalcPreSaveProcessor)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 expr.Value, DbType.String, ParameterDirection.Input);
@@ -396,7 +396,7 @@ namespace CodeM.Common.Orm
                             dynamic inputObj = new DynamicObjectExt();
                             inputObj[p.Name] = expr.Value;
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
+                                p.DoPreSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " NOT LIKE ", paramPlaceholder);
@@ -409,7 +409,7 @@ namespace CodeM.Common.Orm
                         break;
                     case FilterOperator.Between:
                         object[] values = (object[])expr.Value;
-                        if (!p.NeedCalcBeforeSave)
+                        if (!p.NeedCalcPreSaveProcessor)
                         {
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 values[0], dbType, ParameterDirection.Input);
@@ -421,12 +421,12 @@ namespace CodeM.Common.Orm
                             dynamic inputObj = new DynamicObjectExt();
                             inputObj[p.Name] = values[0];
                             dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoBeforeSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
 
                             dynamic inputObj2 = new DynamicObjectExt();
                             inputObj2[p.Name] = values[1];
                             dp2 = DbUtils.CreateParam(currM.Path, paramName2,
-                                p.DoBeforeSaveProcessor(inputObj2), dbType, ParameterDirection.Input);
+                                p.DoPreSaveProcessor(inputObj2), dbType, ParameterDirection.Input);
                         }
                         result.Params.Add(dp);
                         result.Params.Add(dp2);

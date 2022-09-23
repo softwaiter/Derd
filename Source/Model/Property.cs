@@ -125,21 +125,21 @@ namespace CodeM.Common.Orm
         /// <summary>
         /// 存储前处理Processor，在模型保存前会先调用该处理器对属性值进行处理
         /// </summary>
-        internal string BeforeSaveProcessor { get; set; } = null;
+        internal string PreSaveProcessor { get; set; } = null;
 
-        public bool NeedCalcBeforeSave
+        public bool NeedCalcPreSaveProcessor
         {
             get
             {
-                return !string.IsNullOrWhiteSpace(BeforeSaveProcessor);
+                return !string.IsNullOrWhiteSpace(PreSaveProcessor);
             }
         }
 
-        internal object DoBeforeSaveProcessor(dynamic obj)
+        internal object DoPreSaveProcessor(dynamic obj)
         {
-            if (NeedCalcBeforeSave)
+            if (NeedCalcPreSaveProcessor)
             {
-                return Processor.CallPropertyProcessor(BeforeSaveProcessor, Owner, Name, 
+                return Processor.CallPropertyProcessor(PreSaveProcessor, Owner, Name, 
                     obj.Has(Name) ? obj[Name] : null);
             }
             return NotSet.Value;
@@ -148,22 +148,22 @@ namespace CodeM.Common.Orm
         /// <summary>
         /// 查询后处理Processor，在数据从数据库查询返回后调用该处理器对属性值进行处理
         /// </summary>
-        internal string AfterQueryProcessor { get; set; } = null;
+        internal string PostQueryProcessor { get; set; } = null;
 
-        public bool NeedCalcAfterQuery
+        public bool NeedCalcPostQueryProcessor
         {
             get
             {
-                return !string.IsNullOrWhiteSpace(AfterQueryProcessor);
+                return !string.IsNullOrWhiteSpace(PostQueryProcessor);
             }
         }
 
-        internal object DoAfterQueryProcessor(dynamic obj)
+        internal object DoPostQueryProcessor(dynamic propValue)
         {
-            if (NeedCalcAfterQuery)
+            if (NeedCalcPostQueryProcessor)
             {
-                return Processor.CallPropertyProcessor(AfterQueryProcessor, Owner, Name, 
-                    obj.Has(Name) ? obj[Name] : null);
+                return Processor.CallPropertyProcessor(
+                    PostQueryProcessor, Owner, Name, propValue);
             }
             return null;
         }
@@ -306,8 +306,8 @@ namespace CodeM.Common.Orm
             cloneObj.IndexGroup = this.IndexGroup;
             cloneObj.IsNotNull = this.IsNotNull;
             cloneObj.IsPrimaryKey = this.IsPrimaryKey;
-            cloneObj.BeforeSaveProcessor = this.BeforeSaveProcessor;
-            cloneObj.AfterQueryProcessor = this.AfterQueryProcessor;
+            cloneObj.PreSaveProcessor = this.PreSaveProcessor;
+            cloneObj.PostQueryProcessor = this.PostQueryProcessor;
             cloneObj.DefaultValue = this.DefaultValue;
             cloneObj.DefaultValueIsProcessor = this.DefaultValueIsProcessor;
             cloneObj.JoinInsert = this.JoinInsert;

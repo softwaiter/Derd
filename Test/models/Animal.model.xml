@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <model name="Animal" table="t_animal">
 	<property name="Id" field="f_id" notNull="True" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
-	<property name="Name" field="f_name" length="32" notNull="true" beforeSave="{{Upper}}" uniqueGroup="uc_name" desc="名称" />
+	<property name="Name" field="f_name" length="32" notNull="true" preSave="{{Upper}}" uniqueGroup="uc_name" desc="名称" />
 	<property name="DiscDate" field="f_discovery_date" length="32" defaultValue="{{CurrentDate}}" desc="发现日期" />
 	<property name="DiscTime" field="f_discovery_time" length="32" defaultValue="{{CurrentTime}}" desc="发现时间" />
 	<property name="Feature" type="json" />
 	<property name="CreateTime" type="DateTime" field="f_createtime" defaultValue="{{CurrentDateTime}}" joinUpdate="false" desc="创建时间" />
-	<property name="UpdateTime" type="DateTime" field="f_updatetime" beforeSave="{{CurrentDateTime}}" desc="更新时间" />
+	<property name="UpdateTime" type="DateTime" field="f_updatetime" preSave="{{CurrentDateTime}}" desc="更新时间" />
 </model>
