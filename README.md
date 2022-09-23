@@ -8,25 +8,17 @@ Derd是一个基于.net core开发的跨平台轻量级数据库操作框架。D
 #### 特点列表：
 
 * XML格式定义模型
-
+* JSON格式属性
 * 索引约束定义
-
 * 关联外键定义
-
 * 数据库事务支持
-
 * 查询方法支持链式操作
-
+* 属性值格式约束定义&校验
 * 保存前字段值自定义加工，支持动态函数处理器
-
 * 查询后字段值自定义处理，支持动态函数处理器
-
 * 新建数据保存时属性是否参与保存可设置
-
 * 更新数据保存时属性是否参与保存可设置
-
 * 默认值设置支持自定义，支持动态函数处理器
-
 * 查询返回dynamic动态对象，默认关联模型定义属性
 
 
@@ -38,7 +30,7 @@ Derd是一个基于.net core开发的跨平台轻量级数据库操作框架。D
 #### Package Manager
 
 ```shell
-Install-Package Derd -Version 2.0.0
+Install-Package Derd -Version 2.1.6
 ```
 
 
@@ -46,7 +38,7 @@ Install-Package Derd -Version 2.0.0
 #### .NET CLI
 
 ```shell
-dotnet add package Derd --version 2.0.0
+dotnet add package Derd --version 2.1.6
 ```
 
 
@@ -54,7 +46,7 @@ dotnet add package Derd --version 2.0.0
 #### PackageReference
 
 ```xml
-<PackageReference Include="Derd" Version="2.0.0" />
+<PackageReference Include="Derd" Version="2.1.6" />
 ```
 
 
@@ -62,7 +54,7 @@ dotnet add package Derd --version 2.0.0
 #### Paket CLI
 
 ```shell
-paket add Derd --version 2.0.0
+paket add Derd --version 2.1.6
 ```
 
 
@@ -204,7 +196,7 @@ User模型定义
     <property name="Deposit" field="f_deposit" type="Decimal" precision="2" beforeSave="{{EncryptDeposit}}" afterQuery="{{DecryptDeposit}}" desc="银行存款" defaultValue="12345" />
     <property name="IsAdmin" field="f_is_admin" indexGroup="idx_age" type="Boolean" desc="是否超级管理员" defaultValue="false" />
     <property name="CreateTime" type="DateTime" field="f_createtime" defaultValue="{{CurrentDateTime}}" joinUpdate="false" desc="创建时间" />
-    <property name="UpdateTime" type="DateTime" field="f_updatetime" beforeSave="{{CurrentDateTime}}" desc="更新时间" />
+    <property name="UpdateTime" type="DateTime" field="f_updatetime" preSave="{{CurrentDateTime}}" desc="更新时间" />
 </model>
 ```
 
@@ -218,15 +210,27 @@ User模型定义
 
 对应模型的物理表名称，如果未设置，将采用name属性值生成，生成规则为：t_+小写的name属性值（不包括加号）；可选。
 
-###### beforeSave
+###### beforeNew
 
-字符串，模型保存前处理器，可选。
+字符串，新建模型保存前处理器，可选。
 
 该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
 
-###### afterSave
+###### afterNew
 
-字符串，模型保存后处理器，可选。
+字符串，新建模型保存后处理器，可选。
+
+该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
+
+###### beforeUpdate
+
+字符串，修改模型保存前处理器，可选。
+
+该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
+
+###### afterUpdate
+
+字符串，修改模型保存后处理器，可选。
 
 该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
 
@@ -353,13 +357,13 @@ type属性转换表：
 
 默认值支持Processor写法，Processor具体用法参照下方的Processor说明。
 
-###### beforeSave
+###### preSave
 
 字符串，属性保存前处理器，可选。
 
 该值是一个Processor名称，Processor具体用法参照下方的Processor说明。
 
-###### afterQuery
+###### postQuery
 
 字符串，属性查询后处理器，可选。
 
