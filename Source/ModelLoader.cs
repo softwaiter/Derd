@@ -1007,7 +1007,7 @@ namespace CodeM.Common.Orm
                 {
                     if (!nodeInfo.IsEndNode)
                     {
-                        PropertyRule rule = new PropertyRule();
+                        PropertyRule rule = new PropertyRule(currProp);
 
                         string patternStr = nodeInfo.GetAttribute("pattern");
                         if (patternStr != null)

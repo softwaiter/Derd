@@ -19,6 +19,13 @@ namespace CodeM.Common.Orm
     [Serializable]
     public class PropertyRule
     {
+        private Property mProperty;
+
+        public PropertyRule(Property property)
+        {
+            mProperty = property;
+        }
+
         public RulePattern Pattern { get; set; } = RulePattern.Unset;
 
         public Regex Regex { get; set; } = null;
@@ -63,9 +70,11 @@ namespace CodeM.Common.Orm
                 {
                     if (!string.IsNullOrWhiteSpace(Message))
                     {
-                        throw new Exception(Message);
+                        throw new PropertyValidationException(Message);
                     }
-                    throw new Exception(string.Concat("不匹配的模式：", Pattern));
+
+                    string message = string.Concat(mProperty.Name, "必须匹配模式：", Pattern, "。");
+                    throw new PropertyValidationException(message);
                 }
             }
         }
@@ -78,9 +87,11 @@ namespace CodeM.Common.Orm
                 {
                     if (!string.IsNullOrWhiteSpace(Message))
                     {
-                        throw new Exception(Message);
+                        throw new PropertyValidationException(Message);
                     }
-                    throw new Exception(string.Concat("不匹配的正则表达式：", Regex));
+
+                    string message = string.Concat(mProperty.Name, "必须匹配正则表达式：", Regex, "。");
+                    throw new PropertyValidationException(message);
                 }
             }
         }
