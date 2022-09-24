@@ -49,6 +49,11 @@ namespace CodeM.Common.Orm
         /// 属性对应的数据库字段类型
         /// </summary>
         public DbType FieldType { get; set; }
+
+        /// <summary>
+        /// 属性显示名称，用于页面标签显示
+        /// </summary>
+        public string Label { get; set; }
         
         /// <summary>
         /// 属性描述
@@ -294,6 +299,7 @@ namespace CodeM.Common.Orm
             cloneObj.JoinProp = this.JoinProp;
             cloneObj.Field = this.Field;
             cloneObj.FieldType = this.FieldType;
+            cloneObj.Label = this.Label;
             cloneObj.Description = this.Description;
             cloneObj.MinLength = this.MinLength;
             cloneObj.Length = this.Length;

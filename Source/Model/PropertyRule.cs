@@ -73,7 +73,7 @@ namespace CodeM.Common.Orm
                         throw new PropertyValidationException(Message);
                     }
 
-                    string message = string.Concat(mProperty.Name, "必须匹配模式：", Pattern, "。");
+                    string message = string.Concat(mProperty.Label ?? mProperty.Name, "必须匹配模式：", Pattern, "。");
                     throw new PropertyValidationException(message);
                 }
             }
@@ -90,7 +90,7 @@ namespace CodeM.Common.Orm
                         throw new PropertyValidationException(Message);
                     }
 
-                    string message = string.Concat(mProperty.Name, "必须匹配正则表达式：", Regex, "。");
+                    string message = string.Concat(mProperty.Label ?? mProperty.Name, "必须匹配正则表达式：", Regex, "。");
                     throw new PropertyValidationException(message);
                 }
             }

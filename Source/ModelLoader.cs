@@ -831,6 +831,12 @@ namespace CodeM.Common.Orm
                             p.IsNotNull = bool.Parse(notNullStr);
                         }
 
+                        string labelStr = nodeInfo.GetAttribute("label");
+                        if (!string.IsNullOrWhiteSpace(labelStr))
+                        {
+                            p.Label = labelStr;
+                        }
+
                         string descStr = nodeInfo.GetAttribute("desc");
                         if (!string.IsNullOrEmpty(descStr))
                         {

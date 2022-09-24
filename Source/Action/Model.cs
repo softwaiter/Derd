@@ -223,7 +223,7 @@ namespace CodeM.Common.Orm
                     bool result;
                     if (!bool.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：Boolean，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：Boolean，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(byte))
@@ -231,7 +231,7 @@ namespace CodeM.Common.Orm
                     byte result;
                     if (!byte.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：Byte，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：Byte，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(sbyte))
@@ -239,7 +239,7 @@ namespace CodeM.Common.Orm
                     sbyte result;
                     if (!sbyte.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：SByte，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：SByte，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(decimal))
@@ -247,7 +247,7 @@ namespace CodeM.Common.Orm
                     decimal result;
                     if (!decimal.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：Decimal，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：Decimal，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(double))
@@ -255,7 +255,7 @@ namespace CodeM.Common.Orm
                     double result;
                     if (!double.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：Double，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：Double，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(Int16))
@@ -263,7 +263,7 @@ namespace CodeM.Common.Orm
                     Int16 result;
                     if (!Int16.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：Int16，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：Int16，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(Int32))
@@ -271,7 +271,7 @@ namespace CodeM.Common.Orm
                     Int32 result;
                     if (!Int32.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：Int32，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：Int32，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(Int64))
@@ -279,7 +279,7 @@ namespace CodeM.Common.Orm
                     Int64 result;
                     if (!Int64.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：Int64，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：Int64，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(Single))
@@ -287,7 +287,7 @@ namespace CodeM.Common.Orm
                     Single result;
                     if (!Single.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：Single，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：Single，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(UInt16))
@@ -295,7 +295,7 @@ namespace CodeM.Common.Orm
                     UInt16 result;
                     if (!UInt16.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：UInt16，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：UInt16，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(UInt32))
@@ -303,7 +303,7 @@ namespace CodeM.Common.Orm
                     UInt32 result;
                     if (!UInt32.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：UInt32，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：UInt32，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(UInt64))
@@ -311,7 +311,7 @@ namespace CodeM.Common.Orm
                     UInt64 result;
                     if (!UInt64.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：UInt64，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：UInt64，实际类型为：", value.GetType().Name));
                     }
                 }
                 else if (type == typeof(DateTime))
@@ -319,7 +319,7 @@ namespace CodeM.Common.Orm
                     DateTime result;
                     if (!DateTime.TryParse("" + value, out result))
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "期待类型：DateTime，实际类型为：", value.GetType().Name));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "期待类型：DateTime，实际类型为：", value.GetType().Name));
                     }
                 }
             }
@@ -333,7 +333,7 @@ namespace CodeM.Common.Orm
                     string.IsNullOrWhiteSpace(p.DefaultValue) &&
                     !p.NeedCalcPreSaveProcessor)
                 {
-                    throw new PropertyValidationException(string.Concat(p.Name, "不允许为空。"));
+                    throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "不允许为空。"));
                 }
             }
             else
@@ -342,12 +342,12 @@ namespace CodeM.Common.Orm
                 {
                     if (p.MinLength > 0 && value.ToString().Length < p.MinLength)
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "内容长度不能小于", p.Length, "。"));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "内容长度不能小于", p.Length, "。"));
                     }
 
                     if (value.ToString().Length > p.Length)
                     {
-                        throw new PropertyValidationException(string.Concat(p.Name, "内容长度不能超过", p.Length, "。"));
+                        throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "内容长度不能超过", p.Length, "。"));
                     }
                 }
                 else if (FieldUtils.IsNumeric(p.FieldType))
@@ -359,7 +359,7 @@ namespace CodeM.Common.Orm
                         int pos = valueStr.IndexOf(".");
                         if (valueStr.Length - pos - 1 > p.Precision)
                         {
-                            throw new PropertyValidationException(string.Concat(p.Name, "小数位数不能超过", p.Precision, "位小数。"));
+                            throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "小数位数不能超过", p.Precision, "位小数。"));
                         }
                     }
 
@@ -368,14 +368,14 @@ namespace CodeM.Common.Orm
                     {
                         if (dValue < p.MinValue)
                         {
-                            throw new PropertyValidationException(string.Concat(p.Name, "最小值不能小于", p.MinValue, "。"));
+                            throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "最小值不能小于", p.MinValue, "。"));
                         }
                     }
                     if (p.MaxValue != null)
                     {
                         if (dValue > p.MaxValue)
                         {
-                            throw new PropertyValidationException(string.Concat(p.Name, "最大值不能超过：", p.MaxValue, "。"));
+                            throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "最大值不能超过：", p.MaxValue, "。"));
                         }
                     }
                 }
