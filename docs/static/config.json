@@ -1,0 +1,58 @@
+{
+    "title": "Derd",
+    "topicWidth": 250,
+    "openLevel": 1,
+    "topics": [
+    {
+      "id": "01",
+      "name": "Derd是什么？",
+      "src": "static/what.md"
+    },
+    {
+        "id": "02",
+        "name": "开始使用",
+        "submenus": [
+        {
+            "id": "0201",
+            "name": "数据库连接",
+            "src": "static/dbconnection.md"
+        },
+        {
+            "id": "0202",
+            "name": "模型定义",
+            "src": "static/modeldefine.md"
+        },
+        {
+            "id": "0203",
+            "name": "属性类型",
+            "src": "static/propertytype.md"
+        },
+        {
+            "id": "0204",
+            "name": "模型用法",
+            "src": "static/modelusage.md"
+        },
+        {
+            "id": "0205",
+            "name": "属性约束",
+            "src": "static/propertyrule.md"
+        },
+        {
+            "id": "0206",
+            "name": "拦截器",
+            "src": "static/interceptor.md"
+        },
+        {
+            "id": "0207",
+            "name": "Processor",
+            "src": "static/processor.md"
+        },
+        {
+            "id": "0208",
+            "name": "数据库事务",
+            "src": "static/transaction.md"
+        }
+      ]
+    }
+  ]
+}
