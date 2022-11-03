@@ -185,12 +185,13 @@ namespace CodeM.Common.Orm
 
         #region ISetValue
         dynamic mSetValues;
+        List<dynamic> mBatchValues = new List<dynamic>();
 
-        internal bool TryGetValue(Property p, out object value, bool useDefaultValue = true)
+        internal bool TryGetValue(dynamic modelValues, Property p, out object value, bool useDefaultValue = true)
         {
-            if (mSetValues.Has(p.Name))
+            if (modelValues.Has(p.Name))
             {
-                value = mSetValues[p.Name];
+                value = modelValues[p.Name];
                 return true;
             }
             else if (useDefaultValue)
@@ -199,7 +200,7 @@ namespace CodeM.Common.Orm
                 {
                     if (p.DefaultValue != null)
                     {
-                        value = p.CalcDefaultValue(mSetValues);
+                        value = p.CalcDefaultValue(modelValues);
                         return true;
                     }
                 }
@@ -403,6 +404,16 @@ namespace CodeM.Common.Orm
             _CheckPropertyRules(p, value);
         }
 
+        private void _SetPropertyValue(dynamic modelValues,
+            string name, object value, bool validate = false)
+        {
+            if (validate)
+            {
+                _CheckModelConstraint(name, value);
+            }
+            modelValues.SetValue(name, value);
+        }
+
         public Model SetValue(string name, object value, bool validate = false)
         {
             if (mSetValues == null)
@@ -410,11 +421,7 @@ namespace CodeM.Common.Orm
                 mSetValues = new DynamicObjectExt();
             }
 
-            if (validate)
-            {
-                _CheckModelConstraint(name, value);
-            }
-            mSetValues.SetValue(name, value);
+            _SetPropertyValue(mSetValues, name, value, validate);
 
             return this;
         }
@@ -432,6 +439,27 @@ namespace CodeM.Common.Orm
                     }
                 }
             }
+            return this;
+        }
+
+        public Model SetBatchInsertValues(dynamic obj, bool validate = false)
+        {
+            if (obj != null)
+            {
+                if (validate)
+                {
+                    for (int i = 0; i < PropertyCount; i++)
+                    {
+                        Property p = GetProperty(i);
+                        if (obj.Has(p.Name))
+                        {
+                            _CheckModelConstraint(p.Name, obj[p.Name]);
+                        }
+                    }
+                }
+                mBatchValues.Add(obj);
+            }
+
             return this;
         }
         #endregion
@@ -1134,14 +1162,14 @@ namespace CodeM.Common.Orm
             return Derd.GetTransaction(this.Path);
         }
 
-        private void _CalcPreSaveProperties()
+        private void _CalcPreSaveProperties(dynamic modelValues)
         {
             foreach (Property p in mPreSavePropeties)
             {
-                object value = p.DoPreSaveProcessor(mSetValues);
+                object value = p.DoPreSaveProcessor(modelValues);
                 if (!NotSet.IsNotSetValue(value))
                 {
-                    SetValue(p.Name, value);
+                    _SetPropertyValue(modelValues, p.Name, value);
                 }
             }
         }
@@ -1188,7 +1216,7 @@ namespace CodeM.Common.Orm
             return true;
         }
 
-        public bool Save(int? transCode = null)
+        private bool _SaveOne(dynamic modelValues, int? transCode = null)
         {
             DbTransaction trans = null;
 
@@ -1210,17 +1238,12 @@ namespace CodeM.Common.Orm
             bool bRet = false;
             try
             {
-                if (mSetValues == null)
-                {
-                    throw new Exception("没有任何要保存的内容，请通过SetValue设置内容。");
-                }
+                _CalcPreSaveProperties(modelValues);
 
-                _CalcPreSaveProperties();
-
-                CommandSQL cmd = SQLBuilder.BuildInsertSQL(this);
+                CommandSQL cmd = SQLBuilder.BuildInsertSQL(this, modelValues);
                 Derd.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
-                bRet = _CalcBeforeNewProcessor(mSetValues, transCode);
+                bRet = _CalcBeforeNewProcessor(modelValues, transCode);
                 if (bRet)
                 {
                     if (trans == null)
@@ -1234,7 +1257,7 @@ namespace CodeM.Common.Orm
 
                     if (bRet)
                     {
-                        bRet = _CalcAfterNewProcessor(mSetValues, transCode);
+                        bRet = _CalcAfterNewProcessor(modelValues, transCode);
                     }
                 }
                 return bRet;
@@ -1254,6 +1277,123 @@ namespace CodeM.Common.Orm
                 }
 
                 Reset();
+            }
+        }
+
+        private bool _CommonSaveBatch(int? transCode)
+        {
+            DbTransaction trans = null;
+            if (transCode != null)
+            {
+                trans = Derd.GetTransaction(transCode.Value);
+                if (trans == null)
+                {
+                    throw new Exception(string.Format("未找到指定事务：{0}", transCode));
+                }
+            }
+
+            for (int i = 0; i < mBatchValues.Count; i++)
+            {
+                _CalcPreSaveProperties(mBatchValues[i]);
+            }
+
+            CommandSQL cmd = SQLBuilder.BuildBatchInsertSQL(this, mBatchValues);
+            Derd.PrintSQL(cmd.SQL, cmd.Params.ToArray());
+
+            bool bRet = false;
+            if (trans == null)
+            {
+                bRet = CommandUtils.ExecuteNonQuery(this, Path, cmd.SQL, cmd.Params.ToArray()) == mBatchValues.Count;
+            }
+            else
+            {
+                bRet = CommandUtils.ExecuteNonQuery(this, trans, cmd.SQL, cmd.Params.ToArray()) == mBatchValues.Count;
+            }
+
+            return bRet;
+        }
+
+        private bool _SqliteSaveBatch(int? transCode)
+        {
+            bool isInnerTransaction = false;
+            if (transCode == null)
+            {
+                transCode = Derd.GetTransaction();
+                isInnerTransaction = true;
+            }
+
+            bool bRet = true;
+            try
+            {
+                for (int i = 0; i < mBatchValues.Count; i++)
+                {
+                    bRet = _SaveOne(mBatchValues[i], transCode);
+                    if (!bRet)
+                    {
+                        break;
+                    }
+                }
+
+                return bRet;
+            }
+            finally
+            {
+                if (isInnerTransaction)
+                {
+                    if (bRet)
+                    {
+                        Derd.CommitTransaction(transCode.Value);
+                    }
+                    else
+                    {
+                        Derd.RollbackTransaction(transCode.Value);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 批量保存模型不会触发beforeNew、afterNew、beforeUpdate、afterUpdate、beforeDelete、afterDelete等模型事件
+        /// </summary>
+        /// <param name="transCode"></param>
+        /// <returns></returns>
+        private bool _SaveBatch(int? transCode = null)
+        {
+            bool bRet = false;
+            try
+            {
+                ConnectionSetting cs = ConnectionUtils.GetConnectionByModel(this);
+                switch (cs.Dialect.ToLower())
+                {
+                    case "sqlite":
+                        bRet = _SqliteSaveBatch(transCode);
+                        break;
+                    default:
+                        bRet = _CommonSaveBatch(transCode);
+                        break;
+                }
+                return bRet;
+            }
+            finally
+            {
+                Reset();
+                mBatchValues.Clear();
+            }
+        }
+
+        public bool Save(int? transCode = null)
+        {
+            if (mSetValues != null)
+            {
+                return _SaveOne(mSetValues, transCode);
+            }
+            else if (mBatchValues.Count > 0)
+            {
+                return _SaveBatch(transCode);
+            }
+            else
+            {
+                throw new Exception("未找到要保存的内容，请通过SetValue、SetValues或SetBatchInsertValues方法设置内容后再进行保存操作。");
             }
         }
 
@@ -1347,7 +1487,7 @@ namespace CodeM.Common.Orm
             {
                 if (mSetValues == null)
                 {
-                    throw new Exception("没有任何要更新的内容，请通过SetValue设置内容。");
+                    throw new Exception("未找到要更新的内容，请通过SetValue、SetValues或SetBatchInsertValues方法设置内容后再进行更新操作。");
                 }
 
                 if (mFilter.IsEmpty() && !updateAll)
@@ -1355,9 +1495,9 @@ namespace CodeM.Common.Orm
                     throw new Exception("未设置更新的条件范围。");
                 }
 
-                _CalcPreSaveProperties();
+                _CalcPreSaveProperties(mSetValues);
 
-                CommandSQL cmd = SQLBuilder.BuildUpdateSQL(this);
+                CommandSQL cmd = SQLBuilder.BuildUpdateSQL(this, mSetValues);
                 Derd.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
                 dynamic mixedValues = MixActionValues(cmd.FilterProperties);

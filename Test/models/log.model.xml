@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<model name="Log" table="t_log">
+	<property name="Id" field="f_id" notNull="True" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
+	<property name="Operator" type="Person" joinProp="Name" desc="操作人" />
+	<property name="Product" length="255" notNull="true" indexGroup="idx_product" desc="产品编码" />
+	<property name="Module" length="255" notNull="true" indexGroup="idx_module" desc="模块编码" />
+	<property name="Content" length="255" notNull="true" desc="日志内容" />
+	<property name="CreateTime" type="DateTime" field="f_createtime" indexGroup="idx_create_time" joinUpdate="false" defaultValue="{{CurrentDateTime}}" desc="创建时间" />
+</model>

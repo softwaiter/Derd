@@ -13,7 +13,268 @@ namespace CodeM.Common.Orm
 {
     internal class SQLBuilder
     {
-        public static CommandSQL BuildInsertSQL(Model m)
+        private static CommandSQL _BuildOracleBatchInsertSQL(Model modelDefine, List<dynamic> batchModelValues)
+        {
+            string[] quotes = Features.GetObjectQuotes(modelDefine);
+            dynamic firstModelValues = batchModelValues[0];
+
+            CommandSQL result = new CommandSQL();
+
+            object value;
+            string insertFields = string.Empty;
+            List<Property> insertProperties = new List<Property>();
+            for (int i = 0; i < modelDefine.PropertyCount; i++)
+            {
+                Property p = modelDefine.GetProperty(i);
+                if (p.JoinInsert)
+                {
+                    if (modelDefine.TryGetValue(firstModelValues, p, out value))
+                    {
+                        if (value != null)
+                        {
+                            if (p.RealType == typeof(DynamicObjectExt))
+                            {
+                                value = value.ToString();
+                            }
+
+                            if (insertFields.Length > 0)
+                            {
+                                insertFields += ",";
+                            }
+                            insertFields += string.Concat(quotes[0], p.Field, quotes[1]);
+
+                            insertProperties.Add(p);
+                        }
+                    }
+                }
+            }
+
+            StringBuilder sbValues = new StringBuilder(batchModelValues.Count * 100);
+            for (int i = 0; i < batchModelValues.Count; i++)
+            {
+                dynamic currModelValues = batchModelValues[i];
+
+                if (sbValues.Length > 0)
+                {
+                    sbValues.Append(" UNION ");
+                }
+
+                sbValues.Append("SELECT ");
+                for (int j = 0; j < insertProperties.Count; j++)
+                {
+                    Property p = insertProperties[j];
+                    if (!modelDefine.TryGetValue(currModelValues, p, out value))
+                    {
+                        value = null;
+                    }
+
+                    string paramName = CommandUtils.GenParamName(p) + i;
+                    DbType dbType = CommandUtils.GetDbParamType(p);
+                    DbParameter dp = DbUtils.CreateParam(modelDefine.Path, paramName,
+                        value, dbType, ParameterDirection.Input);
+                    result.Params.Add(dp);
+
+                    if (j > 0)
+                    {
+                        sbValues.Append(",");
+                    }
+
+                    string paramPlaceholder = Features.GetCommandParamName(modelDefine, paramName);
+                    sbValues.Append(paramPlaceholder);
+                }
+                sbValues.Append(" FROM DUAL");
+            }
+
+            result.SQL = string.Concat("INSERT INTO ", quotes[0], modelDefine.Table, quotes[1], " (", insertFields, ") ", sbValues);
+            sbValues.Clear();
+
+            return result;
+        }
+
+        private static CommandSQL _BuildSqlserverBatchInsertSQL(Model modelDefine, List<dynamic> batchModelValues)
+        {
+            string[] quotes = Features.GetObjectQuotes(modelDefine);
+            dynamic firstModelValues = batchModelValues[0];
+
+            CommandSQL result = new CommandSQL();
+
+            object value;
+            string insertFields = string.Empty;
+            List<Property> insertProperties = new List<Property>();
+            for (int i = 0; i < modelDefine.PropertyCount; i++)
+            {
+                Property p = modelDefine.GetProperty(i);
+                if (p.JoinInsert)
+                {
+                    if (modelDefine.TryGetValue(firstModelValues, p, out value))
+                    {
+                        if (value != null)
+                        {
+                            if (p.RealType == typeof(DynamicObjectExt))
+                            {
+                                value = value.ToString();
+                            }
+
+                            if (insertFields.Length > 0)
+                            {
+                                insertFields += ",";
+                            }
+                            insertFields += string.Concat(quotes[0], p.Field, quotes[1]);
+
+                            insertProperties.Add(p);
+                        }
+                    }
+                }
+            }
+
+            StringBuilder sbValues = new StringBuilder(batchModelValues.Count * 100);
+            for (int i = 0; i < batchModelValues.Count; i++)
+            {
+                dynamic currModelValues = batchModelValues[i];
+
+                if (sbValues.Length > 0)
+                {
+                    sbValues.Append(" UNION ");
+                }
+
+                sbValues.Append("SELECT ");
+                for (int j = 0; j < insertProperties.Count; j++)
+                {
+                    Property p = insertProperties[j];
+                    if (!modelDefine.TryGetValue(currModelValues, p, out value))
+                    {
+                        value = null;
+                    }
+
+                    //string paramName = CommandUtils.GenParamName(p) + i;
+                    //DbType dbType = CommandUtils.GetDbParamType(p);
+                    //DbParameter dp = DbUtils.CreateParam(modelDefine.Path, paramName,
+                    //    value, dbType, ParameterDirection.Input);
+                    //result.Params.Add(dp);
+
+                    if (j > 0)
+                    {
+                        sbValues.Append(",");
+                    }
+
+                    //string paramPlaceholder = Features.GetCommandParamName(modelDefine, paramName);
+                    bool isNeedQuote = (p.FieldType == DbType.String ||
+                        p.FieldType == DbType.StringFixedLength ||
+                        p.FieldType == DbType.AnsiString ||
+                        p.FieldType == DbType.AnsiStringFixedLength ||
+                        p.FieldType == DbType.Date ||
+                        p.FieldType == DbType.DateTime ||
+                        p.FieldType == DbType.DateTime2);
+                    if (isNeedQuote)
+                    {
+                        sbValues.Append("'");
+                    }
+                    sbValues.Append(value);
+                    if (isNeedQuote)
+                    {
+                        sbValues.Append("'");
+                    }
+                }
+            }
+
+            result.SQL = string.Concat("INSERT INTO ", quotes[0], modelDefine.Table, quotes[1], " (", insertFields, ") ", sbValues);
+            sbValues.Clear();
+
+            return result;
+        }
+
+        public static CommandSQL BuildBatchInsertSQL(Model modelDefine, List<dynamic> batchModelValues)
+
+        {
+            ConnectionSetting cs = ConnectionUtils.GetConnectionByModel(modelDefine);
+            if ("oracle".Equals(cs.Dialect, StringComparison.OrdinalIgnoreCase))
+            {
+                return _BuildOracleBatchInsertSQL(modelDefine, batchModelValues);
+            }
+            else if ("sqlserver".Equals(cs.Dialect, StringComparison.OrdinalIgnoreCase))
+            {
+                return _BuildSqlserverBatchInsertSQL(modelDefine, batchModelValues);
+            }
+            else
+            {
+                string[] quotes = Features.GetObjectQuotes(modelDefine);
+                dynamic firstModelValues = batchModelValues[0];
+
+                CommandSQL result = new CommandSQL();
+
+                object value;
+                string insertFields = string.Empty;
+                List<Property> insertProperties = new List<Property>();
+                for (int i = 0; i < modelDefine.PropertyCount; i++)
+                {
+                    Property p = modelDefine.GetProperty(i);
+                    if (p.JoinInsert)
+                    {
+                        if (modelDefine.TryGetValue(firstModelValues, p, out value))
+                        {
+                            if (value != null)
+                            {
+                                if (p.RealType == typeof(DynamicObjectExt))
+                                {
+                                    value = value.ToString();
+                                }
+
+                                if (insertFields.Length > 0)
+                                {
+                                    insertFields += ",";
+                                }
+                                insertFields += string.Concat(quotes[0], p.Field, quotes[1]);
+
+                                insertProperties.Add(p);
+                            }
+                        }
+                    }
+                }
+
+                StringBuilder sbValues = new StringBuilder(batchModelValues.Count * 100);
+                for (int i = 0; i < batchModelValues.Count; i++)
+                {
+                    dynamic currModelValues = batchModelValues[i];
+
+                    if (sbValues.Length > 0)
+                    {
+                        sbValues.Append(",");
+                    }
+
+                    sbValues.Append("(");
+                    for (int j = 0; j < insertProperties.Count; j++)
+                    {
+                        Property p = insertProperties[j];
+                        if (!modelDefine.TryGetValue(currModelValues, p, out value))
+                        {
+                            value = null;
+                        }
+
+                        string paramName = CommandUtils.GenParamName(p) + i;
+                        DbType dbType = CommandUtils.GetDbParamType(p);
+                        DbParameter dp = DbUtils.CreateParam(modelDefine.Path, paramName,
+                            value, dbType, ParameterDirection.Input);
+                        result.Params.Add(dp);
+
+                        if (j > 0)
+                        {
+                            sbValues.Append(",");
+                        }
+
+                        string paramPlaceholder = Features.GetCommandParamName(modelDefine, paramName);
+                        sbValues.Append(paramPlaceholder);
+                    }
+                    sbValues.Append(")");
+                }
+
+                result.SQL = string.Concat("INSERT INTO ", quotes[0], modelDefine.Table, quotes[1], " (", insertFields, ") VALUES", sbValues);
+                sbValues.Clear();
+
+                return result;
+            }
+        }
+
+        public static CommandSQL BuildInsertSQL(Model m, dynamic modelValues)
         {
             string[] quotes = Features.GetObjectQuotes(m);
 
@@ -27,7 +288,7 @@ namespace CodeM.Common.Orm
                 Property p = m.GetProperty(i);
                 if (p.JoinInsert)
                 {
-                    if (m.TryGetValue(p, out value))
+                    if (m.TryGetValue(modelValues, p, out value))
                     {
                         if (value != null)
                         {
@@ -63,7 +324,7 @@ namespace CodeM.Common.Orm
             return result;
         }
 
-        public static CommandSQL BuildUpdateSQL(Model m)
+        public static CommandSQL BuildUpdateSQL(Model m, dynamic modelValues)
         {
             string[] quotes = Features.GetObjectQuotes(m);
 
@@ -76,7 +337,7 @@ namespace CodeM.Common.Orm
                 Property p = m.GetProperty(i);
                 if (p.JoinUpdate)
                 {
-                    if (m.TryGetValue(p, out value, false))
+                    if (m.TryGetValue(modelValues, p, out value, false))
                     {
                         DbType dbType = CommandUtils.GetDbParamType(p);
                         string paramName = CommandUtils.GenParamName(p);

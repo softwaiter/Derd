@@ -6,5 +6,7 @@
 
         Model SetValues(dynamic obj, bool validate = false);
 
+        Model SetBatchInsertValues(dynamic obj, bool validate = false);
+
     }
 }

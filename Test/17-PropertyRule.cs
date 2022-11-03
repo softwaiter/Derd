@@ -7,7 +7,7 @@ using System.IO;
 namespace Test
 {
     [TestClass]
-    public class _09_PropertyRule
+    public class _17_PropertyRule
     {
         [TestInitialize]
         public void Init()
