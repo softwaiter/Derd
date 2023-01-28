@@ -358,7 +358,7 @@ namespace CodeM.Common.Orm
                     if (FieldUtils.IsFloat(p.FieldType) && p.Precision > 0)
                     {
                         int pos = valueStr.IndexOf(".");
-                        if (valueStr.Length - pos - 1 > p.Precision)
+                        if (pos > 0 && valueStr.Length - pos - 1 > p.Precision)
                         {
                             throw new PropertyValidationException(string.Concat(p.Label ?? p.Name, "小数位数不能超过", p.Precision, "位小数。"));
                         }
