@@ -45,6 +45,8 @@ namespace UnitTest
             Test4();
             Test5();
             Test6();
+            Test7();
+            Test8();
         }
 
         [Description("加载模型定义，判断是否定义Person模型应返回True")]
@@ -76,8 +78,22 @@ namespace UnitTest
             Assert.IsFalse(ret);
         }
 
-        [Description("使用Orm方法直接执行sql语句创建数据表orm_test，应成功。")]
+        [Description("判断Person模型是否包含Org.Name级联属性定义,应返回True")]
         public void Test5()
+        {
+            bool ret = Derd.Model("Person").HasProperty("Org.Name");
+            Assert.IsTrue(ret);
+        }
+
+        [Description("判断Person模型是否包含Org.Address级联属性定义,应返回False")]
+        public void Test6()
+        {
+            bool ret = Derd.Model("Person").HasProperty("Org.Address");
+            Assert.IsFalse(ret);
+        }
+
+        [Description("使用Orm方法直接执行sql语句创建数据表orm_test，应成功。")]
+        public void Test7()
         {
             string sql = "Create Table orm_test(id integer primary key, name varchar(64), age int, address varchar(255))";
             int ret = Derd.ExecSql(sql);
@@ -85,7 +101,7 @@ namespace UnitTest
         }
 
         [Description("删除Test3创建的数据表orm_test，应成功。")]
-        public void Test6()
+        public void Test8()
         {
             string sql = "Drop Table  orm_test";
             int ret = Derd.ExecSql(sql);

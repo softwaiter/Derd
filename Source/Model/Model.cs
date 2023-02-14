@@ -122,7 +122,32 @@ namespace CodeM.Common.Orm
         {
             if (!string.IsNullOrWhiteSpace(name))
             {
-                return mProperties.ContainsKey(name.ToLower());
+                if (!name.Contains("."))
+                {
+                    return mProperties.ContainsKey(name.ToLower());
+                }
+                else
+                {
+                    Model currM = this;
+                    string[] typeItems = name.Split(".");
+                    for (int i = 0; i < typeItems.Length; i++)
+                    {
+                        if (currM.HasProperty(typeItems[i]))
+                        {
+                            if (i < typeItems.Length - 1)
+                            {
+                                Property p = currM.GetProperty(typeItems[i]);
+                                currM = ModelUtils.GetModel(p.TypeValue);
+                            }
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
             }
             return false;
         }
