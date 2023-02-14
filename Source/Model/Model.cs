@@ -118,6 +118,15 @@ namespace CodeM.Common.Orm
             return result;
         }
 
+        public bool HasProperty(string name)
+        {
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                return mProperties.ContainsKey(name.ToLower());
+            }
+            return false;
+        }
+
         public Property GetProperty(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
