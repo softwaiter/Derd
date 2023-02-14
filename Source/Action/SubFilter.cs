@@ -57,10 +57,22 @@ namespace CodeM.Common.Orm
             }
         }
 
+        public IFilter And(string condition)
+        {
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.And, condition));
+            return this;
+        }
+
         public IFilter And(IFilter subFilter)
         {
             subFilter.Parent = this;
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.And, subFilter));
+            return this;
+        }
+
+        public IFilter Or(string condition)
+        {
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Or, condition));
             return this;
         }
 
@@ -254,24 +266,52 @@ namespace CodeM.Common.Orm
                 switch (item.Key)
                 {
                     case FilterOperator.And:
-                        if (!string.IsNullOrWhiteSpace(result.SQL))
+                        if (item.Value != null && !string.IsNullOrWhiteSpace(item.Value.ToString()))
                         {
-                            result.SQL += " AND ";
+                            if (item.Value is SubFilter)
+                            {
+                                if (!string.IsNullOrWhiteSpace(result.SQL))
+                                {
+                                    result.SQL += " AND ";
+                                }
+                                CommandSQL andActionSQL = ((SubFilter)item.Value).Build(model);
+                                result.SQL += andActionSQL.SQL;
+                                result.Params.AddRange(andActionSQL.Params);
+                                result.ForeignTables.AddRange(andActionSQL.ForeignTables);
+                            }
+                            else if (item.Value is String)
+                            {
+                                if (!string.IsNullOrWhiteSpace(result.SQL))
+                                {
+                                    result.SQL += " AND ";
+                                }
+                                result.SQL += item.Value;
+                            }
                         }
-                        CommandSQL andActionSQL = ((SubFilter)item.Value).Build(model);
-                        result.SQL += andActionSQL.SQL;
-                        result.Params.AddRange(andActionSQL.Params);
-                        result.ForeignTables.AddRange(andActionSQL.ForeignTables);
                         break;
                     case FilterOperator.Or:
-                        if (!string.IsNullOrWhiteSpace(result.SQL))
+                        if (item.Value != null && !string.IsNullOrWhiteSpace(item.Value.ToString()))
                         {
-                            result.SQL += " OR ";
+                            if (item.Value is SubFilter)
+                            {
+                                if (!string.IsNullOrWhiteSpace(result.SQL))
+                                {
+                                    result.SQL += " OR ";
+                                }
+                                CommandSQL orActionSQL = ((SubFilter)item.Value).Build(model);
+                                result.SQL += orActionSQL.SQL;
+                                result.Params.AddRange(orActionSQL.Params);
+                                result.ForeignTables.AddRange(orActionSQL.ForeignTables);
+                            }
+                            else if (item.Value is String)
+                            {
+                                if (!string.IsNullOrWhiteSpace(result.SQL))
+                                {
+                                    result.SQL += " OR ";
+                                }
+                                result.SQL += item.Value;
+                            }
                         }
-                        CommandSQL orActionSQL = ((SubFilter)item.Value).Build(model);
-                        result.SQL += orActionSQL.SQL;
-                        result.Params.AddRange(orActionSQL.Params);
-                        result.ForeignTables.AddRange(orActionSQL.ForeignTables);
                         break;
                     case FilterOperator.Equals:
                         if (!p.NeedCalcPreSaveProcessor)

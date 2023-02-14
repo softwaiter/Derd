@@ -575,9 +575,21 @@ namespace CodeM.Common.Orm
             }
         }
 
+        public Model And(string constCondition)
+        {
+            mFilter.And(constCondition);
+            return this;
+        }
+
         public Model And(IFilter subCondition)
         {
             mFilter.And(subCondition);
+            return this;
+        }
+
+        public Model Or(string constCondition)
+        {
+            mFilter.Or(constCondition);
             return this;
         }
 

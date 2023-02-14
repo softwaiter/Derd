@@ -5,7 +5,11 @@
 
         IFilter Parent { get; set; }
 
+        IFilter And(string condition);
+
         IFilter And(IFilter subFilter);
+
+        IFilter Or(string condition);
 
         IFilter Or(IFilter subFilter);
 
