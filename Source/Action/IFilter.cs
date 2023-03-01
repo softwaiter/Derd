@@ -2,6 +2,7 @@
 {
     public interface IFilter
     {
+        bool IsEmpty();
 
         IFilter Parent { get; set; }
 

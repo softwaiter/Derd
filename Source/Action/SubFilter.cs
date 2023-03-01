@@ -517,7 +517,14 @@ namespace CodeM.Common.Orm
 
             if (!string.IsNullOrWhiteSpace(result.SQL))
             {
-                result.SQL = string.Concat("(", result.SQL, ")");
+                if (result.SQL.Contains(" OR ", StringComparison.OrdinalIgnoreCase) ||
+                    result.SQL.Contains(" AND ", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!(result.SQL.StartsWith("(") && result.SQL.EndsWith(")")))
+                    {
+                        result.SQL = string.Concat("(", result.SQL, ")");
+                    }
+                }
             }
 
             return result;
