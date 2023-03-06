@@ -1421,8 +1421,17 @@ namespace CodeM.Common.Orm
             while (e.MoveNext())
             {
                 if (!result.ContainsKey(e.Current.Key))
-                { 
-                    result.SetValue(e.Current.Key, e.Current.Value);
+                {
+                    object value = e.Current.Value;
+                    if (value != null)
+                    {
+                        Property p;
+                        if (mProperties.TryGetValue(e.Current.Key.ToLower(), out p))
+                        {
+                            value = Convert.ChangeType(value, p.Type);
+                        }
+                    }
+                    result.SetValue(e.Current.Key, value);
                 }
             }
             return result;
