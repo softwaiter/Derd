@@ -98,7 +98,11 @@ namespace CodeM.Common.Orm
 
         private void CheckValidation(Property prop, object value)
         {
-            Processor.CallRuleProcessor(ValidationProcessor, prop, value);
+            string[] processors = ValidationProcessor.Split(",");
+            for (int i = 0; i < processors.Length; i++)
+            {
+                Processor.CallRuleProcessor(processors[i].Trim(), prop, value);
+            }
         }
 
         public void Validate(Property prop, object value)

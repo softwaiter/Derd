@@ -1197,7 +1197,16 @@ namespace CodeM.Common.Orm
             {
                 try
                 {
-                    return Processor.CallModelProcessor(BeforeNewProcessor, this, obj, transCode);
+                    string[] processors = BeforeNewProcessor.Split(",");
+                    for (int i = 0; i < processors.Length; i++)
+                    {
+                        if (!Processor.CallModelProcessor(
+                            processors[i].Trim(), this,
+                            obj, transCode))
+                        {
+                            return false;
+                        }
+                    }
                 }
                 catch
                 {
@@ -1218,7 +1227,16 @@ namespace CodeM.Common.Orm
             {
                 try
                 {
-                    return Processor.CallModelProcessor(AfterNewProcessor, this, obj, transCode);
+                    string[] processors = AfterNewProcessor.Split(",");
+                    for (int i = 0; i < processors.Length; i++)
+                    {
+                        if (!Processor.CallModelProcessor(
+                            processors[i].Trim(), this,
+                            obj, transCode))
+                        {
+                            return false;
+                        }
+                    }
                 }
                 catch
                 {
@@ -1463,7 +1481,16 @@ namespace CodeM.Common.Orm
             {
                 try
                 {
-                    return Processor.CallModelProcessor(BeforeUpdateProcessor, this, obj, transCode);
+                    string[] processors = BeforeUpdateProcessor.Split(",");
+                    for (int i = 0; i < processors.Length; i++)
+                    {
+                        if (!Processor.CallModelProcessor(
+                            processors[i].Trim(), this,
+                            obj, transCode))
+                        {
+                            return false;
+                        }
+                    }
                 }
                 catch
                 {
@@ -1484,7 +1511,16 @@ namespace CodeM.Common.Orm
             {
                 try
                 {
-                    return Processor.CallModelProcessor(AfterUpdateProcessor, this, obj, transCode);
+                    string[] processors = AfterUpdateProcessor.Split(",");
+                    for (int i = 0; i < processors.Length; i++)
+                    {
+                        if (!Processor.CallModelProcessor(
+                            processors[i].Trim(), this,
+                            obj, transCode))
+                        {
+                            return false;
+                        }
+                    }
                 }
                 catch
                 {
@@ -1594,7 +1630,16 @@ namespace CodeM.Common.Orm
             {
                 try
                 {
-                    return Processor.CallModelProcessor(BeforeDeleteProcessor, this, obj, transCode);
+                    string[] processors = BeforeDeleteProcessor.Split(",");
+                    for (int i = 0; i < processors.Length; i++)
+                    {
+                        if (!Processor.CallModelProcessor(
+                            processors[i].Trim(), this,
+                            obj, transCode))
+                        {
+                            return false;
+                        }
+                    }
                 }
                 catch
                 {
@@ -1615,7 +1660,16 @@ namespace CodeM.Common.Orm
             {
                 try
                 {
-                    return Processor.CallModelProcessor(AfterDeleteProcessor, this, obj, transCode);
+                    string[] processors = AfterDeleteProcessor.Split(",");
+                    for (int i = 0; i < processors.Length; i++)
+                    {
+                        if (!Processor.CallModelProcessor(
+                            processors[i].Trim(), this,
+                            obj, transCode))
+                        {
+                            return false;
+                        }
+                    }
                 }
                 catch
                 {
