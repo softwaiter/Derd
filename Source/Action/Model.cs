@@ -1272,10 +1272,7 @@ namespace CodeM.Common.Orm
                         bRet = _CalcAfterNewProcessor(modelValues, transCode);
                     }
                 }
-                return bRet;
-            }
-            finally
-            {
+
                 if (trans != null && !haveUserTransCode)
                 {
                     if (bRet)
@@ -1288,6 +1285,18 @@ namespace CodeM.Common.Orm
                     }
                 }
 
+                return bRet;
+            }
+            catch (Exception exp)
+            {
+                if (trans != null && !haveUserTransCode)
+                {
+                    Derd.RollbackTransaction(transCode.Value);
+                }
+                throw exp;
+            }
+            finally
+            {
                 Reset();
             }
         }
@@ -1346,10 +1355,6 @@ namespace CodeM.Common.Orm
                     }
                 }
 
-                return bRet;
-            }
-            finally
-            {
                 if (isInnerTransaction)
                 {
                     if (bRet)
@@ -1361,6 +1366,16 @@ namespace CodeM.Common.Orm
                         Derd.RollbackTransaction(transCode.Value);
                     }
                 }
+
+                return bRet;
+            }
+            catch (Exception exp)
+            {
+                if (isInnerTransaction)
+                {
+                    Derd.RollbackTransaction(transCode.Value);
+                }
+                throw exp;
             }
         }
 
@@ -1428,7 +1443,7 @@ namespace CodeM.Common.Orm
                         Property p;
                         if (mProperties.TryGetValue(e.Current.Key.ToLower(), out p))
                         {
-                            value = Convert.ChangeType(value, p.Type);
+                            value = Convert.ChangeType(value, p.RealType);
                         }
                     }
                     result.SetValue(e.Current.Key, value);
@@ -1539,10 +1554,7 @@ namespace CodeM.Common.Orm
                         bRet = _CalcAfterUpdateProcessor(mixedValues, transCode);
                     }
                 }
-                return bRet;
-            }
-            finally
-            {
+
                 if (trans != null && !haveUserTransCode)
                 {
                     if (bRet)
@@ -1555,6 +1567,18 @@ namespace CodeM.Common.Orm
                     }
                 }
 
+                return bRet;
+            }
+            catch (Exception exp)
+            {
+                if (trans != null && !haveUserTransCode)
+                {
+                    Derd.RollbackTransaction(transCode.Value);
+                }
+                throw exp;
+            }
+            finally
+            {
                 Reset();
             }
         }
@@ -1658,13 +1682,10 @@ namespace CodeM.Common.Orm
 
                     if (bRet)
                     {
-                        _CalcAfterDeleteProcessor(mixedValues, transCode);
+                        bRet = _CalcAfterDeleteProcessor(mixedValues, transCode);
                     }
                 }
-                return bRet;
-            }
-            finally
-            {
+
                 if (trans != null && !haveUserTransCode)
                 {
                     if (bRet)
@@ -1677,6 +1698,18 @@ namespace CodeM.Common.Orm
                     }
                 }
 
+                return bRet;
+            }
+            catch (Exception exp)
+            {
+                if (trans != null && !haveUserTransCode)
+                {
+                    Derd.RollbackTransaction(transCode.Value);
+                }
+                throw exp;
+            }
+            finally
+            {
                 Reset();
             }
         }
