@@ -1195,22 +1195,15 @@ namespace CodeM.Common.Orm
         {
             if (_HasBeforeNewProcessor())
             {
-                try
+                string[] processors = BeforeNewProcessor.Split(",");
+                for (int i = 0; i < processors.Length; i++)
                 {
-                    string[] processors = BeforeNewProcessor.Split(",");
-                    for (int i = 0; i < processors.Length; i++)
+                    if (!Processor.CallModelProcessor(
+                        processors[i].Trim(), this,
+                        obj, transCode))
                     {
-                        if (!Processor.CallModelProcessor(
-                            processors[i].Trim(), this,
-                            obj, transCode))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
-                }
-                catch
-                {
-                    return false;
                 }
             }
             return true;
@@ -1225,22 +1218,15 @@ namespace CodeM.Common.Orm
         {
             if (_HasAfterNewProcessor())
             {
-                try
+                string[] processors = AfterNewProcessor.Split(",");
+                for (int i = 0; i < processors.Length; i++)
                 {
-                    string[] processors = AfterNewProcessor.Split(",");
-                    for (int i = 0; i < processors.Length; i++)
+                    if (!Processor.CallModelProcessor(
+                        processors[i].Trim(), this,
+                        obj, transCode))
                     {
-                        if (!Processor.CallModelProcessor(
-                            processors[i].Trim(), this,
-                            obj, transCode))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
-                }
-                catch
-                {
-                    return false;
                 }
             }
             return true;
@@ -1479,22 +1465,15 @@ namespace CodeM.Common.Orm
         {
             if (_HasBeforeUpdateProcessor())
             {
-                try
+                string[] processors = BeforeUpdateProcessor.Split(",");
+                for (int i = 0; i < processors.Length; i++)
                 {
-                    string[] processors = BeforeUpdateProcessor.Split(",");
-                    for (int i = 0; i < processors.Length; i++)
+                    if (!Processor.CallModelProcessor(
+                        processors[i].Trim(), this,
+                        obj, transCode))
                     {
-                        if (!Processor.CallModelProcessor(
-                            processors[i].Trim(), this,
-                            obj, transCode))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
-                }
-                catch
-                {
-                    return false;
                 }
             }
             return true;
@@ -1509,22 +1488,15 @@ namespace CodeM.Common.Orm
         {
             if (_HasAfterUpdateProcessor())
             {
-                try
+                string[] processors = AfterUpdateProcessor.Split(",");
+                for (int i = 0; i < processors.Length; i++)
                 {
-                    string[] processors = AfterUpdateProcessor.Split(",");
-                    for (int i = 0; i < processors.Length; i++)
+                    if (!Processor.CallModelProcessor(
+                        processors[i].Trim(), this,
+                        obj, transCode))
                     {
-                        if (!Processor.CallModelProcessor(
-                            processors[i].Trim(), this,
-                            obj, transCode))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
-                }
-                catch
-                {
-                    return false;
                 }
             }
             return true;
@@ -1628,22 +1600,15 @@ namespace CodeM.Common.Orm
         {
             if (_HasBeforeDeleteProcessor())
             {
-                try
+                string[] processors = BeforeDeleteProcessor.Split(",");
+                for (int i = 0; i < processors.Length; i++)
                 {
-                    string[] processors = BeforeDeleteProcessor.Split(",");
-                    for (int i = 0; i < processors.Length; i++)
+                    if (!Processor.CallModelProcessor(
+                        processors[i].Trim(), this,
+                        obj, transCode))
                     {
-                        if (!Processor.CallModelProcessor(
-                            processors[i].Trim(), this,
-                            obj, transCode))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
-                }
-                catch
-                {
-                    return false;
                 }
             }
             return true;
@@ -1658,22 +1623,15 @@ namespace CodeM.Common.Orm
         {
             if (_HasAfterDeleteProcessor())
             {
-                try
+                string[] processors = AfterDeleteProcessor.Split(",");
+                for (int i = 0; i < processors.Length; i++)
                 {
-                    string[] processors = AfterDeleteProcessor.Split(",");
-                    for (int i = 0; i < processors.Length; i++)
+                    if (!Processor.CallModelProcessor(
+                        processors[i].Trim(), this,
+                        obj, transCode))
                     {
-                        if (!Processor.CallModelProcessor(
-                            processors[i].Trim(), this,
-                            obj, transCode))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
-                }
-                catch
-                {
-                    return false;
                 }
             }
             return true;
@@ -1713,8 +1671,22 @@ namespace CodeM.Common.Orm
 
                 CommandSQL where = mFilter.Build(this);
 
-                string sql = string.Concat("DElETE FROM ", this.Table);
-                if (!string.IsNullOrWhiteSpace(where.SQL))
+                string[] quotes = Features.GetObjectQuotes(this);
+                string sql = string.Concat("DELETE FROM ", quotes[0], this.Table, quotes[1]);
+
+                if (where.ForeignTables.Count > 0)
+                {
+                    if (this.PrimaryKeyCount > 1)
+                    {
+                        throw new NotSupportedException("暂不支持组合主键的关联条件删除。");
+                    }
+
+                    Property pp = GetPrimaryKey(0);
+                    string joinSql = SQLBuilder.BuildJoinTableSQL(this, where.ForeignTables);
+                    string subSql = string.Concat("SELECT ", quotes[0], this.Table, quotes[1], ".", pp.Field, " FROM ", quotes[0], this.Table, quotes[1], joinSql, " WHERE ", where.SQL);
+                    sql += String.Concat(" WHERE ", pp.Field, " IN (", subSql, ")");
+                }
+                else if (!string.IsNullOrWhiteSpace(where.SQL))
                 {
                     sql += string.Concat(" WHERE ", where.SQL);
                 }
