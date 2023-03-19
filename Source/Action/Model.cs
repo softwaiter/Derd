@@ -1740,6 +1740,52 @@ namespace CodeM.Common.Orm
             }
         }
 
+        private bool _HasBeforeQueryProcessor()
+        {
+            return !string.IsNullOrWhiteSpace(BeforeQueryProcessor);
+        }
+
+        private bool _CalcBeforeQueryProcessor(dynamic obj, int? transCode = null)
+        {
+            if (_HasBeforeQueryProcessor())
+            {
+                string[] processors = BeforeQueryProcessor.Split(",");
+                for (int i = 0; i < processors.Length; i++)
+                {
+                    if (!Processor.CallModelProcessor(
+                        processors[i].Trim(), this,
+                        obj, transCode))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private bool _HasAfterQueryProcessor()
+        {
+            return !string.IsNullOrWhiteSpace(AfterQueryProcessor);
+        }
+
+        private bool _CalcAfterQueryProcessor(dynamic obj, int? transCode)
+        {
+            if (_HasAfterQueryProcessor())
+            {
+                string[] processors = AfterQueryProcessor.Split(",");
+                for (int i = 0; i < processors.Length; i++)
+                {
+                    if (!Processor.CallModelProcessor(
+                        processors[i].Trim(), this,
+                        obj, transCode))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         private void SetPropertyValueFromDB(dynamic obj, Property prop, string propName, DbDataReader dr, string fieldName = null)
         {
             if (fieldName == null)
@@ -1860,115 +1906,121 @@ namespace CodeM.Common.Orm
 
                 Derd.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
-                if (trans == null)
+                bool bRet = _CalcBeforeQueryProcessor(result, transCode);
+                if (bRet)
                 {
-                    dr = DbUtils.ExecuteDataReader(Path, cmd.SQL, cmd.Params.ToArray());
-                }
-                else
-                {
-                    dr = DbUtils.ExecuteDataReader(trans, cmd.SQL, cmd.Params.ToArray());
-                }
-
-                if (dr != null)
-                {
-                    while (dr.Read())
+                    if (trans == null)
                     {
-                        dynamic obj = new DynamicObjectExt();
-                        foreach (GetValueSetting gvs in mGetValues)
+                        dr = DbUtils.ExecuteDataReader(Path, cmd.SQL, cmd.Params.ToArray());
+                    }
+                    else
+                    {
+                        dr = DbUtils.ExecuteDataReader(trans, cmd.SQL, cmd.Params.ToArray());
+                    }
+
+                    if (dr != null)
+                    {
+                        while (dr.Read())
                         {
-                            if (!gvs.Name.Contains("."))
+                            dynamic obj = new DynamicObjectExt();
+                            foreach (GetValueSetting gvs in mGetValues)
                             {
-                                Property p = GetProperty(gvs.Name);
-                                if (dr.IsDBNull(gvs.FieldName))
+                                if (!gvs.Name.Contains("."))
                                 {
-                                    obj.SetValueByPath(gvs.OutputName, null);
-                                }
-                                else
-                                {
-                                    if (HaveOperation(gvs))
+                                    Property p = GetProperty(gvs.Name);
+                                    if (dr.IsDBNull(gvs.FieldName))
                                     {
-                                        object processedValue = dr.GetValue(gvs.FieldName);
-                                        obj.SetValueByPath(gvs.OutputName, processedValue);
+                                        obj.SetValueByPath(gvs.OutputName, null);
                                     }
                                     else
                                     {
-                                        SetPropertyValueFromDB(obj, p, gvs.OutputName, dr, gvs.FieldName);
-                                    }
-                                }
-
-                                if (!HaveOperation(gvs) && p.NeedCalcPostQueryProcessor)
-                                {
-                                    object input = obj.HasPath(gvs.OutputName) ? obj.GetValueByPath(gvs.OutputName) : null;
-                                    dynamic value = p.DoPostQueryProcessor(input);
-                                    if (!NotSet.IsNotSetValue(value))
-                                    {
-                                        if (value != null)
+                                        if (HaveOperation(gvs))
                                         {
-                                            obj.SetValueByPath(gvs.OutputName, value);
+                                            object processedValue = dr.GetValue(gvs.FieldName);
+                                            obj.SetValueByPath(gvs.OutputName, processedValue);
                                         }
                                         else
                                         {
-                                            obj.SetValueByPath(gvs.OutputName, null);
+                                            SetPropertyValueFromDB(obj, p, gvs.OutputName, dr, gvs.FieldName);
                                         }
                                     }
-                                }
-                            }
-                            else
-                            {
-                                Model currM = this;
-                                string[] subNames = gvs.Name.Split(".");
-                                for (int i = 0; i < subNames.Length; i++)
-                                {
-                                    string subName = subNames[i];
-                                    Property subProp = currM.GetProperty(subName);
-                                    Model subM = ModelUtils.GetModel(subProp.TypeValue);
-                                    currM = subM;
 
-                                    if (i == subNames.Length - 2)
+                                    if (!HaveOperation(gvs) && p.NeedCalcPostQueryProcessor)
                                     {
-                                        string lastName = subNames[subNames.Length - 1];
-                                        Property lastProp = currM.GetProperty(lastName);
-                                        if (dr.IsDBNull(gvs.FieldName))
+                                        object input = obj.HasPath(gvs.OutputName) ? obj.GetValueByPath(gvs.OutputName) : null;
+                                        dynamic value = p.DoPostQueryProcessor(input);
+                                        if (!NotSet.IsNotSetValue(value))
                                         {
-                                            obj.SetValueByPath(gvs.OutputName, null);
-                                        }
-                                        else
-                                        {
-                                            if (HaveOperation(gvs))
+                                            if (value != null)
                                             {
-                                                object processedValue = dr.GetValue(gvs.FieldName);
-                                                obj.SetValueByPath(gvs.OutputName, processedValue);
+                                                obj.SetValueByPath(gvs.OutputName, value);
                                             }
                                             else
                                             {
-                                                SetPropertyValueFromDB(obj, lastProp, gvs.OutputName, dr, gvs.FieldName);
+                                                obj.SetValueByPath(gvs.OutputName, null);
                                             }
                                         }
+                                    }
+                                }
+                                else
+                                {
+                                    Model currM = this;
+                                    string[] subNames = gvs.Name.Split(".");
+                                    for (int i = 0; i < subNames.Length; i++)
+                                    {
+                                        string subName = subNames[i];
+                                        Property subProp = currM.GetProperty(subName);
+                                        Model subM = ModelUtils.GetModel(subProp.TypeValue);
+                                        currM = subM;
 
-                                        if (!HaveOperation(gvs) && lastProp.NeedCalcPostQueryProcessor)
+                                        if (i == subNames.Length - 2)
                                         {
-                                            object input = obj.HasPath(gvs.OutputName) ? obj.GetValueByPath(gvs.OutputName) : null;
-                                            object value = lastProp.DoPostQueryProcessor(input);
-                                            if (!NotSet.IsNotSetValue(value))
+                                            string lastName = subNames[subNames.Length - 1];
+                                            Property lastProp = currM.GetProperty(lastName);
+                                            if (dr.IsDBNull(gvs.FieldName))
                                             {
-                                                if (value != null)
+                                                obj.SetValueByPath(gvs.OutputName, null);
+                                            }
+                                            else
+                                            {
+                                                if (HaveOperation(gvs))
                                                 {
-                                                    obj.SetValueByPath(gvs.OutputName, value);
+                                                    object processedValue = dr.GetValue(gvs.FieldName);
+                                                    obj.SetValueByPath(gvs.OutputName, processedValue);
                                                 }
                                                 else
                                                 {
-                                                    obj.SetValueByPath(gvs.OutputName, null);
+                                                    SetPropertyValueFromDB(obj, lastProp, gvs.OutputName, dr, gvs.FieldName);
                                                 }
                                             }
-                                        }
 
-                                        break;
+                                            if (!HaveOperation(gvs) && lastProp.NeedCalcPostQueryProcessor)
+                                            {
+                                                object input = obj.HasPath(gvs.OutputName) ? obj.GetValueByPath(gvs.OutputName) : null;
+                                                object value = lastProp.DoPostQueryProcessor(input);
+                                                if (!NotSet.IsNotSetValue(value))
+                                                {
+                                                    if (value != null)
+                                                    {
+                                                        obj.SetValueByPath(gvs.OutputName, value);
+                                                    }
+                                                    else
+                                                    {
+                                                        obj.SetValueByPath(gvs.OutputName, null);
+                                                    }
+                                                }
+                                            }
+
+                                            break;
+                                        }
                                     }
                                 }
                             }
+                            result.Add(obj);
                         }
-                        result.Add(obj);
                     }
+
+                    _CalcAfterDeleteProcessor(result, transCode);
                 }
 
                 return result;

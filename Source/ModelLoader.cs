@@ -591,6 +591,38 @@ namespace CodeM.Common.Orm
                                 throw new Exception("afterDelete属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
                             }
                         }
+
+                        string beforeQueryProcStr = nodeInfo.GetAttribute("beforeQuery");
+                        if (beforeQueryProcStr != null)
+                        {
+                            beforeQueryProcStr = beforeQueryProcStr.Trim();
+                            if (beforeQueryProcStr.Length > 4 &&
+                                beforeQueryProcStr.StartsWith("{{") &&
+                                beforeQueryProcStr.EndsWith("}}"))
+                            {
+                                model.BeforeQueryProcessor = beforeQueryProcStr.Substring(2, beforeQueryProcStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("beforeQuery属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
+
+                        string afterQueryProcStr = nodeInfo.GetAttribute("afterQuery");
+                        if (afterQueryProcStr != null)
+                        {
+                            afterQueryProcStr = afterQueryProcStr.Trim();
+                            if (afterQueryProcStr.Length > 4 &&
+                                afterQueryProcStr.StartsWith("{{") &&
+                                afterQueryProcStr.EndsWith("}}"))
+                            {
+                                model.AfterQueryProcessor = afterQueryProcStr.Substring(2, afterQueryProcStr.Length - 4);
+                            }
+                            else
+                            {
+                                throw new Exception("afterQuery属性必须是Processor。 " + modelFilePath + " - Line " + nodeInfo.Line);
+                            }
+                        }
                     }
                 }
                 else if (nodeInfo.Path == "/model/property")

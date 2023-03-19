@@ -39,6 +39,10 @@ namespace CodeM.Common.Orm
 
         internal string AfterDeleteProcessor { get; set; } = null;
 
+        internal string BeforeQueryProcessor { get; set; } = null;
+
+        internal string AfterQueryProcessor { get; set; } = null;
+
         internal bool AddProperty(Property p)
         {
             p.Owner = this;
@@ -320,6 +324,8 @@ namespace CodeM.Common.Orm
             m.AfterUpdateProcessor = this.AfterUpdateProcessor;
             m.BeforeDeleteProcessor = this.BeforeDeleteProcessor;
             m.AfterDeleteProcessor = this.AfterDeleteProcessor;
+            m.BeforeQueryProcessor = this.BeforeQueryProcessor;
+            m.AfterQueryProcessor = this.AfterQueryProcessor;
 
             for (int i = 0; i < PropertyCount; i++)
             {
