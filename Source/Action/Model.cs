@@ -2020,7 +2020,7 @@ namespace CodeM.Common.Orm
                         }
                     }
 
-                    _CalcAfterDeleteProcessor(result, transCode);
+                    _CalcAfterQueryProcessor(result, transCode);
                 }
 
                 return result;
