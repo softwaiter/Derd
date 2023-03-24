@@ -215,7 +215,7 @@ namespace CodeM.Common.Orm
                         p = model.GetProperty(expr.Key);
                         if (recordEqualsProperties && item.Key == FilterOperator.Equals)
                         {
-                            result.FilterProperties.Add(expr.Key, expr.Value);
+                            result.FilterProperties.Add(p.Name, expr.Value);
                         }
                     }
                     else
@@ -278,6 +278,15 @@ namespace CodeM.Common.Orm
                                 result.SQL += andActionSQL.SQL;
                                 result.Params.AddRange(andActionSQL.Params);
                                 result.ForeignTables.AddRange(andActionSQL.ForeignTables);
+
+                                if (recordEqualsProperties && andActionSQL.FilterProperties.Count > 0)
+                                {
+                                    Dictionary<string, object>.Enumerator e = andActionSQL.FilterProperties.GetEnumerator();
+                                    while (e.MoveNext())
+                                    {
+                                        result.FilterProperties.Add(e.Current.Key, e.Current.Value);
+                                    }
+                                }
                             }
                             else if (item.Value is String)
                             {

@@ -1191,7 +1191,7 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(BeforeNewProcessor);
         }
 
-        private bool _CalcBeforeNewProcessor(dynamic obj, int? transCode = null)
+        private bool _CalcBeforeNewProcessor(dynamic input, dynamic output, int? transCode = null)
         {
             if (_HasBeforeNewProcessor())
             {
@@ -1200,7 +1200,7 @@ namespace CodeM.Common.Orm
                 {
                     if (!Processor.CallModelProcessor(
                         processors[i].Trim(), this,
-                        obj, transCode))
+                        input, output, transCode))
                     {
                         return false;
                     }
@@ -1214,7 +1214,7 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(AfterNewProcessor);
         }
 
-        private bool _CalcAfterNewProcessor(dynamic obj, int? transCode = null)
+        private bool _CalcAfterNewProcessor(dynamic input, dynamic output, int? transCode = null)
         {
             if (_HasAfterNewProcessor())
             {
@@ -1223,7 +1223,7 @@ namespace CodeM.Common.Orm
                 {
                     if (!Processor.CallModelProcessor(
                         processors[i].Trim(), this,
-                        obj, transCode))
+                        input, output, transCode))
                     {
                         return false;
                     }
@@ -1259,7 +1259,7 @@ namespace CodeM.Common.Orm
                 CommandSQL cmd = SQLBuilder.BuildInsertSQL(this, modelValues);
                 Derd.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
-                bRet = _CalcBeforeNewProcessor(modelValues, transCode);
+                bRet = _CalcBeforeNewProcessor(modelValues, null, transCode);
                 if (bRet)
                 {
                     if (trans == null)
@@ -1273,7 +1273,7 @@ namespace CodeM.Common.Orm
 
                     if (bRet)
                     {
-                        bRet = _CalcAfterNewProcessor(modelValues, transCode);
+                        bRet = _CalcAfterNewProcessor(modelValues, null, transCode);
                     }
                 }
 
@@ -1461,7 +1461,7 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(BeforeUpdateProcessor);
         }
 
-        private bool _CalcBeforeUpdateProcessor(dynamic obj, int? transCode = null)
+        private bool _CalcBeforeUpdateProcessor(dynamic input, dynamic output, int? transCode = null)
         {
             if (_HasBeforeUpdateProcessor())
             {
@@ -1470,7 +1470,7 @@ namespace CodeM.Common.Orm
                 {
                     if (!Processor.CallModelProcessor(
                         processors[i].Trim(), this,
-                        obj, transCode))
+                        input, output, transCode))
                     {
                         return false;
                     }
@@ -1484,7 +1484,7 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(AfterUpdateProcessor);
         }
 
-        private bool _CalcAfterUpdateProcessor(dynamic obj, int? transCode = null)
+        private bool _CalcAfterUpdateProcessor(dynamic input, dynamic output, int? transCode = null)
         {
             if (_HasAfterUpdateProcessor())
             {
@@ -1493,7 +1493,7 @@ namespace CodeM.Common.Orm
                 {
                     if (!Processor.CallModelProcessor(
                         processors[i].Trim(), this,
-                        obj, transCode))
+                        input, output, transCode))
                     {
                         return false;
                     }
@@ -1545,7 +1545,7 @@ namespace CodeM.Common.Orm
                 Derd.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
                 dynamic mixedValues = MixActionValues(cmd.FilterProperties);
-                bRet = _CalcBeforeUpdateProcessor(mixedValues, transCode);
+                bRet = _CalcBeforeUpdateProcessor(mixedValues, null, transCode);
                 if (bRet)
                 {
                     if (trans == null)
@@ -1559,7 +1559,7 @@ namespace CodeM.Common.Orm
 
                     if (bRet)
                     {
-                        bRet = _CalcAfterUpdateProcessor(mixedValues, transCode);
+                        bRet = _CalcAfterUpdateProcessor(mixedValues, null, transCode);
                     }
                 }
 
@@ -1596,7 +1596,7 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(BeforeDeleteProcessor);
         }
 
-        private bool _CalcBeforeDeleteProcessor(dynamic obj, int? transCode = null)
+        private bool _CalcBeforeDeleteProcessor(dynamic input, dynamic output, int? transCode = null)
         {
             if (_HasBeforeDeleteProcessor())
             {
@@ -1605,7 +1605,7 @@ namespace CodeM.Common.Orm
                 {
                     if (!Processor.CallModelProcessor(
                         processors[i].Trim(), this,
-                        obj, transCode))
+                        input, output, transCode))
                     {
                         return false;
                     }
@@ -1619,7 +1619,7 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(AfterDeleteProcessor);
         }
 
-        private bool _CalcAfterDeleteProcessor(dynamic obj, int? transCode)
+        private bool _CalcAfterDeleteProcessor(dynamic input, dynamic output, int? transCode = null)
         {
             if (_HasAfterDeleteProcessor())
             {
@@ -1628,7 +1628,7 @@ namespace CodeM.Common.Orm
                 {
                     if (!Processor.CallModelProcessor(
                         processors[i].Trim(), this,
-                        obj, transCode))
+                        input, output, transCode))
                     {
                         return false;
                     }
@@ -1694,7 +1694,7 @@ namespace CodeM.Common.Orm
                 Derd.PrintSQL(sql, where.Params.ToArray());
 
                 dynamic mixedValues = MixActionValues(where.FilterProperties);
-                bRet = _CalcBeforeDeleteProcessor(mixedValues, transCode);
+                bRet = _CalcBeforeDeleteProcessor(mixedValues, null, transCode);
                 if (bRet)
                 {
                     if (trans == null)
@@ -1708,7 +1708,7 @@ namespace CodeM.Common.Orm
 
                     if (bRet)
                     {
-                        bRet = _CalcAfterDeleteProcessor(mixedValues, transCode);
+                        bRet = _CalcAfterDeleteProcessor(mixedValues, null, transCode);
                     }
                 }
 
@@ -1745,7 +1745,7 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(BeforeQueryProcessor);
         }
 
-        private bool _CalcBeforeQueryProcessor(dynamic obj, int? transCode = null)
+        private bool _CalcBeforeQueryProcessor(dynamic input, dynamic output, int? transCode = null)
         {
             if (_HasBeforeQueryProcessor())
             {
@@ -1754,7 +1754,7 @@ namespace CodeM.Common.Orm
                 {
                     if (!Processor.CallModelProcessor(
                         processors[i].Trim(), this,
-                        obj, transCode))
+                        input, output, transCode))
                     {
                         return false;
                     }
@@ -1768,7 +1768,7 @@ namespace CodeM.Common.Orm
             return !string.IsNullOrWhiteSpace(AfterQueryProcessor);
         }
 
-        private bool _CalcAfterQueryProcessor(dynamic obj, int? transCode)
+        private bool _CalcAfterQueryProcessor(dynamic input, dynamic output, int? transCode)
         {
             if (_HasAfterQueryProcessor())
             {
@@ -1777,7 +1777,7 @@ namespace CodeM.Common.Orm
                 {
                     if (!Processor.CallModelProcessor(
                         processors[i].Trim(), this,
-                        obj, transCode))
+                        input, output, transCode))
                     {
                         return false;
                     }
@@ -1906,7 +1906,8 @@ namespace CodeM.Common.Orm
 
                 Derd.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
-                bool bRet = _CalcBeforeQueryProcessor(result, transCode);
+                dynamic mixedValues = MixActionValues(cmd.FilterProperties);
+                bool bRet = _CalcBeforeQueryProcessor(mixedValues, result, transCode);
                 if (bRet)
                 {
                     if (trans == null)
@@ -2020,7 +2021,7 @@ namespace CodeM.Common.Orm
                         }
                     }
 
-                    _CalcAfterQueryProcessor(result, transCode);
+                    _CalcAfterQueryProcessor(mixedValues, result, transCode);
                 }
 
                 return result;

@@ -2,6 +2,6 @@
 {
     public interface IModelProcessor
     {
-        public bool Process(Model modelDefine, dynamic modelValues, int? transCode = null);
+        public bool Process(Model modelDefine, dynamic input, dynamic output, int? transCode = null);
     }
 }

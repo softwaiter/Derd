@@ -80,14 +80,14 @@ namespace CodeM.Common.Orm
         }
 
         public static bool CallModelProcessor(string processorName,
-            Model modelDefine, dynamic modelValues, int? trans = null)
+            Model modelDefine, dynamic input, dynamic output, int? trans = null)
         {
             dynamic inst;
             if (sProcessorImpls.TryGetValue(processorName.ToLower(), out inst))
             {
                 if (inst is IModelProcessor)
                 {
-                    return ((IModelProcessor)inst).Process(modelDefine, modelValues, trans);
+                    return ((IModelProcessor)inst).Process(modelDefine, input, output, trans);
                 }
                 throw new Exception(string.Concat("无效的ModelProcessor：", processorName));
             }

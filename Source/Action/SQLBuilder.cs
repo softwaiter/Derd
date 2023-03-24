@@ -619,6 +619,8 @@ namespace CodeM.Common.Orm
 
             CommandSQL where = m.Where.Build(m);
 
+            result.FilterProperties = where.FilterProperties;
+
             foreignTables.AddRange(where.ForeignTables);
             foreignTables.AddRange(m.ForeignSortNames);
             string joinSql = BuildJoinTableSQL(m, foreignTables);
