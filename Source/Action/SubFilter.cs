@@ -215,7 +215,10 @@ namespace CodeM.Common.Orm
                         p = model.GetProperty(expr.Key);
                         if (recordEqualsProperties && item.Key == FilterOperator.Equals)
                         {
-                            result.FilterProperties.Add(p.Name, expr.Value);
+                            if (!result.FilterProperties.ContainsKey(p.Name))
+                            {
+                                result.FilterProperties.Add(p.Name, expr.Value);
+                            }
                         }
                     }
                     else
@@ -284,7 +287,10 @@ namespace CodeM.Common.Orm
                                     Dictionary<string, object>.Enumerator e = andActionSQL.FilterProperties.GetEnumerator();
                                     while (e.MoveNext())
                                     {
-                                        result.FilterProperties.Add(e.Current.Key, e.Current.Value);
+                                        if (!result.FilterProperties.ContainsKey(e.Current.Key))
+                                        {
+                                            result.FilterProperties.Add(e.Current.Key, e.Current.Value);
+                                        }
                                     }
                                 }
                             }
