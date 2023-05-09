@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<model name="Player" table="t_player">
+	<property name="Id" field="f_id" notNull="True" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
+	<property name="Type" type="Int16" defaultValue="0" desc="玩家类型（0：法术系，1：肉盾系，2：敏捷系）" />
+	<property name="Skill" type="JSON" desc="技能树" />
+	<property name="CreateTime" type="DateTime" field="f_createtime" defaultValue="{{CurrentDateTime}}" joinUpdate="false" desc="创建时间" />
+	<property name="UpdateTime" type="DateTime" field="f_updatetime"  preSave="{{CurrentDateTime}}" desc="更新时间" />
+</model>
