@@ -514,21 +514,42 @@ namespace CodeM.Common.Orm
         public Model GetValue(AggregateType aggType, string name, string alias = null)
         {
             string compactName = CheckGetValuePropName(name);
-            mGetValues.Add(new GetValueSetting(compactName, aggType, alias));
+            if (aggType == AggregateType.DISTINCT)
+            {
+                mGetValues.Insert(0, new GetValueSetting(compactName, aggType, alias));
+            }
+            else
+            {
+                mGetValues.Add(new GetValueSetting(compactName, aggType, alias));
+            }
             return this;
         }
 
         public Model GetValue(AggregateType aggType, FunctionType funcType, string name, string alias = null)
         {
             string compactName = CheckGetValuePropName(name);
-            mGetValues.Add(new GetValueSetting(compactName, aggType, funcType, alias));
+            if (aggType == AggregateType.DISTINCT)
+            {
+                mGetValues.Insert(0, new GetValueSetting(compactName, aggType, funcType, alias));
+            }
+            else
+            {
+                mGetValues.Add(new GetValueSetting(compactName, aggType, funcType, alias));
+            }
             return this;
         }
 
         public Model GetValue(AggregateType aggType, AggregateType aggType2, string name, string alias = null)
         {
             string compactName = CheckGetValuePropName(name);
-            mGetValues.Add(new GetValueSetting(compactName, aggType, aggType2, alias));
+            if (aggType == AggregateType.DISTINCT || aggType2 == AggregateType.DISTINCT)
+            {
+                mGetValues.Insert(0, new GetValueSetting(compactName, aggType, aggType2, alias));
+            }
+            else
+            {
+                mGetValues.Add(new GetValueSetting(compactName, aggType, aggType2, alias));
+            }
             return this;
         }
 
@@ -542,7 +563,14 @@ namespace CodeM.Common.Orm
         public Model GetValue(FunctionType funcType, AggregateType aggType, string name, string alias = null)
         {
             string compactName = CheckGetValuePropName(name);
-            mGetValues.Add(new GetValueSetting(compactName, funcType, aggType, alias));
+            if (aggType == AggregateType.DISTINCT)
+            {
+                mGetValues.Insert(0, new GetValueSetting(compactName, funcType, aggType, alias));
+            }
+            else
+            {
+                mGetValues.Add(new GetValueSetting(compactName, funcType, aggType, alias));
+            }
             return this;
         }
 
