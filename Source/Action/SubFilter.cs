@@ -353,7 +353,7 @@ namespace CodeM.Common.Orm
                         else
                         {
                             dynamic inputObj = new DynamicObjectExt();
-                            inputObj[p.Name] = expr.Value;
+                            inputObj.SetValue(p.Name, expr.Value);
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
@@ -369,7 +369,7 @@ namespace CodeM.Common.Orm
                         else
                         {
                             dynamic inputObj = new DynamicObjectExt();
-                            inputObj[p.Name] = expr.Value;
+                            inputObj.SetValue(p.Name, expr.Value);
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
@@ -385,7 +385,7 @@ namespace CodeM.Common.Orm
                         else
                         {
                             dynamic inputObj = new DynamicObjectExt();
-                            inputObj[p.Name] = expr.Value;
+                            inputObj.SetValue(p.Name, expr.Value);
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
@@ -401,7 +401,7 @@ namespace CodeM.Common.Orm
                         else
                         {
                             dynamic inputObj = new DynamicObjectExt();
-                            inputObj[p.Name] = expr.Value;
+                            inputObj.SetValue(p.Name, expr.Value);
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
@@ -417,7 +417,7 @@ namespace CodeM.Common.Orm
                         else
                         {
                             dynamic inputObj = new DynamicObjectExt();
-                            inputObj[p.Name] = expr.Value;
+                            inputObj.SetValue(p.Name, expr.Value);
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
                         }
@@ -433,7 +433,7 @@ namespace CodeM.Common.Orm
                         else
                         {
                             dynamic inputObj = new DynamicObjectExt();
-                            inputObj[p.Name] = expr.Value;
+                            inputObj.SetValue(p.Name, expr.Value);
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 p.DoPreSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
                         }
@@ -449,7 +449,7 @@ namespace CodeM.Common.Orm
                         else
                         {
                             dynamic inputObj = new DynamicObjectExt();
-                            inputObj[p.Name] = expr.Value;
+                            inputObj.SetValue(p.Name, expr.Value);
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 p.DoPreSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
                         }
@@ -474,12 +474,12 @@ namespace CodeM.Common.Orm
                         else
                         {
                             dynamic inputObj = new DynamicObjectExt();
-                            inputObj[p.Name] = values[0];
+                            inputObj.SetValue(p.Name, values[0]);
                             dp = DbUtils.CreateParam(currM.Path, paramName,
                                 p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
 
                             dynamic inputObj2 = new DynamicObjectExt();
-                            inputObj2[p.Name] = values[1];
+                            inputObj2.SetValue(p.Name, values[1]);
                             dp2 = DbUtils.CreateParam(currM.Path, paramName2,
                                 p.DoPreSaveProcessor(inputObj2), dbType, ParameterDirection.Input);
                         }
