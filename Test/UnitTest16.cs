@@ -1,6 +1,6 @@
 ﻿using CodeM.Common.Orm;
+using CodeM.Common.Orm.Functions;
 using CodeM.Common.Tools.DynamicObject;
-using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -57,7 +57,7 @@ namespace UnitTest
         {
             dynamic result = Derd.Model("Shopping")
                 .Equals("Code", "iPhone 12")
-                .GetValue(FunctionType.DATE, "CreateTime")
+                .GetValue(Date.DATE("CreateTime"))
                 .QueryFirst();
             Assert.IsNotNull(result);
             Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), result.CreateTime);
@@ -68,7 +68,7 @@ namespace UnitTest
         {
             dynamic result = Derd.Model("Shopping")
                 .Equals("Code", "iPhone 12")
-                .GetValue(FunctionType.DATE, "CreateTime", "CDate")
+                .GetValue(Date.DATE("CreateTime"), "CDate")
                 .QueryFirst();
             Assert.IsNotNull(result);
             Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), result.CDate);
@@ -84,10 +84,10 @@ namespace UnitTest
             Assert.IsTrue(ret);
 
             List<dynamic> result = Derd.Model("Shopping")
-                .GetValue(FunctionType.DATE, "CreateTime")
+                .GetValue(Date.DATE("CreateTime"))
                 .GetValue("Code")
-                .GetValue(AggregateType.COUNT, "Id", "Count")
-                .GroupBy(FunctionType.DATE, "CreateTime")
+                .GetValue(Aggregate.COUNT("Id"), "Count")
+                .GroupBy(Date.DATE("CreateTime"))
                 .GroupBy("Code")
                 .Query();
             Assert.AreEqual(1, result.Count);

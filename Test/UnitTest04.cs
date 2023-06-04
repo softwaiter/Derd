@@ -1,6 +1,5 @@
 ﻿using CodeM.Common.Orm;
 using CodeM.Common.Tools.DynamicObject;
-using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -71,7 +70,11 @@ namespace UnitTest
         [Description("查询用户wangxm的信息，并判断年龄是否为18，应为True。")]
         public void Test3()
         {
-            List<dynamic> result = Derd.Model("person").GetValue("name", "age").Equals("name", "wangxm").Query();
+            List<dynamic> result = Derd.Model("person")
+                .GetValue("name")
+                .GetValue("age")
+                .Equals("name", "wangxm")
+                .Query();
             Assert.IsTrue(result[0].age == 18);
         }
 

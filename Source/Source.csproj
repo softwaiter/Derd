@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>2.2.17</Version>
+    <Version>2.3.0</Version>
     <Authors>softwaiter</Authors>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>

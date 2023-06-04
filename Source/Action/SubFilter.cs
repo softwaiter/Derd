@@ -31,8 +31,22 @@ namespace CodeM.Common.Orm
     [Serializable]
     public class SubFilter : IFilter
     {
+        private Model mModel;
         private IFilter mParent = null;
         private List<KeyValuePair<FilterOperator, object>> mFilterItems = new List<KeyValuePair<FilterOperator, object>>();
+
+        public SubFilter(Model m)
+        {
+            mModel = m;
+        }
+
+        public Model Owner
+        {
+            get
+            {
+                return mModel;
+            }
+        }
 
         public void Reset()
         {
@@ -83,8 +97,70 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        internal bool TryGetProperty(Model m, object value, out Property p)
+        {
+            p = null;
+
+            if (value == null ||
+                value.GetType() != typeof(string))
+            {
+                return false;
+            }
+
+            string propName = value.ToString();
+            if (!propName.Contains("."))
+            {
+                if (m.HasProperty(propName))
+                {
+                    p = m.GetProperty(propName);
+                    return true;
+                }
+            }
+            else
+            {
+                Model currM = m;
+                string[] subNames = propName.Split(".");
+                for (int i = 0; i < subNames.Length; i++)
+                {
+                    string subName = subNames[i];
+                    if (TryGetProperty(currM, subName, out p))
+                    {
+                        if (i < subNames.Length - 1)
+                        {
+                            Model subM = ModelUtils.GetModel(p.TypeValue);
+                            if (subM != null)
+                            {
+                                currM = subM;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        internal void CheckProperty(string name)
+        {
+            if (!TryGetProperty(Owner, name, out Property p))
+            {
+                throw new Exception("无法识别的属性：" + name);
+            }
+        }
+
         public IFilter Equals(string name, object value)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
                 new KeyValuePair<string, object>(name, value)));
             return this;
@@ -92,6 +168,8 @@ namespace CodeM.Common.Orm
 
         public IFilter NotEquals(string name, object value)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
                 new KeyValuePair<string, object>(name, value)));
             return this;
@@ -99,6 +177,8 @@ namespace CodeM.Common.Orm
 
         public IFilter Gt(string name, object value)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gt,
                 new KeyValuePair<string, object>(name, value)));
             return this;
@@ -106,6 +186,8 @@ namespace CodeM.Common.Orm
 
         public IFilter Gte(string name, object value)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gte,
                 new KeyValuePair<string, object>(name, value)));
             return this;
@@ -113,6 +195,8 @@ namespace CodeM.Common.Orm
 
         public IFilter Lt(string name, object value)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lt,
                 new KeyValuePair<string, object>(name, value)));
             return this;
@@ -120,6 +204,8 @@ namespace CodeM.Common.Orm
 
         public IFilter Lte(string name, object value)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lte,
                 new KeyValuePair<string, object>(name, value)));
             return this;
@@ -127,6 +213,8 @@ namespace CodeM.Common.Orm
 
         public IFilter Like(string name, string value)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Like,
                 new KeyValuePair<string, object>(name, value)));
             return this;
@@ -134,6 +222,8 @@ namespace CodeM.Common.Orm
 
         public IFilter NotLike(string name, string value)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotLike,
                 new KeyValuePair<string, object>(name, value)));
             return this;
@@ -141,6 +231,8 @@ namespace CodeM.Common.Orm
 
         public IFilter IsNull(string name)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNull,
                 new KeyValuePair<string, object>(name, true)));
             return this;
@@ -148,6 +240,8 @@ namespace CodeM.Common.Orm
 
         public IFilter IsNotNull(string name)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNotNull,
                 new KeyValuePair<string, object>(name, true)));
             return this;
@@ -155,6 +249,8 @@ namespace CodeM.Common.Orm
 
         public IFilter Between(string name, object value, object value2)
         {
+            CheckProperty(name);
+
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Between,
                 new KeyValuePair<string, object>(name, new object[] { value, value2 })));
             return this;
@@ -162,6 +258,8 @@ namespace CodeM.Common.Orm
 
         public IFilter In(string name, params object[] values)
         {
+            CheckProperty(name);
+
             if (values.Length == 1)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
@@ -177,6 +275,8 @@ namespace CodeM.Common.Orm
 
         public IFilter NotIn(string name, params object[] values)
         {
+            CheckProperty(name);
+
             if (values.Length == 1)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
@@ -199,7 +299,7 @@ namespace CodeM.Common.Orm
 
             KeyValuePair<string, object> expr = new KeyValuePair<string, object>();
             Model currM;
-            Property p = null;
+            Property p = null, p2 = null;
             DbParameter dp, dp2;
             foreach (KeyValuePair<FilterOperator, object> item in mFilterItems)
             {
@@ -209,6 +309,30 @@ namespace CodeM.Common.Orm
                     item.Key != FilterOperator.Or)
                 {
                     expr = (KeyValuePair<string, object>)item.Value;
+
+                    bool keyIsProp = TryGetProperty(model, expr.Key, out p);
+                    bool valueIsProp = TryGetProperty(model, expr.Value, out p2);
+
+                    if (valueIsProp)
+                    {
+                    }
+                    else
+                    {
+                        if (!expr.Key.Contains("."))
+                        {
+                            if (recordEqualsProperties && item.Key == FilterOperator.Equals)
+                            {
+                                if (!result.FilterProperties.ContainsKey(p.Name))
+                                {
+                                    result.FilterProperties.Add(p.Name, expr.Value);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            result.ForeignTables.Add(expr.Key);
+                        }
+                    }
 
                     if (!expr.Key.Contains("."))
                     {

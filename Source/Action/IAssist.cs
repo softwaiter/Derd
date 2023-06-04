@@ -1,4 +1,6 @@
-﻿namespace CodeM.Common.Orm.Action
+﻿using CodeM.Common.Orm.Functions.Impl;
+
+namespace CodeM.Common.Orm.Action
 {
     public interface IAssist
     {
@@ -8,6 +10,6 @@
 
         Model GroupBy(params string[] names);
 
-        Model GroupBy(FunctionType funcType, string name);
+        Model GroupBy(Function function);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Orm.Functions.Impl;
 using CodeM.Common.Tools.DynamicObject;
 using System;
 using System.Collections;
@@ -429,53 +430,35 @@ namespace CodeM.Common.Orm
             return sbJoins.ToString();
         }
 
-        private static string GenAggregateTypeField(AggregateType type, string field)
+        internal static string GenFunctionSQL(Model m, Function function, string field)
         {
-            switch (type)
+            string funcName = function.GetType().Name.ToUpper();
+            if (function.ChildFunction != null)
             {
-                case AggregateType.COUNT:
-                    return string.Concat("COUNT(", field, ")");
-                case AggregateType.DISTINCT:
-                    return string.Concat("DISTINCT(", field, ")");
-                case AggregateType.SUM:
-                    return string.Concat("SUM(", field, ")");
-                case AggregateType.MAX:
-                    return string.Concat("MAX(", field, ")");
-                case AggregateType.MIN:
-                    return string.Concat("MIN(", field, ")");
-                case AggregateType.AVG:
-                    return string.Concat("AVG(", field, ")");
+                return Features.GetFunctionCommand(m, funcName,
+                    GenFunctionSQL(m, function.ChildFunction, field));
             }
-            return field;
+            return Features.GetFunctionCommand(m, funcName, field);
         }
 
-        private static string GenFunctionTypeField(Model m, FunctionType type, string field)
-        {
-            switch (type)
-            {
-                case FunctionType.DATE:
-                    string funcName = Enum.GetName(typeof(FunctionType), type);
-                    return Features.GetFunctionCommand(m, funcName, field);
-            }
-            return field;
-        }
-
-        internal static string GenQueryField(Model m, GetValueSetting gvs, string field)
+        internal static string GenQueryFieldSQL(Model m, GetValueSetting gvs, string field)
         {
             string qryField = field;
-            for (int i = gvs.Operations.Count - 1; i >= 0; i--)
+            if (!(gvs.Function is NONE))
             {
-                dynamic _typ = gvs.Operations[i];
-                if (_typ is AggregateType)
-                {
-                    qryField = GenAggregateTypeField(_typ, qryField);
-                }
-                else if (_typ is FunctionType)
-                {
-                    qryField = GenFunctionTypeField(m, _typ, qryField);
-                }
+                qryField = GenFunctionSQL(m, gvs.Function, field);
             }
             return qryField;
+        }
+
+        internal static string GenGroupbyFieldSQL(Model m, GroupBySetting gbs, string field)
+        {
+            string gpbField = field;
+            if (!(gbs.Function is NONE))
+            {
+                gpbField = GenFunctionSQL(m, gbs.Function, field);
+            }
+            return gpbField;
         }
 
         internal static string BuildGroupBySQL(Model m)
@@ -489,19 +472,18 @@ namespace CodeM.Common.Orm
                 sbResult.Append("GROUP BY ");
                 foreach (GroupBySetting gbs in m.GroupByNames)
                 {
-                    if (!gbs.Name.Contains("."))    //直接属性
+                    if (!gbs.PropertyName.Contains("."))    //直接属性
                     {
-                        Property p = m.GetProperty(gbs.Name);
+                        Property p = m.GetProperty(gbs.PropertyName);
                         if (sbResult.Length > 9)
                         {
                             sbResult.Append(",");
                         }
 
                         string groupField = string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1]);
-                        if (gbs.FunctionType != FunctionType.NONE)
+                        if (gbs.IncludeFunction)
                         {
-                            string funcName = Enum.GetName(typeof(FunctionType), gbs.FunctionType);
-                            string groupFuncField = Features.GetFunctionCommand(m, funcName, groupField);
+                            string groupFuncField = GenGroupbyFieldSQL(m, gbs, groupField);
                             sbResult.Append(groupFuncField);
                         }
                         else
@@ -512,7 +494,7 @@ namespace CodeM.Common.Orm
                     else    //Model属性引用
                     {
                         Model currM = m;
-                        string[] subNames = gbs.Name.Split(".");
+                        string[] subNames = gbs.PropertyName.Split(".");
                         for (int i = 0; i < subNames.Length; i++)
                         {
                             Property subProp = currM.GetProperty(subNames[i]);
@@ -527,10 +509,9 @@ namespace CodeM.Common.Orm
 
                                 Property lastProp = currM.GetProperty(subNames[i + 1]);
                                 string groupField = string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1]);
-                                if (gbs.FunctionType != FunctionType.NONE)
+                                if (gbs.IncludeFunction)
                                 {
-                                    string funcName = Enum.GetName(typeof(FunctionType), gbs.FunctionType);
-                                    string groupFuncField = Features.GetFunctionCommand(m, funcName, groupField);
+                                    string groupFuncField = GenGroupbyFieldSQL(m, gbs, groupField);
                                     sbResult.Append(groupFuncField);
                                 }
                                 else
@@ -569,7 +550,7 @@ namespace CodeM.Common.Orm
             {
                 for (int i = 0; i < m.PropertyCount; i++)
                 {
-                    queryFields.Add(new GetValueSetting(m.GetProperty(i).Name));
+                    queryFields.Add(new GetValueSetting(new NONE(m.GetProperty(i).Name)));
                 }
             }
 
@@ -577,23 +558,23 @@ namespace CodeM.Common.Orm
             StringBuilder sbFields = new StringBuilder();
             foreach (GetValueSetting gvs in queryFields)
             {
-                if (!gvs.Name.Contains("."))    //直接属性
+                if (!gvs.PropertyName.Contains("."))    //直接属性
                 {
-                    Property p = m.GetProperty(gvs.Name);
+                    Property p = m.GetProperty(gvs.PropertyName);
                     if (sbFields.Length > 0)
                     {
                         sbFields.Append(",");
                     }
                     sbFields.Append(string.Concat(
-                        GenQueryField(m, gvs, string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1])),
+                        GenQueryFieldSQL(m, gvs, string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1])),
                         " AS ", aliasQuotes[0], gvs.FieldName, aliasQuotes[1]));
                 }
                 else    //Model属性引用
                 {
-                    foreignTables.Add(gvs.Name);
+                    foreignTables.Add(gvs.PropertyName);
 
                     Model currM = m;
-                    string[] subNames = gvs.Name.Split(".");
+                    string[] subNames = gvs .PropertyName.Split(".");
                     for (int i = 0; i < subNames.Length; i++)
                     {
                         Property subProp = currM.GetProperty(subNames[i]);
@@ -608,7 +589,7 @@ namespace CodeM.Common.Orm
 
                             Property lastProp = currM.GetProperty(subNames[i + 1]); 
                             sbFields.Append(string.Concat(
-                                GenQueryField(currM, gvs, string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1])),
+                                GenQueryFieldSQL(currM, gvs, string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1])),
                                 " AS ", aliasQuotes[0], gvs.FieldName, aliasQuotes[1]));
 
                             break;

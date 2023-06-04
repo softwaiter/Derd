@@ -1,6 +1,5 @@
 ﻿using CodeM.Common.Orm;
 using CodeM.Common.Tools.DynamicObject;
-using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -69,7 +68,12 @@ namespace UnitTest
         [Description("查询名称为wangxm的所属机构Id和名称，应为1和XX科技")]
         public void Test4()
         {
-            List<dynamic> userList = Derd.Model("Person").Equals("Name", "wangxm").GetValue("Name", "Org.Id", "Org.Name").Query();
+            List<dynamic> userList = Derd.Model("Person")
+                .Equals("Name", "wangxm")
+                .GetValue("Name")
+                .GetValue("Org.Id")
+                .GetValue("Org.Name")
+                .Query();
             Assert.AreEqual("1-XX科技", userList[0].Org.Id + "-" + userList[0].Org.Name);
         }
 

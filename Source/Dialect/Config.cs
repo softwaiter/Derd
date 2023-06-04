@@ -261,6 +261,24 @@ namespace CodeM.Common.Orm.Dialect
                 { "sqlite", "DATE({0})" },
                 { "mysql", "DATE_FORMAT({0}, '%Y-%m-%d')" },
                 { "sqlserver", "CONVERT(VARCHAR(10), {0}, 120)" }
+            }},
+            { "COUNT", new Hashtable() {
+                { "default", "COUNT({0})" }
+            }},
+            { "DISTINCT", new Hashtable() {
+                { "default", "DISTINCT({0})" }
+            }},
+            { "SUM", new Hashtable() {
+                { "default", "SUM({0})" }
+            }},
+            { "MAX", new Hashtable() {
+                { "default", "MAX({0})" }
+            }},
+            { "MIN", new Hashtable() {
+                { "default", "MIN({0})" }
+            }},
+            { "AVG", new Hashtable() {
+                { "default", "AVG({0})" }
             }}
         });
 

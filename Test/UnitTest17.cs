@@ -1,4 +1,5 @@
 ﻿using CodeM.Common.Orm;
+using CodeM.Common.Orm.Functions;
 using CodeM.Common.Tools.DynamicObject;
 using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -83,7 +84,7 @@ namespace UnitTest
         public void Test3()
         {
             List<dynamic> result = Derd.Model("Person")
-                .GetValue(AggregateType.COUNT, AggregateType.DISTINCT, "Age", "Count")
+                .GetValue(Aggregate.COUNT(Aggregate.DISTINCT("Age")), "Count")
                 .Query();
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual(3, result[0].Count);
