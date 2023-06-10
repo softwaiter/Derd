@@ -1,5 +1,5 @@
-﻿namespace CodeM.Common.Orm.Functions.Impl
-{
+﻿namespace CodeM.Common.Orm
+{ 
     public class MAX : Function
     {
         public MAX(string propName) : base(propName)

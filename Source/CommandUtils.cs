@@ -1,6 +1,5 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.Dialect;
-using CodeM.Common.Orm.Functions.Impl;
 using System;
 using System.Data;
 using System.Data.Common;

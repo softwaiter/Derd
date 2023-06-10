@@ -1,6 +1,4 @@
-﻿using CodeM.Common.Orm.Functions.Impl;
-
-namespace CodeM.Common.Orm.Functions
+﻿namespace CodeM.Common.Orm
 {
     public class Aggregate
     {

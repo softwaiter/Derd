@@ -1,5 +1,4 @@
-﻿using CodeM.Common.Orm.Functions.Impl;
-using System;
+﻿using System;
 
 namespace CodeM.Common.Orm
 {

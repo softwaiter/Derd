@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CodeM.Common.Orm.Functions.Impl
+namespace CodeM.Common.Orm
 {
     public class Function
     {

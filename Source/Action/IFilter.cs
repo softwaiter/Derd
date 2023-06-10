@@ -1,6 +1,4 @@
-﻿using CodeM.Common.Orm.Functions.Impl;
-
-namespace CodeM.Common.Orm
+﻿namespace CodeM.Common.Orm
 {
     public interface IFilter
     {

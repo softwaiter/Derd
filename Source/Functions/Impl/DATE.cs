@@ -1,4 +1,4 @@
-﻿namespace CodeM.Common.Orm.Functions.Impl
+﻿namespace CodeM.Common.Orm
 {
     public class DATE : Function
     {

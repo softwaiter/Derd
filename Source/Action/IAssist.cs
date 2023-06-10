@@ -1,6 +1,4 @@
-﻿using CodeM.Common.Orm.Functions.Impl;
-
-namespace CodeM.Common.Orm.Action
+﻿namespace CodeM.Common.Orm.Action
 {
     public interface IAssist
     {

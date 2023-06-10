@@ -1,5 +1,4 @@
 ﻿using CodeM.Common.Orm;
-using CodeM.Common.Orm.Functions;
 using CodeM.Common.Tools.DynamicObject;
 using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

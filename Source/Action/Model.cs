@@ -1,7 +1,6 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.Action;
 using CodeM.Common.Orm.Dialect;
-using CodeM.Common.Orm.Functions.Impl;
 using CodeM.Common.Tools;
 using CodeM.Common.Tools.DynamicObject;
 using System;
