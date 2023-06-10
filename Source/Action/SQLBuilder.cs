@@ -432,13 +432,17 @@ namespace CodeM.Common.Orm
 
         internal static string GenFunctionSQL(Model m, Function function, string field)
         {
-            string funcName = function.GetType().Name.ToUpper();
-            if (function.ChildFunction != null)
+            if (!(function is NONE))
             {
-                return Features.GetFunctionCommand(m, funcName,
-                    GenFunctionSQL(m, function.ChildFunction, field));
+                string funcName = function.GetType().Name.ToUpper();
+                if (function.ChildFunction != null)
+                {
+                    return Features.GetFunctionCommand(m, funcName,
+                        GenFunctionSQL(m, function.ChildFunction, field));
+                }
+                return Features.GetFunctionCommand(m, funcName, field);
             }
-            return Features.GetFunctionCommand(m, funcName, field);
+            return field;
         }
 
         internal static string GenQueryFieldSQL(Model m, GetValueSetting gvs, string field)

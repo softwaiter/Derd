@@ -433,71 +433,17 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private string CheckGetValuePropName(string name)
-        {
-            string compactName = name.Trim();
-            if (!compactName.Contains("."))
-            {
-                Property p = GetProperty(compactName);
-                if (p == null)
-                {
-                    throw new Exception(string.Concat("未找到属性：", compactName));
-                }
-            }
-            else
-            {
-                string[] typeItems = compactName.Split(".");
-                Model currM = this;
-                for (int i = 0; i < typeItems.Length; i++)
-                {
-                    Property p = currM.GetProperty(typeItems[i]);
-                    if (p == null)
-                    {
-                        throw new Exception(string.Concat("未找到属性：", compactName));
-                    }
-
-                    if (i < typeItems.Length - 1)
-                    {
-                        currM = ModelUtils.GetModel(p.TypeValue);
-                        if (currM == null)
-                        {
-                            throw new Exception(string.Concat("非法的Model引用：", p.TypeValue));
-                        }
-                    }
-                }
-            }
-            return compactName;
-        }
-
         public Model GetValue(string propName, string alias = null)
         {
-            string compactName = CheckGetValuePropName(propName);
+            string compactName = PropertyChecker.CheckValueProperty(this, propName);
             mGetValues.Add(new GetValueSetting(new NONE(compactName), alias));
             return this;
 
         }
 
-        private bool CheckGetValueFunction(Function function)
-        {
-            bool includeDistinct = false;
-
-            Function currFunction = function;
-            while (string.IsNullOrWhiteSpace(currFunction.PropertyName))
-            {
-                if (!includeDistinct && currFunction is DISTINCT)
-                {
-                    includeDistinct = true;
-                }
-                currFunction = currFunction.ChildFunction;
-            }
-            CheckGetValuePropName(currFunction.PropertyName);
-
-            return includeDistinct;
-        }
-
         public Model GetValue(Function function, string alias = null)
         {
-            if (CheckGetValueFunction(function))    // 是否包含Distinct运算
+            if (PropertyChecker.CheckFunctionProperty(this, function))    // 是否包含Distinct运算
             {
                 mGetValues.Insert(0, new GetValueSetting(function, alias));
             }
@@ -552,9 +498,21 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        public Model Equals(Function function, object value)
+        {
+            mFilter.Equals(function, value);
+            return this;
+        }
+
         public Model NotEquals(string name, object value)
         {
             mFilter.NotEquals(name, value);
+            return this;
+        }
+
+        public Model NotEquals(Function function, object value)
+        {
+            mFilter.NotEquals(function, value);
             return this;
         }
 
@@ -564,9 +522,21 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        public Model Gt(Function function, object value)
+        {
+            mFilter.Gt(function, value);
+            return this;
+        }
+
         public Model Gte(string name, object value)
         {
             mFilter.Gte(name, value);
+            return this;
+        }
+
+        public Model Gte(Function function, object value)
+        {
+            mFilter.Gte(function, value);
             return this;
         }
 
@@ -576,21 +546,45 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        public Model Lt(Function function, object value)
+        {
+            mFilter.Lt(function, value);
+            return this;
+        }
+
         public Model Lte(string name, object value)
         {
             mFilter.Lte(name, value);
             return this;
         }
 
-        public Model Like(string name, string value)
+        public Model Lte(Function function, object value)
+        {
+            mFilter.Lte(function, value);
+            return this;
+        }
+
+        public Model Like(string name, object value)
         {
             mFilter.Like(name, value);
             return this;
         }
 
-        public Model NotLike(string name, string value)
+        public Model Like(Function function, object value)
+        {
+            mFilter.Like(function, value);
+            return this;
+        }
+
+        public Model NotLike(string name, object value)
         {
             mFilter.NotLike(name, value);
+            return this;
+        }
+
+        public Model NotLike(Function function, object value)
+        {
+            mFilter.NotLike(function, value);
             return this;
         }
 
@@ -600,9 +594,21 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        public Model IsNull(Function function)
+        {
+            mFilter.IsNull(function);
+            return this;
+        }
+
         public Model IsNotNull(string name)
         {
             mFilter.IsNotNull(name);
+            return this;
+        }
+
+        public Model IsNotNull(Function function)
+        {
+            mFilter.IsNotNull(function);
             return this;
         }
 
@@ -612,15 +618,33 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        public Model Between(Function function, object value, object value2)
+        {
+            mFilter.Between(function, value, value2);
+            return this;
+        }
+
         public Model In(string name, params object[] values)
         {
             mFilter.In(name, values);
             return this;
         }
 
+        public Model In(Function function, params object[] values)
+        {
+            mFilter.In(function, values);
+            return this;
+        }
+
         public Model NotIn(string name, params object[] values)
         {
             mFilter.NotIn(name, values);
+            return this;
+        }
+
+        public Model NotIn(Function function, params object[] values)
+        {
+            mFilter.NotIn(function, values);
             return this;
         }
 
@@ -867,7 +891,7 @@ namespace CodeM.Common.Orm
         {
             foreach (string name in names)
             {
-                string compactName = CheckGetValuePropName(name);
+                string compactName = PropertyChecker.CheckValueProperty(this, name);
                 mGroupByNames.Add(new GroupBySetting(new NONE(compactName)));
             }
             return this;
@@ -875,7 +899,7 @@ namespace CodeM.Common.Orm
 
         public Model GroupBy(Function function)
         {
-            CheckGetValueFunction(function);
+            PropertyChecker.CheckFunctionProperty(this, function);
             mGroupByNames.Add(new GroupBySetting(function));
             return this;
         }

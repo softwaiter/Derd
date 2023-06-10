@@ -282,6 +282,31 @@ namespace CodeM.Common.Orm.Dialect
             }}
         });
 
+        static Hashtable sFunctionReturnTypes = Hashtable.Synchronized(new Hashtable()
+        {
+            { "DATE", new Hashtable() {
+                { "default", "String" }
+            }},
+            { "COUNT", new Hashtable() {
+                { "default", "Int64" }
+            }},
+            { "DISTINCT", new Hashtable() {
+                { "default", "" }
+            }},
+            { "SUM", new Hashtable() {
+                { "default", "Double" }
+            }},
+            { "MAX", new Hashtable() {
+                { "default", "" }
+            }},
+            { "MIN", new Hashtable() {
+                { "default", "" }
+            }},
+            { "AVG", new Hashtable() {
+                { "default", "Decimal" }
+            }}
+        });
+
         /// <summary>
         /// 配置项汇总访问入口
         /// </summary>
@@ -291,7 +316,8 @@ namespace CodeM.Common.Orm.Dialect
             { "fieldtype", sFieldTypes },
             { "fieldlength", sFieldDefaultLengths },
             { "autoincrtag", sFieldAutoIncrementTags },
-            { "function", sFunctions }
+            { "function", sFunctions },
+            { "functiontype", sFunctionReturnTypes }
         });
 
         internal static object GetConfigValue(string config, Model model, object key)

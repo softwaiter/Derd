@@ -1,5 +1,6 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Orm.Functions.Impl;
 using CodeM.Common.Tools.DynamicObject;
 using System;
 using System.Collections.Generic;
@@ -101,10 +102,19 @@ namespace CodeM.Common.Orm
         {
             p = null;
 
-            if (value == null ||
-                value.GetType() != typeof(string))
+            if (value == null)
             {
                 return false;
+            }
+
+            if (value is Function)
+            {
+                Function func = (Function)value;
+                while (func.ChildFunction != null)
+                {
+                    func = func.ChildFunction;
+                }
+                value = func.PropertyName;
             }
 
             string propName = value.ToString();
@@ -149,145 +159,300 @@ namespace CodeM.Common.Orm
             return false;
         }
 
-        internal void CheckProperty(string name)
-        {
-            if (!TryGetProperty(Owner, name, out Property p))
-            {
-                throw new Exception("无法识别的属性：" + name);
-            }
-        }
-
         public IFilter Equals(string name, object value)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
-                new KeyValuePair<string, object>(name, value)));
+                new KeyValuePair<Function, object>(new NONE(name), value)));
+            return this;
+        }
+
+        public IFilter Equals(Function function, object value)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
+                new KeyValuePair<Function, object>(function, value)));
             return this;
         }
 
         public IFilter NotEquals(string name, object value)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
-                new KeyValuePair<string, object>(name, value)));
+                new KeyValuePair<Function, object>(new NONE(name), value)));
+            return this;
+        }
+
+        public IFilter NotEquals(Function function, object value)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
+                new KeyValuePair<Function, object>(function, value)));
             return this;
         }
 
         public IFilter Gt(string name, object value)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gt,
-                new KeyValuePair<string, object>(name, value)));
+                new KeyValuePair<Function, object>(new NONE(name), value)));
+            return this;
+        }
+
+        public IFilter Gt(Function function, object value)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gt,
+                new KeyValuePair<Function, object>(function, value)));
             return this;
         }
 
         public IFilter Gte(string name, object value)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gte,
-                new KeyValuePair<string, object>(name, value)));
+                new KeyValuePair<Function, object>(new NONE(name), value)));
+            return this;
+        }
+
+        public IFilter Gte(Function function, object value)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gte,
+                new KeyValuePair<Function, object>(function, value)));
             return this;
         }
 
         public IFilter Lt(string name, object value)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lt,
-                new KeyValuePair<string, object>(name, value)));
+                new KeyValuePair<Function, object>(new NONE(name), value)));
+            return this;
+        }
+
+        public IFilter Lt(Function function, object value)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lt,
+                new KeyValuePair<Function, object>(function, value)));
             return this;
         }
 
         public IFilter Lte(string name, object value)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lte,
-                new KeyValuePair<string, object>(name, value)));
+                new KeyValuePair<Function, object>(new NONE(name), value)));
             return this;
         }
 
-        public IFilter Like(string name, string value)
+        public IFilter Lte(Function function, object value)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lte,
+                new KeyValuePair<Function, object>(function, value)));
+            return this;
+        }
+
+        public IFilter Like(string name, object value)
+        {
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Like,
-                new KeyValuePair<string, object>(name, value)));
+                new KeyValuePair<Function, object>(new NONE(name), value)));
             return this;
         }
 
-        public IFilter NotLike(string name, string value)
+        public IFilter Like(Function function, object value)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Like,
+                new KeyValuePair<Function, object>(function, value)));
+            return this;
+        }
+
+        public IFilter NotLike(string name, object value)
+        {
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotLike,
-                new KeyValuePair<string, object>(name, value)));
+                new KeyValuePair<Function, object>(new NONE(name), value)));
+            return this;
+        }
+
+        public IFilter NotLike(Function function, object value)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotLike,
+                new KeyValuePair<Function, object>(function, value)));
             return this;
         }
 
         public IFilter IsNull(string name)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNull,
-                new KeyValuePair<string, object>(name, true)));
+                new KeyValuePair<Function, object>(new NONE(name), true)));
+            return this;
+        }
+
+        public IFilter IsNull(Function function)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNull,
+                new KeyValuePair<Function, object>(function, true)));
             return this;
         }
 
         public IFilter IsNotNull(string name)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNotNull,
-                new KeyValuePair<string, object>(name, true)));
+                new KeyValuePair<Function, object>(new NONE(name), true)));
+            return this;
+        }
+
+        public IFilter IsNotNull(Function function)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNotNull,
+                new KeyValuePair<Function, object>(function, true)));
             return this;
         }
 
         public IFilter Between(string name, object value, object value2)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Between,
-                new KeyValuePair<string, object>(name, new object[] { value, value2 })));
+                new KeyValuePair<Function, object>(new NONE(name), new object[] { value, value2 })));
+            return this;
+        }
+
+        public IFilter Between(Function function, object value, object value2)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Between,
+                new KeyValuePair<Function, object>(function, new object[] { value, value2 })));
             return this;
         }
 
         public IFilter In(string name, params object[] values)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             if (values.Length == 1)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
-                    new KeyValuePair<string, object>(name, values[0])));
+                    new KeyValuePair<Function, object>(new NONE(name), values[0])));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.In,
-                    new KeyValuePair<string, object>(name, values)));
+                    new KeyValuePair<Function, object>(new NONE(name), values)));
+            }
+            return this;
+        }
+
+        public IFilter In(Function function, params object[] values)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            if (values.Length == 1)
+            {
+                mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
+                    new KeyValuePair<Function, object>(function, values[0])));
+            }
+            else
+            {
+                mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.In,
+                    new KeyValuePair<Function, object>(function, values)));
             }
             return this;
         }
 
         public IFilter NotIn(string name, params object[] values)
         {
-            CheckProperty(name);
+            PropertyChecker.CheckValueProperty(Owner, name);
 
             if (values.Length == 1)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
-                    new KeyValuePair<string, object>(name, values[0])));
+                    new KeyValuePair<Function, object>(new NONE(name), values[0])));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotIn,
-                    new KeyValuePair<string, object>(name, values)));
+                    new KeyValuePair<Function, object>(new NONE(name), values)));
             }
             return this;
+        }
+
+        public IFilter NotIn(Function function, params object[] values)
+        {
+            PropertyChecker.CheckFunctionProperty(Owner, function);
+
+            if (values.Length == 1)
+            {
+                mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
+                    new KeyValuePair<Function, object>(function, values[0])));
+            }
+            else
+            {
+                mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotIn,
+                    new KeyValuePair<Function, object>(function, values)));
+            }
+            return this;
+        }
+
+        private DbType GetParamDbType(Function function, Property p)
+        {
+            if (function != null && !(function is NONE))
+            {
+                string funcName = function.GetType().Name.ToUpper();
+                string funcType = Features.GetFunctionReturnType(p.Owner, funcName);
+                if (string.IsNullOrWhiteSpace(funcType))
+                {
+                    return CommandUtils.GetDbParamType(p);
+                }
+                else
+                {
+                    return (DbType)Enum.Parse(typeof(DbType), funcType, true);
+                }
+            }
+            else
+            {
+                return CommandUtils.GetDbParamType(p);
+            }
+        }
+
+        private bool IsFunctionExpr(object obj)
+        {
+            if (obj != null)
+            {
+                return (obj is Function && !(obj is NONE));
+            }
+            return false;
         }
 
         internal CommandSQL Build(Model model)
@@ -297,28 +462,36 @@ namespace CodeM.Common.Orm
             bool recordEqualsProperties = true;
             CommandSQL result = new CommandSQL();
 
-            KeyValuePair<string, object> expr = new KeyValuePair<string, object>();
             Model currM;
-            Property p = null, p2 = null;
+            KeyValuePair<Function, object> expr, defaultExpr = new KeyValuePair<Function, object>();
+            bool valueIsProp;
+            Property p = null, p2 = null, p3 = null;
             DbParameter dp, dp2;
+            string exprLeft = null, exprRight = null;
             foreach (KeyValuePair<FilterOperator, object> item in mFilterItems)
             {
                 currM = model;
+                expr = defaultExpr;
+                valueIsProp = false;
 
                 if (item.Key != FilterOperator.And &&
                     item.Key != FilterOperator.Or)
                 {
-                    expr = (KeyValuePair<string, object>)item.Value;
+                    expr = (KeyValuePair<Function, object>)item.Value;
 
-                    bool keyIsProp = TryGetProperty(model, expr.Key, out p);
-                    bool valueIsProp = TryGetProperty(model, expr.Value, out p2);
+                    TryGetProperty(model, expr.Key, out p);
+                    valueIsProp = TryGetProperty(model, expr.Value, out p2);
 
-                    if (valueIsProp)
+                    // 将带.分隔符的搜索条件添加到关联表变量中
+                    if (expr.Key.PropertyName.Contains("."))
                     {
+                        result.ForeignTables.Add(expr.Key.PropertyName);
                     }
-                    else
+
+                    if (!valueIsProp)
                     {
-                        if (!expr.Key.Contains("."))
+                        // 对当前模型直接属性Equals的表达式，转换成对象属性值
+                        if (!IsFunctionExpr(expr.Value) && !expr.Key.PropertyName.Contains("."))
                         {
                             if (recordEqualsProperties && item.Key == FilterOperator.Equals)
                             {
@@ -328,47 +501,29 @@ namespace CodeM.Common.Orm
                                 }
                             }
                         }
-                        else
-                        {
-                            result.ForeignTables.Add(expr.Key);
-                        }
-                    }
-
-                    if (!expr.Key.Contains("."))
-                    {
-                        p = model.GetProperty(expr.Key);
-                        if (recordEqualsProperties && item.Key == FilterOperator.Equals)
-                        {
-                            if (!result.FilterProperties.ContainsKey(p.Name))
-                            {
-                                result.FilterProperties.Add(p.Name, expr.Value);
-                            }
-                        }
                     }
                     else
                     {
-                        string[] subNames = expr.Key.Split(".");
-                        for (int i = 0; i < subNames.Length; i++)
+                        // 如果条件表达式值为属性类型，且属性非当前模型直接属性，需加入关联表变量中
+                        string propName = expr.Value.ToString();
+                        if (expr.Value is Function)
                         {
-                            string subName = subNames[i];
-                            Property subProp = currM.GetProperty(subName);
-                            Model subM = ModelUtils.GetModel(subProp.TypeValue);
-                            currM = subM;
-
-                            if (i == subNames.Length - 2)
-                            {
-                                p = subM.GetProperty(subNames[i + 1]);
-                                break;
-                            }
+                            propName = ((Function)expr.Value).PropertyName;
                         }
 
-                        result.ForeignTables.Add(expr.Key);
+                        if (propName.Contains("."))
+                        {
+                            result.ForeignTables.Add(propName);
+                        }
                     }
 
                     if (!string.IsNullOrEmpty(result.SQL))
                     {
                         result.SQL += " AND ";
                     }
+
+                    exprLeft = SQLBuilder.GenFunctionSQL(currM, expr.Key,
+                        string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1]));
                 }
                 else if (item.Key == FilterOperator.Or)
                 {
@@ -383,7 +538,7 @@ namespace CodeM.Common.Orm
                 string paramPlaceholder2 = null;
                 if (p != null)
                 {
-                    dbType = CommandUtils.GetDbParamType(p);
+                    dbType = GetParamDbType(expr.Key, p);
                     paramName = CommandUtils.GenParamName(p);
                     paramPlaceholder = Features.GetCommandParamName(currM, paramName);
                     paramName2 = CommandUtils.GenParamName(p);
@@ -453,166 +608,382 @@ namespace CodeM.Common.Orm
                         }
                         break;
                     case FilterOperator.Equals:
-                        if (!p.NeedCalcPreSaveProcessor)
+                        if (!valueIsProp && !IsFunctionExpr(expr.Value))
                         {
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, dbType, ParameterDirection.Input);
+                            if (!p.NeedCalcPreSaveProcessor)
+                            {
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    expr.Value, dbType, ParameterDirection.Input);
+                            }
+                            else
+                            {
+                                dynamic inputObj = new DynamicObjectExt();
+                                inputObj.SetValue(p.Name, expr.Value);
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            }
+                            result.Params.Add(dp);
+
+                            result.SQL += string.Concat(exprLeft, "=", paramPlaceholder);
                         }
                         else
                         {
-                            dynamic inputObj = new DynamicObjectExt();
-                            inputObj.SetValue(p.Name, expr.Value);
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            if (p2 != null)
+                            {
+                                exprRight = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                            }
+                            else
+                            {
+                                exprRight = string.Concat("'", ((Function)expr.Value).PropertyName, "'");
+                            }
+
+                            if (expr.Value is Function)
+                            {
+                                exprRight = SQLBuilder.GenFunctionSQL(currM, (Function)expr.Value, exprRight);
+                            }
+                            result.SQL += string.Concat(exprLeft, "=", exprRight);
                         }
-                        result.Params.Add(dp);
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "=", paramPlaceholder);
                         break;
                     case FilterOperator.NotEquals:
-                        if (!p.NeedCalcPreSaveProcessor)
+                        if (!valueIsProp && !IsFunctionExpr(expr.Value))
                         {
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, dbType, ParameterDirection.Input);
+                            if (!p.NeedCalcPreSaveProcessor)
+                            {
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    expr.Value, dbType, ParameterDirection.Input);
+                            }
+                            else
+                            {
+                                dynamic inputObj = new DynamicObjectExt();
+                                inputObj.SetValue(p.Name, expr.Value);
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            }
+                            result.Params.Add(dp);
+                            result.SQL += string.Concat(exprLeft, "<>", paramPlaceholder);
                         }
                         else
                         {
-                            dynamic inputObj = new DynamicObjectExt();
-                            inputObj.SetValue(p.Name, expr.Value);
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            if (p2 != null)
+                            {
+                                exprRight = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                            }
+                            else
+                            {
+                                exprRight = string.Concat("'", ((Function)expr.Value).PropertyName, "'");
+                            }
+
+                            if (expr.Value is Function)
+                            {
+                                exprRight = SQLBuilder.GenFunctionSQL(currM, (Function)expr.Value, exprRight);
+                            }
+                            result.SQL += string.Concat(exprLeft, "<>", exprRight);
                         }
-                        result.Params.Add(dp);
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "<>", paramPlaceholder);
                         break;
                     case FilterOperator.Gt:
-                        if (!p.NeedCalcPreSaveProcessor)
+                        if (!valueIsProp && !IsFunctionExpr(expr.Value))
                         {
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, dbType, ParameterDirection.Input);
+                            if (!p.NeedCalcPreSaveProcessor)
+                            {
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    expr.Value, dbType, ParameterDirection.Input);
+                            }
+                            else
+                            {
+                                dynamic inputObj = new DynamicObjectExt();
+                                inputObj.SetValue(p.Name, expr.Value);
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            }
+                            result.Params.Add(dp);
+                            result.SQL += string.Concat(exprLeft, ">", paramPlaceholder);
                         }
                         else
                         {
-                            dynamic inputObj = new DynamicObjectExt();
-                            inputObj.SetValue(p.Name, expr.Value);
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            if (p2 != null)
+                            {
+                                exprRight = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                            }
+                            else
+                            {
+                                exprRight = string.Concat("'", ((Function)expr.Value).PropertyName, "'");
+                            }
+
+                            if (expr.Value is Function)
+                            {
+                                exprRight = SQLBuilder.GenFunctionSQL(currM, (Function)expr.Value, exprRight);
+                            }
+                            result.SQL += string.Concat(exprLeft, ">", exprRight);
                         }
-                        result.Params.Add(dp);
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], ">", paramPlaceholder);
                         break;
                     case FilterOperator.Gte:
-                        if (!p.NeedCalcPreSaveProcessor)
+                        if (!valueIsProp && !IsFunctionExpr(expr.Value))
                         {
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, dbType, ParameterDirection.Input);
+                            if (!p.NeedCalcPreSaveProcessor)
+                            {
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    expr.Value, dbType, ParameterDirection.Input);
+                            }
+                            else
+                            {
+                                dynamic inputObj = new DynamicObjectExt();
+                                inputObj.SetValue(p.Name, expr.Value);
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            }
+                            result.Params.Add(dp);
+                            result.SQL += string.Concat(exprLeft, ">=", paramPlaceholder);
                         }
                         else
                         {
-                            dynamic inputObj = new DynamicObjectExt();
-                            inputObj.SetValue(p.Name, expr.Value);
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            if (p2 != null)
+                            {
+                                exprRight = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                            }
+                            else
+                            {
+                                exprRight = string.Concat("'", ((Function)expr.Value).PropertyName, "'");
+                            }
+
+                            if (expr.Value is Function)
+                            {
+                                exprRight = SQLBuilder.GenFunctionSQL(currM, (Function)expr.Value, exprRight);
+                            }
+                            result.SQL += string.Concat(exprLeft, ">=", exprRight);
                         }
-                        result.Params.Add(dp);
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], ">=", paramPlaceholder);
                         break;
                     case FilterOperator.Lt:
-                        if (!p.NeedCalcPreSaveProcessor)
+                        if (!valueIsProp && !IsFunctionExpr(expr.Value))
                         {
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, dbType, ParameterDirection.Input);
+                            if (!p.NeedCalcPreSaveProcessor)
+                            {
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    expr.Value, dbType, ParameterDirection.Input);
+                            }
+                            else
+                            {
+                                dynamic inputObj = new DynamicObjectExt();
+                                inputObj.SetValue(p.Name, expr.Value);
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            }
+                            result.Params.Add(dp);
+                            result.SQL += string.Concat(exprLeft, "<", paramPlaceholder);
                         }
-                        else
+                        else 
                         {
-                            dynamic inputObj = new DynamicObjectExt();
-                            inputObj.SetValue(p.Name, expr.Value);
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            if (p2 != null)
+                            {
+                                exprRight = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                            }
+                            else
+                            {
+                                exprRight = string.Concat("'", ((Function)expr.Value).PropertyName, "'");
+                            }
+
+                            if (expr.Value is Function)
+                            {
+                                exprRight = SQLBuilder.GenFunctionSQL(currM, (Function)expr.Value, exprRight);
+                            }
+                            result.SQL += string.Concat(exprLeft, "<", exprRight);
                         }
-                        result.Params.Add(dp);
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "<", paramPlaceholder);
                         break;
                     case FilterOperator.Lte:
-                        if (!p.NeedCalcPreSaveProcessor)
+                        if (!valueIsProp && !IsFunctionExpr(expr.Value))
                         {
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, dbType, ParameterDirection.Input);
+                            if (!p.NeedCalcPreSaveProcessor)
+                            {
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    expr.Value, dbType, ParameterDirection.Input);
+                            }
+                            else
+                            {
+                                dynamic inputObj = new DynamicObjectExt();
+                                inputObj.SetValue(p.Name, expr.Value);
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            }
+                            result.Params.Add(dp);
+                            result.SQL += string.Concat(exprLeft, "<=", paramPlaceholder);
                         }
                         else
                         {
-                            dynamic inputObj = new DynamicObjectExt();
-                            inputObj.SetValue(p.Name, expr.Value);
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            if (p2 != null)
+                            {
+                                exprRight = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                            }
+                            else
+                            {
+                                exprRight = string.Concat("'", ((Function)expr.Value).PropertyName, "'");
+                            }
+
+                            if (expr.Value is Function)
+                            {
+                                exprRight = SQLBuilder.GenFunctionSQL(currM, (Function)expr.Value, exprRight);
+                            }
+                            result.SQL += string.Concat(exprLeft, "<=", exprRight);
                         }
-                        result.Params.Add(dp);
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], "<=", paramPlaceholder);
                         break;
                     case FilterOperator.Like:
-                        if (!p.NeedCalcPreSaveProcessor)
+                        if (!valueIsProp && !IsFunctionExpr(expr.Value))
                         {
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, DbType.String, ParameterDirection.Input);
+                            if (!p.NeedCalcPreSaveProcessor)
+                            {
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    expr.Value, DbType.String, ParameterDirection.Input);
+                            }
+                            else
+                            {
+                                dynamic inputObj = new DynamicObjectExt();
+                                inputObj.SetValue(p.Name, expr.Value);
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    p.DoPreSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
+                            }
+                            result.Params.Add(dp);
+                            result.SQL += string.Concat(exprLeft, " LIKE ", paramPlaceholder);
                         }
                         else
                         {
-                            dynamic inputObj = new DynamicObjectExt();
-                            inputObj.SetValue(p.Name, expr.Value);
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoPreSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
+                            if (p2 != null)
+                            {
+                                exprRight = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                            }
+                            else
+                            {
+                                exprRight = string.Concat("'", ((Function)expr.Value).PropertyName, "'");
+                            }
+
+                            if (expr.Value is Function)
+                            {
+                                exprRight = SQLBuilder.GenFunctionSQL(currM, (Function)expr.Value, exprRight);
+                            }
+                            result.SQL += string.Concat(exprLeft, " LIKE ", exprRight);
                         }
-                        result.Params.Add(dp);
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " LIKE ", paramPlaceholder);
                         break;
                     case FilterOperator.NotLike:
-                        if (!p.NeedCalcPreSaveProcessor)
+                        if (!valueIsProp && !IsFunctionExpr(expr.Value))
                         {
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                expr.Value, DbType.String, ParameterDirection.Input);
+                            if (!p.NeedCalcPreSaveProcessor)
+                            {
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    expr.Value, DbType.String, ParameterDirection.Input);
+                            }
+                            else
+                            {
+                                dynamic inputObj = new DynamicObjectExt();
+                                inputObj.SetValue(p.Name, expr.Value);
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    p.DoPreSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
+                            }
+                            result.Params.Add(dp);
+                            result.SQL += string.Concat(exprLeft, " NOT LIKE ", paramPlaceholder);
                         }
                         else
                         {
-                            dynamic inputObj = new DynamicObjectExt();
-                            inputObj.SetValue(p.Name, expr.Value);
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoPreSaveProcessor(inputObj), DbType.String, ParameterDirection.Input);
+                            if (p2 != null)
+                            {
+                                exprRight = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                            }
+                            else
+                            {
+                                exprRight = string.Concat("'", ((Function)expr.Value).PropertyName, "'");
+                            }
+
+                            if (expr.Value is Function)
+                            {
+                                exprRight = SQLBuilder.GenFunctionSQL(currM, (Function)expr.Value, exprRight);
+                            }
+                            result.SQL += string.Concat(exprLeft, " NOT LIKE ", exprRight);
                         }
-                        result.Params.Add(dp);
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " NOT LIKE ", paramPlaceholder);
                         break;
                     case FilterOperator.IsNull:
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " IS NULL");
+                        result.SQL += string.Concat(exprLeft, " IS NULL");
                         break;
                     case FilterOperator.IsNotNull:
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " IS NOT NULL");
+                        result.SQL += string.Concat(exprLeft, " IS NOT NULL");
                         break;
                     case FilterOperator.Between:
                         object[] values = (object[])expr.Value;
+
+                        bool value1IsProp = TryGetProperty(model, values[0], out p2);
+                        bool value2IsProp = TryGetProperty(model, values[1], out p3);
+
                         if (!p.NeedCalcPreSaveProcessor)
                         {
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                values[0], dbType, ParameterDirection.Input);
-                            dp2 = DbUtils.CreateParam(currM.Path, paramName2,
-                                values[1], dbType, ParameterDirection.Input);
+                            if (!value1IsProp && !IsFunctionExpr(values[0]))
+                            {
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    values[0], dbType, ParameterDirection.Input);
+                                result.Params.Add(dp);
+                            }
+
+                            if (!value2IsProp && !IsFunctionExpr(values[1]))
+                            {
+                                dp2 = DbUtils.CreateParam(currM.Path, paramName2,
+                                    values[1], dbType, ParameterDirection.Input);
+                                result.Params.Add(dp2);
+                            }
                         }
                         else
                         {
-                            dynamic inputObj = new DynamicObjectExt();
-                            inputObj.SetValue(p.Name, values[0]);
-                            dp = DbUtils.CreateParam(currM.Path, paramName,
-                                p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                            if (!value1IsProp && !IsFunctionExpr(values[0]))
+                            {
+                                dynamic inputObj = new DynamicObjectExt();
+                                inputObj.SetValue(p.Name, values[0]);
+                                dp = DbUtils.CreateParam(currM.Path, paramName,
+                                    p.DoPreSaveProcessor(inputObj), dbType, ParameterDirection.Input);
+                                result.Params.Add(dp);
+                            }
 
-                            dynamic inputObj2 = new DynamicObjectExt();
-                            inputObj2.SetValue(p.Name, values[1]);
-                            dp2 = DbUtils.CreateParam(currM.Path, paramName2,
-                                p.DoPreSaveProcessor(inputObj2), dbType, ParameterDirection.Input);
+                            if (!value2IsProp && !IsFunctionExpr(values[1]))
+                            {
+                                dynamic inputObj2 = new DynamicObjectExt();
+                                inputObj2.SetValue(p.Name, values[1]);
+                                dp2 = DbUtils.CreateParam(currM.Path, paramName2,
+                                    p.DoPreSaveProcessor(inputObj2), dbType, ParameterDirection.Input);
+                                result.Params.Add(dp2);
+                            }
                         }
-                        result.Params.Add(dp);
-                        result.Params.Add(dp2);
-                        result.SQL += string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " BETWEEN ", paramPlaceholder, " AND ", paramPlaceholder2);
+
+                        string exprRight1 = paramPlaceholder;
+                        string exprRight2 = paramPlaceholder2;
+                        if (value1IsProp || IsFunctionExpr(values[0]))
+                        {
+                            if (p2 != null)
+                            {
+                                exprRight1 = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                            }
+                            else
+                            {
+                                exprRight1 = string.Concat("'", ((Function)values[0]).PropertyName, "'");
+                            }
+
+                            if (values[0] is Function)
+                            {
+                                exprRight1 = SQLBuilder.GenFunctionSQL(currM, (Function)values[0], exprRight1);
+                            }
+                        }
+                        if (value2IsProp || IsFunctionExpr(values[1]))
+                        {
+                            if (p3 != null)
+                            {
+                                exprRight2 = string.Concat(quotes[0], p3.Owner.Table, quotes[1], ".", quotes[0], p3.Field, quotes[1]);
+                            }
+                            else
+                            {
+                                exprRight2 = string.Concat("'", ((Function)values[1]).PropertyName, "'");
+                            }
+
+                            if (values[1] is Function)
+                            {
+                                exprRight2 = SQLBuilder.GenFunctionSQL(currM, (Function)values[1], exprRight2);
+                            }
+                        }
+
+                        result.SQL += string.Concat(exprLeft, " BETWEEN ", exprRight1, " AND ", exprRight2);
                         break;
                     case FilterOperator.In:
-                        StringBuilder sbInSQL = new StringBuilder(string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " IN("));
+                        StringBuilder sbInSQL = new StringBuilder(string.Concat(exprLeft, " IN("));
                         object[] items = (object[])expr.Value;
                         for (int i = 0; i < items.Length; i++)
                         {
@@ -621,18 +992,40 @@ namespace CodeM.Common.Orm
                                 sbInSQL.Append(",");
                             }
 
-                            string inParamName = CommandUtils.GenParamName(p);
-                            dp = DbUtils.CreateParam(currM.Path, inParamName,
-                                items[i], dbType, ParameterDirection.Input);
-                            result.Params.Add(dp);
-                            string inParamPlaceholder = Features.GetCommandParamName(currM, inParamName);
-                            sbInSQL.Append(inParamPlaceholder);
+                            valueIsProp = TryGetProperty(model, items[i], out p2);
+                            if (!valueIsProp && !IsFunctionExpr(items[i]))
+                            {
+                                string inParamName = CommandUtils.GenParamName(p);
+                                dp = DbUtils.CreateParam(currM.Path, inParamName,
+                                    items[i], dbType, ParameterDirection.Input);
+                                result.Params.Add(dp);
+                                string inParamPlaceholder = Features.GetCommandParamName(currM, inParamName);
+                                sbInSQL.Append(inParamPlaceholder);
+                            }
+                            else
+                            {
+                                if (p2 != null)
+                                {
+                                    exprRight = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                                }
+                                else
+                                {
+                                    exprRight = string.Concat("'", ((Function)items[i]).PropertyName, "'");
+                                }
+
+                                if (items[i] is Function)
+                                {
+                                    exprRight = SQLBuilder.GenFunctionSQL(currM, (Function)items[i], exprRight);
+                                }
+
+                                sbInSQL.Append(exprRight);
+                            }
                         }
                         sbInSQL.Append(")");
                         result.SQL += sbInSQL.ToString();
                         break;
                     case FilterOperator.NotIn:
-                        StringBuilder sbNotInSQL = new StringBuilder(string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " NOT IN("));
+                        StringBuilder sbNotInSQL = new StringBuilder(string.Concat(exprLeft, " NOT IN("));
                         object[] notItems = (object[])expr.Value;
                         for (int i = 0; i < notItems.Length; i++)
                         {
@@ -641,12 +1034,34 @@ namespace CodeM.Common.Orm
                                 sbNotInSQL.Append(",");
                             }
 
-                            string notInParamName = CommandUtils.GenParamName(p);
-                            dp = DbUtils.CreateParam(currM.Path, notInParamName,
-                                notItems[i], dbType, ParameterDirection.Input);
-                            result.Params.Add(dp);
-                            string notInParamPlaceholder = Features.GetCommandParamName(currM, notInParamName);
-                            sbNotInSQL.Append(notInParamPlaceholder);
+                            valueIsProp = TryGetProperty(model, notItems[i], out p2);
+                            if (!valueIsProp && !IsFunctionExpr(notItems[i]))
+                            {
+                                string notInParamName = CommandUtils.GenParamName(p);
+                                dp = DbUtils.CreateParam(currM.Path, notInParamName,
+                                    notItems[i], dbType, ParameterDirection.Input);
+                                result.Params.Add(dp);
+                                string notInParamPlaceholder = Features.GetCommandParamName(currM, notInParamName);
+                                sbNotInSQL.Append(notInParamPlaceholder);
+                            }
+                            else
+                            {
+                                if (p2 != null)
+                                {
+                                    exprRight = string.Concat(quotes[0], p2.Owner.Table, quotes[1], ".", quotes[0], p2.Field, quotes[1]);
+                                }
+                                else
+                                {
+                                    exprRight = string.Concat("'", ((Function)notItems[i]).PropertyName, "'");
+                                }
+
+                                if (notItems[i] is Function)
+                                {
+                                    exprRight = SQLBuilder.GenFunctionSQL(currM, (Function)notItems[i], exprRight);
+                                }
+
+                                sbNotInSQL.Append(exprRight);
+                            }
                         }
                         sbNotInSQL.Append(")");
                         result.SQL += sbNotInSQL.ToString();

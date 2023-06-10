@@ -169,6 +169,12 @@
             return string.Format(funcCmd, args);
         }
 
+        internal static string GetFunctionReturnType(Model model, string funcName)
+        {
+            string funcType = Config.GetConfigValue<string>("functiontype", model, funcName.Trim().ToUpper());
+            return funcType;
+        }
+
         internal static bool IsSupportMultiCommand(Model model)
         {
             return Config.GetConfigValue<bool>("feature", model, "exec_multi_command");
