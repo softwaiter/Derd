@@ -125,7 +125,7 @@ namespace Test
             Model m = Derd.Model("Person");
             List<dynamic> result = m
                 .Equals("Org.Code", "microsoft")
-                .Or(new SubFilter(m).Equals("Org.Code", "ibm"))
+                .Or(new SubFilter().Equals("Org.Code", "ibm"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(4, result.Count);

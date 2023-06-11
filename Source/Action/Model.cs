@@ -135,11 +135,6 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public Model()
-        {
-            mFilter = new SubFilter(this);
-        }
-
         #region ISetValue
         dynamic mSetValues;
         List<dynamic> mBatchValues = new List<dynamic>();
@@ -466,7 +461,7 @@ namespace CodeM.Common.Orm
 
         #region IFilter
 
-        private SubFilter mFilter;
+        private SubFilter mFilter = new SubFilter();
 
         internal SubFilter Where
         {

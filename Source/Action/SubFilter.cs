@@ -31,22 +31,8 @@ namespace CodeM.Common.Orm
     [Serializable]
     public class SubFilter : IFilter
     {
-        private Model mModel;
         private IFilter mParent = null;
         private List<KeyValuePair<FilterOperator, object>> mFilterItems = new List<KeyValuePair<FilterOperator, object>>();
-
-        public SubFilter(Model m)
-        {
-            mModel = m;
-        }
-
-        public Model Owner
-        {
-            get
-            {
-                return mModel;
-            }
-        }
 
         public void Reset()
         {
@@ -160,8 +146,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Equals(string name, object value)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
                 new KeyValuePair<Function, object>(new NONE(name), value)));
             return this;
@@ -169,8 +153,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Equals(Function function, object value)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
                 new KeyValuePair<Function, object>(function, value)));
             return this;
@@ -178,8 +160,6 @@ namespace CodeM.Common.Orm
 
         public IFilter NotEquals(string name, object value)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
                 new KeyValuePair<Function, object>(new NONE(name), value)));
             return this;
@@ -187,8 +167,6 @@ namespace CodeM.Common.Orm
 
         public IFilter NotEquals(Function function, object value)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
                 new KeyValuePair<Function, object>(function, value)));
             return this;
@@ -196,8 +174,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Gt(string name, object value)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gt,
                 new KeyValuePair<Function, object>(new NONE(name), value)));
             return this;
@@ -205,8 +181,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Gt(Function function, object value)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gt,
                 new KeyValuePair<Function, object>(function, value)));
             return this;
@@ -214,8 +188,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Gte(string name, object value)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gte,
                 new KeyValuePair<Function, object>(new NONE(name), value)));
             return this;
@@ -223,8 +195,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Gte(Function function, object value)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gte,
                 new KeyValuePair<Function, object>(function, value)));
             return this;
@@ -232,8 +202,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Lt(string name, object value)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lt,
                 new KeyValuePair<Function, object>(new NONE(name), value)));
             return this;
@@ -241,8 +209,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Lt(Function function, object value)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lt,
                 new KeyValuePair<Function, object>(function, value)));
             return this;
@@ -250,8 +216,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Lte(string name, object value)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lte,
                 new KeyValuePair<Function, object>(new NONE(name), value)));
             return this;
@@ -259,8 +223,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Lte(Function function, object value)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lte,
                 new KeyValuePair<Function, object>(function, value)));
             return this;
@@ -268,8 +230,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Like(string name, object value)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Like,
                 new KeyValuePair<Function, object>(new NONE(name), value)));
             return this;
@@ -277,8 +237,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Like(Function function, object value)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Like,
                 new KeyValuePair<Function, object>(function, value)));
             return this;
@@ -286,8 +244,6 @@ namespace CodeM.Common.Orm
 
         public IFilter NotLike(string name, object value)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotLike,
                 new KeyValuePair<Function, object>(new NONE(name), value)));
             return this;
@@ -295,8 +251,6 @@ namespace CodeM.Common.Orm
 
         public IFilter NotLike(Function function, object value)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotLike,
                 new KeyValuePair<Function, object>(function, value)));
             return this;
@@ -304,8 +258,6 @@ namespace CodeM.Common.Orm
 
         public IFilter IsNull(string name)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNull,
                 new KeyValuePair<Function, object>(new NONE(name), true)));
             return this;
@@ -313,8 +265,6 @@ namespace CodeM.Common.Orm
 
         public IFilter IsNull(Function function)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNull,
                 new KeyValuePair<Function, object>(function, true)));
             return this;
@@ -322,8 +272,6 @@ namespace CodeM.Common.Orm
 
         public IFilter IsNotNull(string name)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNotNull,
                 new KeyValuePair<Function, object>(new NONE(name), true)));
             return this;
@@ -331,8 +279,6 @@ namespace CodeM.Common.Orm
 
         public IFilter IsNotNull(Function function)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNotNull,
                 new KeyValuePair<Function, object>(function, true)));
             return this;
@@ -340,8 +286,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Between(string name, object value, object value2)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Between,
                 new KeyValuePair<Function, object>(new NONE(name), new object[] { value, value2 })));
             return this;
@@ -349,8 +293,6 @@ namespace CodeM.Common.Orm
 
         public IFilter Between(Function function, object value, object value2)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Between,
                 new KeyValuePair<Function, object>(function, new object[] { value, value2 })));
             return this;
@@ -358,8 +300,6 @@ namespace CodeM.Common.Orm
 
         public IFilter In(string name, params object[] values)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             if (values.Length == 1)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
@@ -375,8 +315,6 @@ namespace CodeM.Common.Orm
 
         public IFilter In(Function function, params object[] values)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             if (values.Length == 1)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
@@ -392,8 +330,6 @@ namespace CodeM.Common.Orm
 
         public IFilter NotIn(string name, params object[] values)
         {
-            PropertyChecker.CheckValueProperty(Owner, name);
-
             if (values.Length == 1)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
@@ -409,8 +345,6 @@ namespace CodeM.Common.Orm
 
         public IFilter NotIn(Function function, params object[] values)
         {
-            PropertyChecker.CheckFunctionProperty(Owner, function);
-
             if (values.Length == 1)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
@@ -477,6 +411,14 @@ namespace CodeM.Common.Orm
                     item.Key != FilterOperator.Or)
                 {
                     expr = (KeyValuePair<Function, object>)item.Value;
+                    if (expr.Key is NONE)
+                    {
+                        PropertyChecker.CheckValueProperty(model, expr.Key.PropertyName);
+                    }
+                    else
+                    {
+                        PropertyChecker.CheckFunctionProperty(model, expr.Key);
+                    }
 
                     TryGetProperty(model, expr.Key, out p);
                     valueIsProp = TryGetProperty(model, expr.Value, out p2);
