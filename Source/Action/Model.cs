@@ -453,6 +453,15 @@ namespace CodeM.Common.Orm
 
             return this;
         }
+
+        public Model GetValues(params string[] names)
+        {
+            foreach (string name in names)
+            {
+                GetValue(name);
+            }
+            return this;
+        }
         #endregion
 
         #region IFilter
