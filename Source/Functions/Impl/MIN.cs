@@ -2,7 +2,7 @@
 { 
     public class MIN : Function
     {
-        public MIN(string propName) : base(propName)
+        public MIN(object value) : base(value)
         {
         }
 

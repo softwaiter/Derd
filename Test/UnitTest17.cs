@@ -83,7 +83,7 @@ namespace UnitTest
         public void Test3()
         {
             List<dynamic> result = Derd.Model("Person")
-                .GetValue(Aggregate.COUNT(Aggregate.DISTINCT("Age")), "Count")
+                .GetValue(Funcs.COUNT(Funcs.DISTINCT("Age")), "Count")
                 .Query();
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual(3, result[0].Count);

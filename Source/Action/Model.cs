@@ -1,6 +1,7 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.Action;
-using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Orm.SQL;
+using CodeM.Common.Orm.SQL.Dialect;
 using CodeM.Common.Tools;
 using CodeM.Common.Tools.DynamicObject;
 using System;
@@ -13,128 +14,6 @@ namespace CodeM.Common.Orm
 {
     public partial class Model : ISetValue, IGetValue, IPaging, ISort, ICommand, IAssist
     {
-        internal class GetValueSetting
-        {
-            public GetValueSetting(Function function, string alias = null)
-            {
-                if (function == null)
-                {
-                    throw new ArgumentNullException("function");
-                }
-
-                this.Function = function;
-                this.Alias = alias;
-            }
-
-            public Function Function { get; }
-
-            public string Alias { get; } = null;
-
-            public bool IncludeFunction
-            {
-                get
-                {
-                    return this.Function != null &&
-                        !(this.Function is NONE);
-                }
-            }
-
-            private string mPropertyName = null;
-            public string PropertyName
-            {
-                get 
-                {
-                    if (!string.IsNullOrWhiteSpace(mPropertyName))
-                    {
-                        return mPropertyName;
-                    }
-
-                    Function currFunction = Function;
-                    while (string.IsNullOrWhiteSpace(currFunction.PropertyName))
-                    {
-                        currFunction = currFunction.ChildFunction;
-                    }
-                    mPropertyName = currFunction.PropertyName;
-                    return mPropertyName;
-                }
-            }
-
-            /// <summary>
-            /// 拼接SQL使用的名称
-            /// </summary>
-            public string FieldName
-            {
-                get
-                {
-                    if (!string.IsNullOrWhiteSpace(this.Alias))
-                    {
-                        return this.Alias;
-                    }
-
-                    if (PropertyName.Contains("."))
-                    {
-                        return PropertyName.Replace(".", "_");
-                    }
-                    return PropertyName;
-                }
-            }
-
-            /// <summary>
-            /// 输出JSON对象使用的名称
-            /// </summary>
-            public string OutputName
-            {
-                get
-                {
-                    if (!string.IsNullOrWhiteSpace(this.Alias))
-                    {
-                        return this.Alias;
-                    }
-
-                    return PropertyName;
-                }
-            }
-        }
-
-        internal class GroupBySetting
-        {
-            public GroupBySetting(Function function)
-            {
-                this.Function = function;
-            }
-
-            public Function Function { get; }
-
-            public bool IncludeFunction
-            {
-                get
-                {
-                    return this.Function != null &&
-                        !(this.Function is NONE);
-                }
-            }
-
-            private string mPropertyName = null;
-            public string PropertyName
-            {
-                get
-                {
-                    if (!string.IsNullOrWhiteSpace(mPropertyName))
-                    {
-                        return mPropertyName;
-                    }
-
-                    Function currFunction = Function;
-                    while (string.IsNullOrWhiteSpace(currFunction.PropertyName))
-                    {
-                        currFunction = currFunction.ChildFunction;
-                    }
-                    mPropertyName = currFunction.PropertyName;
-                    return mPropertyName;
-                }
-            }
-        }
-
         #region ISetValue
         dynamic mSetValues;
         List<dynamic> mBatchValues = new List<dynamic>();
@@ -417,9 +296,9 @@ namespace CodeM.Common.Orm
         #endregion
 
         #region IGetValue
-        List<GetValueSetting> mGetValues = new List<GetValueSetting>();
+        List<SelectFieldPart> mGetValues = new List<SelectFieldPart>();
 
-        internal List<GetValueSetting> ReturnValues
+        internal List<SelectFieldPart> ReturnValues
         {
             get
             {
@@ -429,21 +308,31 @@ namespace CodeM.Common.Orm
 
         public Model GetValue(string propName, string alias = null)
         {
-            string compactName = PropertyChecker.CheckValueProperty(this, propName);
-            mGetValues.Add(new GetValueSetting(new NONE(compactName), alias));
+            if (CommandUtils.IsProperty(this, propName, out Property p))
+            {
+                mGetValues.Add(new SelectFieldPart(new PROPERTY(propName, p), mGetValues.Count + 1, alias));
+            }
+            else
+            {
+                mGetValues.Add(new SelectFieldPart(new VALUE(propName), mGetValues.Count + 1, alias));
+            }
             return this;
-
         }
 
         public Model GetValue(Function function, string alias = null)
         {
-            if (PropertyChecker.CheckFunctionProperty(this, function))    // 是否包含Distinct运算
+            if (function == null)
             {
-                mGetValues.Insert(0, new GetValueSetting(function, alias));
+                throw new ArgumentNullException("function");
+            }
+
+            if (function.IsIncludeDistinct())    // 是否包含Distinct运算
+            {
+                mGetValues.Insert(0, new SelectFieldPart(function, mGetValues.Count + 1, alias));
             }
             else
             {
-                mGetValues.Add(new GetValueSetting(function, alias));
+                mGetValues.Add(new SelectFieldPart(function, mGetValues.Count + 1, alias));
             }
 
             return this;
@@ -495,9 +384,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Equals(string name, object value)
+        public new Model Equals(object key, object value)
         {
-            mFilter.Equals(name, value);
+            mFilter.Equals(key, value);
             return this;
         }
 
@@ -507,9 +396,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model NotEquals(string name, object value)
+        public Model NotEquals(object key, object value)
         {
-            mFilter.NotEquals(name, value);
+            mFilter.NotEquals(key, value);
             return this;
         }
 
@@ -519,9 +408,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Gt(string name, object value)
+        public Model Gt(object key, object value)
         {
-            mFilter.Gt(name, value);
+            mFilter.Gt(key, value);
             return this;
         }
 
@@ -531,9 +420,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Gte(string name, object value)
+        public Model Gte(object key, object value)
         {
-            mFilter.Gte(name, value);
+            mFilter.Gte(key, value);
             return this;
         }
 
@@ -543,9 +432,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Lt(string name, object value)
+        public Model Lt(object key, object value)
         {
-            mFilter.Lt(name, value);
+            mFilter.Lt(key, value);
             return this;
         }
 
@@ -555,9 +444,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Lte(string name, object value)
+        public Model Lte(object key, object value)
         {
-            mFilter.Lte(name, value);
+            mFilter.Lte(key, value);
             return this;
         }
 
@@ -567,9 +456,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Like(string name, object value)
+        public Model Like(object key, object value)
         {
-            mFilter.Like(name, value);
+            mFilter.Like(key, value);
             return this;
         }
 
@@ -579,9 +468,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model NotLike(string name, object value)
+        public Model NotLike(object key, object value)
         {
-            mFilter.NotLike(name, value);
+            mFilter.NotLike(key, value);
             return this;
         }
 
@@ -591,9 +480,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model IsNull(string name)
+        public Model IsNull(object key)
         {
-            mFilter.IsNull(name);
+            mFilter.IsNull(key);
             return this;
         }
 
@@ -603,9 +492,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model IsNotNull(string name)
+        public Model IsNotNull(object key)
         {
-            mFilter.IsNotNull(name);
+            mFilter.IsNotNull(key);
             return this;
         }
 
@@ -615,9 +504,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Between(string name, object value, object value2)
+        public Model Between(object key, object value, object value2)
         {
-            mFilter.Between(name, value, value2);
+            mFilter.Between(key, value, value2);
             return this;
         }
 
@@ -627,9 +516,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model In(string name, params object[] values)
+        public Model In(object key, params object[] values)
         {
-            mFilter.In(name, values);
+            mFilter.In(key, values);
             return this;
         }
 
@@ -639,9 +528,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model NotIn(string name, params object[] values)
+        public Model NotIn(object key, params object[] values)
         {
-            mFilter.NotIn(name, values);
+            mFilter.NotIn(key, values);
             return this;
         }
 
@@ -730,7 +619,7 @@ namespace CodeM.Common.Orm
         {
             string[] quotes = Features.GetObjectQuotes(this);
 
-            if (mGetValues.Exists(item => item.Alias == name))
+            if (mGetValues.Exists(item => item.FieldName == name))
             {
                 mSorts.Add(string.Concat(quotes[0], name, quotes[1], " ASC"));
             }
@@ -773,7 +662,7 @@ namespace CodeM.Common.Orm
         {
             string[] quotes = Features.GetObjectQuotes(this);
 
-            if (mGetValues.Exists(item => item.Alias == name))
+            if (mGetValues.Exists(item => item.FieldName == name))
             {
                 mSorts.Add(string.Concat(quotes[0], name, quotes[1], " DESC"));
             }
@@ -880,9 +769,9 @@ namespace CodeM.Common.Orm
             }
         }
 
-        List<GroupBySetting> mGroupByNames = new List<GroupBySetting>();
+        List<GroupByPart> mGroupByNames = new List<GroupByPart>();
 
-        internal List<GroupBySetting> GroupByNames
+        internal List<GroupByPart> GroupByNames
         {
             get
             {
@@ -894,16 +783,21 @@ namespace CodeM.Common.Orm
         {
             foreach (string name in names)
             {
-                string compactName = PropertyChecker.CheckValueProperty(this, name);
-                mGroupByNames.Add(new GroupBySetting(new NONE(compactName)));
+                if (CommandUtils.IsProperty(this, name, out Property p))
+                {
+                    mGroupByNames.Add(new GroupByPart(new PROPERTY(name, p)));
+                }
+                else
+                {
+                    mGroupByNames.Add(new GroupByPart(new VALUE(name)));
+                }
             }
             return this;
         }
 
         public Model GroupBy(Function function)
         {
-            PropertyChecker.CheckFunctionProperty(this, function);
-            mGroupByNames.Add(new GroupBySetting(function));
+            mGroupByNames.Add(new GroupByPart(function));
             return this;
         }
         #endregion
@@ -1780,7 +1674,7 @@ namespace CodeM.Common.Orm
                     for (int i = 0; i < PropertyCount; i++)
                     {
                         Property p = GetProperty(i);
-                        mGetValues.Add(new GetValueSetting(new NONE(p.Name)));
+                        mGetValues.Add(new SelectFieldPart(new PROPERTY(p.Name, p), i + 1));
                     }
                 }
 
@@ -1808,96 +1702,40 @@ namespace CodeM.Common.Orm
                         while (dr.Read())
                         {
                             dynamic obj = new DynamicObjectExt();
-                            foreach (GetValueSetting gvs in mGetValues)
+                            foreach (SelectFieldPart sfp in mGetValues)
                             {
-                                if (!gvs.PropertyName.Contains("."))
+                                if (dr.IsDBNull(sfp.FieldName))
                                 {
-                                    Property p = GetProperty(gvs.PropertyName);
-                                    if (dr.IsDBNull(gvs.FieldName))
-                                    {
-                                        obj.SetValueByPath(gvs.OutputName, null);
-                                    }
-                                    else
-                                    {
-                                        if (gvs.IncludeFunction)
-                                        {
-                                            object processedValue = dr.GetValue(gvs.FieldName);
-                                            obj.SetValueByPath(gvs.OutputName, processedValue);
-                                        }
-                                        else
-                                        {
-                                            SetPropertyValueFromDB(obj, p, gvs.OutputName, dr, gvs.FieldName);
-                                        }
-                                    }
-
-                                    if (!gvs.IncludeFunction && p.NeedCalcPostQueryProcessor)
-                                    {
-                                        object input = obj.HasPath(gvs.OutputName) ? obj.GetValueByPath(gvs.OutputName) : null;
-                                        dynamic value = p.DoPostQueryProcessor(input);
-                                        if (!NotSet.IsNotSetValue(value))
-                                        {
-                                            if (value != null)
-                                            {
-                                                obj.SetValueByPath(gvs.OutputName, value);
-                                            }
-                                            else
-                                            {
-                                                obj.SetValueByPath(gvs.OutputName, null);
-                                            }
-                                        }
-                                    }
+                                    obj.SetValueByPath(sfp.OutputName, null);
                                 }
                                 else
                                 {
-                                    Model currM = this;
-                                    string[] subNames = gvs.PropertyName.Split(".");
-                                    for (int i = 0; i < subNames.Length; i++)
+                                    if (CommandUtils.IsProperty(this,
+                                        sfp.PropertyName, out Property p))
                                     {
-                                        string subName = subNames[i];
-                                        Property subProp = currM.GetProperty(subName);
-                                        Model subM = ModelUtils.GetModel(subProp.TypeValue);
-                                        currM = subM;
+                                        SetPropertyValueFromDB(obj, p, sfp.OutputName, dr, sfp.FieldName);
 
-                                        if (i == subNames.Length - 2)
+                                        if (p.NeedCalcPostQueryProcessor)
                                         {
-                                            string lastName = subNames[subNames.Length - 1];
-                                            Property lastProp = currM.GetProperty(lastName);
-                                            if (dr.IsDBNull(gvs.FieldName))
+                                            object input = obj.HasPath(sfp.OutputName) ? obj.GetValueByPath(sfp.OutputName) : null;
+                                            dynamic value = p.DoPostQueryProcessor(input);
+                                            if (!NotSet.IsNotSetValue(value))
                                             {
-                                                obj.SetValueByPath(gvs.OutputName, null);
-                                            }
-                                            else
-                                            {
-                                                if (gvs.IncludeFunction)
+                                                if (value != null)
                                                 {
-                                                    object processedValue = dr.GetValue(gvs.FieldName);
-                                                    obj.SetValueByPath(gvs.OutputName, processedValue);
+                                                    obj.SetValueByPath(sfp.OutputName, value);
                                                 }
                                                 else
                                                 {
-                                                    SetPropertyValueFromDB(obj, lastProp, gvs.OutputName, dr, gvs.FieldName);
+                                                    obj.SetValueByPath(sfp.OutputName, null);
                                                 }
                                             }
-
-                                            if (!gvs.IncludeFunction && lastProp.NeedCalcPostQueryProcessor)
-                                            {
-                                                object input = obj.HasPath(gvs.OutputName) ? obj.GetValueByPath(gvs.OutputName) : null;
-                                                object value = lastProp.DoPostQueryProcessor(input);
-                                                if (!NotSet.IsNotSetValue(value))
-                                                {
-                                                    if (value != null)
-                                                    {
-                                                        obj.SetValueByPath(gvs.OutputName, value);
-                                                    }
-                                                    else
-                                                    {
-                                                        obj.SetValueByPath(gvs.OutputName, null);
-                                                    }
-                                                }
-                                            }
-
-                                            break;
                                         }
+                                    }
+                                    else
+                                    {
+                                        object processedValue = dr.GetValue(sfp.FieldName);
+                                        obj.SetValueByPath(sfp.OutputName, processedValue);
                                     }
                                 }
                             }

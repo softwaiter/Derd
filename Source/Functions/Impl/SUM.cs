@@ -2,7 +2,7 @@
 {
     public class SUM : Function
     {
-        public SUM(string propName) : base(propName)
+        public SUM(object value) : base(value)
         {
         }
 

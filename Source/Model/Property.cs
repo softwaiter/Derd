@@ -1,4 +1,4 @@
-﻿using CodeM.Common.Orm.Dialect;
+﻿using CodeM.Common.Orm.SQL.Dialect;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -170,7 +170,7 @@ namespace CodeM.Common.Orm
                 return Processor.CallPropertyProcessor(
                     PostQueryProcessor, Owner, Name, propValue);
             }
-            return null;
+            return NotSet.Value;
         }
 
         /// <summary>

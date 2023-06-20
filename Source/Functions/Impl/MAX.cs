@@ -2,7 +2,7 @@
 { 
     public class MAX : Function
     {
-        public MAX(string propName) : base(propName)
+        public MAX(object value) : base(value)
         {
         }
 

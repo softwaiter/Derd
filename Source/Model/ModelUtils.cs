@@ -8,6 +8,7 @@ namespace CodeM.Common.Orm
 {
     internal class ModelUtils
     {
+        #region global data
         internal static ConcurrentDictionary<string, Model> sModels = new ConcurrentDictionary<string, Model>();
 
         internal static void ClearModels()
@@ -75,6 +76,7 @@ namespace CodeM.Common.Orm
             }
             return null;
         }
+        #endregion
 
         #region Version Model
         private static string sVerModelName = "VersionControl";

@@ -77,7 +77,7 @@ namespace UnitTest
         {
             List<dynamic> result = Derd.Model("Person")
                 .GroupBy("Age")
-                .GetValue(Aggregate.COUNT("Id"), "Id_Count")
+                .GetValue(Funcs.COUNT("Id"), "Id_Count")
                 .GetValue("Age")
                 .DescendingSort("Id_Count")
                 .Top(5)

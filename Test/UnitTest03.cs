@@ -117,7 +117,7 @@ namespace UnitTest
             Assert.IsTrue(ret);
 
             Assert.IsTrue(Derd.Model("Person").Count() == 3);
-            Assert.IsTrue(Derd.Model("Person").GetValue(Aggregate.DISTINCT("Age")).Count() == 2);
+            Assert.IsTrue(Derd.Model("Person").GetValue(Funcs.DISTINCT("Age")).Count() == 2);
         }
 
         [Description("User模型属性Org真实数据类型应为String，应成功。")]

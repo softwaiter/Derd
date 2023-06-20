@@ -1,5 +1,6 @@
 ﻿using CodeM.Common.DbHelper;
-using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Orm.SQL;
+using CodeM.Common.Orm.SQL.Dialect;
 using CodeM.Common.Tools.DynamicObject;
 using System;
 using System.Collections;
@@ -7,7 +8,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text;
-using static CodeM.Common.Orm.Model;
 
 namespace CodeM.Common.Orm
 {
@@ -429,103 +429,22 @@ namespace CodeM.Common.Orm
             return sbJoins.ToString();
         }
 
-        internal static string GenFunctionSQL(Model m, Function function, string field)
+        internal static string BuildGroupBySQL(Model m, List<string> foreignTables)
         {
-            if (!(function is NONE))
-            {
-                string funcName = function.GetType().Name.ToUpper();
-                if (function.ChildFunction != null)
-                {
-                    return Features.GetFunctionCommand(m, funcName,
-                        GenFunctionSQL(m, function.ChildFunction, field));
-                }
-                return Features.GetFunctionCommand(m, funcName, field);
-            }
-            return field;
-        }
-
-        internal static string GenQueryFieldSQL(Model m, GetValueSetting gvs, string field)
-        {
-            string qryField = field;
-            if (!(gvs.Function is NONE))
-            {
-                qryField = GenFunctionSQL(m, gvs.Function, field);
-            }
-            return qryField;
-        }
-
-        internal static string GenGroupbyFieldSQL(Model m, GroupBySetting gbs, string field)
-        {
-            string gpbField = field;
-            if (!(gbs.Function is NONE))
-            {
-                gpbField = GenFunctionSQL(m, gbs.Function, field);
-            }
-            return gpbField;
-        }
-
-        internal static string BuildGroupBySQL(Model m)
-        {
-            string[] quotes = Features.GetObjectQuotes(m);
-
             StringBuilder sbResult = new StringBuilder();
 
             if (m.GroupByNames.Count > 0)
             {
                 sbResult.Append("GROUP BY ");
-                foreach (GroupBySetting gbs in m.GroupByNames)
+                foreach (GroupByPart gbp in m.GroupByNames)
                 {
-                    if (!gbs.PropertyName.Contains("."))    //直接属性
+                    if (sbResult.Length > 9)
                     {
-                        Property p = m.GetProperty(gbs.PropertyName);
-                        if (sbResult.Length > 9)
-                        {
-                            sbResult.Append(",");
-                        }
-
-                        string groupField = string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1]);
-                        if (gbs.IncludeFunction)
-                        {
-                            string groupFuncField = GenGroupbyFieldSQL(m, gbs, groupField);
-                            sbResult.Append(groupFuncField);
-                        }
-                        else
-                        {
-                            sbResult.Append(groupField);
-                        }
+                        sbResult.Append(",");
                     }
-                    else    //Model属性引用
-                    {
-                        Model currM = m;
-                        string[] subNames = gbs.PropertyName.Split(".");
-                        for (int i = 0; i < subNames.Length; i++)
-                        {
-                            Property subProp = currM.GetProperty(subNames[i]);
-                            currM = ModelUtils.GetModel(subProp.TypeValue);
+                    sbResult.Append(gbp.Convert2SQL(m));
 
-                            if (i == subNames.Length - 2)
-                            {
-                                if (sbResult.Length > 9)
-                                {
-                                    sbResult.Append(",");
-                                }
-
-                                Property lastProp = currM.GetProperty(subNames[i + 1]);
-                                string groupField = string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1]);
-                                if (gbs.IncludeFunction)
-                                {
-                                    string groupFuncField = GenGroupbyFieldSQL(m, gbs, groupField);
-                                    sbResult.Append(groupFuncField);
-                                }
-                                else
-                                {
-                                    sbResult.Append(groupField);
-                                }
-
-                                break;
-                            }
-                        }
-                    }
+                    CommandUtils.CheckFunctionForeignProperty(m, gbp.Function, foreignTables);
                 }
             }
 
@@ -534,17 +453,9 @@ namespace CodeM.Common.Orm
 
         internal static CommandSQL BuildQuerySQL(Model m)
         {
-            string[] quotes = Features.GetObjectQuotes(m);
-            string[] aliasQuotes = new string[] { quotes[0], quotes[1] };
-            string[] specAliasQuotes = Features.GetFieldAliasQuotes(m);
-            if (specAliasQuotes.Length > 0)
-            {
-                aliasQuotes = specAliasQuotes;
-            }
-
             CommandSQL result = new CommandSQL();
 
-            List<GetValueSetting> queryFields = new List<GetValueSetting>();
+            List<SelectFieldPart> queryFields = new List<SelectFieldPart>();
             if (m.ReturnValues.Count > 0)
             {
                 queryFields.AddRange(m.ReturnValues);
@@ -553,52 +464,22 @@ namespace CodeM.Common.Orm
             {
                 for (int i = 0; i < m.PropertyCount; i++)
                 {
-                    queryFields.Add(new GetValueSetting(new NONE(m.GetProperty(i).Name)));
+                    Property p = m.GetProperty(i);
+                    queryFields.Add(new SelectFieldPart(new PROPERTY(p.Name, p), i + 1));
                 }
             }
 
             List<string> foreignTables = new List<string>();
             StringBuilder sbFields = new StringBuilder();
-            foreach (GetValueSetting gvs in queryFields)
+            foreach (SelectFieldPart sfp in queryFields)
             {
-                if (!gvs.PropertyName.Contains("."))    //直接属性
+                if (sbFields.Length > 0)
                 {
-                    Property p = m.GetProperty(gvs.PropertyName);
-                    if (sbFields.Length > 0)
-                    {
-                        sbFields.Append(",");
-                    }
-                    sbFields.Append(string.Concat(
-                        GenQueryFieldSQL(m, gvs, string.Concat(quotes[0], m.Table, quotes[1], ".", quotes[0], p.Field, quotes[1])),
-                        " AS ", aliasQuotes[0], gvs.FieldName, aliasQuotes[1]));
+                    sbFields.Append(",");
                 }
-                else    //Model属性引用
-                {
-                    foreignTables.Add(gvs.PropertyName);
+                sbFields.Append(sfp.Convert2SQL(m));
 
-                    Model currM = m;
-                    string[] subNames = gvs .PropertyName.Split(".");
-                    for (int i = 0; i < subNames.Length; i++)
-                    {
-                        Property subProp = currM.GetProperty(subNames[i]);
-                        currM = ModelUtils.GetModel(subProp.TypeValue);
-
-                        if (i == subNames.Length - 2)
-                        {
-                            if (sbFields.Length > 0)
-                            {
-                                sbFields.Append(",");
-                            }
-
-                            Property lastProp = currM.GetProperty(subNames[i + 1]); 
-                            sbFields.Append(string.Concat(
-                                GenQueryFieldSQL(currM, gvs, string.Concat(quotes[0], currM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1])),
-                                " AS ", aliasQuotes[0], gvs.FieldName, aliasQuotes[1]));
-
-                            break;
-                        }
-                    }
-                }
+                CommandUtils.CheckFunctionForeignProperty(m, sfp.Function, foreignTables);
             }
 
             CommandSQL where = m.Where.Build(m);
@@ -608,7 +489,8 @@ namespace CodeM.Common.Orm
             foreignTables.AddRange(where.ForeignTables);
             foreignTables.AddRange(m.ForeignSortNames);
             string joinSql = BuildJoinTableSQL(m, foreignTables);
-            
+
+            string[] quotes = Features.GetObjectQuotes(m);
             result.SQL = string.Concat(sbFields, " FROM ", quotes[0], m.Table, quotes[1], joinSql);
             if (!string.IsNullOrEmpty(where.SQL))
             {
@@ -618,7 +500,7 @@ namespace CodeM.Common.Orm
 
             if (m.GroupByNames.Count > 0)
             {
-                string groupBySQL = BuildGroupBySQL(m);
+                string groupBySQL = BuildGroupBySQL(m, foreignTables);
                 if (!string.IsNullOrWhiteSpace(groupBySQL))
                 {
                     result.SQL += string.Concat(" ", groupBySQL, " ");

@@ -1,5 +1,5 @@
 ﻿using CodeM.Common.Ioc;
-using CodeM.Common.Orm.Dialect;
+using CodeM.Common.Orm.SQL.Dialect;
 using CodeM.Common.Tools;
 using CodeM.Common.Tools.DynamicObject;
 using System;
@@ -324,140 +324,6 @@ namespace CodeM.Common.Orm
             }
         }
 
-        private static Type DbType2Type(DbType type)
-        {
-            if (type == DbType.String ||
-                type == DbType.AnsiString ||
-                type == DbType.AnsiStringFixedLength ||
-                type == DbType.StringFixedLength)
-            {
-                return typeof(string);
-            }
-            else if (type == DbType.Boolean)
-            {
-                return typeof(bool);
-            }
-            else if (type == DbType.Byte)
-            {
-                return typeof(byte);
-            }
-            else if (type == DbType.SByte)
-            {
-                return typeof(sbyte);
-            }
-            else if (type == DbType.Decimal)
-            {
-                return typeof(decimal);
-            }
-            else if (type == DbType.Double)
-            {
-                return typeof(double);
-            }
-            else if (type == DbType.Int16)
-            {
-                return typeof(Int16);
-            }
-            else if (type == DbType.Int32)
-            {
-                return typeof(Int32);
-            }
-            else if (type == DbType.Int64)
-            {
-                return typeof(Int64);
-            }
-            else if (type == DbType.Single)
-            {
-                return typeof(Single);
-            }
-            else if (type == DbType.UInt16)
-            {
-                return typeof(UInt16);
-            }
-            else if (type == DbType.UInt32)
-            {
-                return typeof(UInt32);
-            }
-            else if (type == DbType.UInt64)
-            {
-                return typeof(UInt64);
-            }
-            else if (type == DbType.Date ||
-                type == DbType.DateTime ||
-                type == DbType.DateTime2 ||
-                type == DbType.DateTimeOffset)
-            {
-                return typeof(DateTime);
-            }
-            return typeof(Object);
-        }
-
-        /// <summary>
-        /// 将数据类型转换为数据库对应类型
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private static DbType Type2DbType(Type type)
-        {
-            if (type == typeof(string) ||
-                type == typeof(DynamicObjectExt))
-            {
-                return DbType.String;
-            }
-            else if (type == typeof(bool))
-            {
-                return DbType.Boolean;
-            }
-            else if (type == typeof(byte))
-            {
-                return DbType.Byte;
-            }
-            else if (type == typeof(sbyte))
-            {
-                return DbType.SByte;
-            }
-            else if (type == typeof(decimal))
-            {
-                return DbType.Decimal;
-            }
-            else if (type == typeof(double))
-            {
-                return DbType.Double;
-            }
-            else if (type == typeof(Int16))
-            {
-                return DbType.Int16;
-            }
-            else if (type == typeof(Int32))
-            {
-                return DbType.Int32;
-            }
-            else if (type == typeof(Int64))
-            {
-                return DbType.Int64;
-            }
-            else if (type == typeof(Single))
-            {
-                return DbType.Single;
-            }
-            else if (type == typeof(UInt16))
-            {
-                return DbType.Int32;
-            }
-            else if (type == typeof(UInt32))
-            {
-                return DbType.Int64;
-            }
-            else if (type == typeof(UInt64))
-            {
-                return DbType.Int64;
-            }
-            else if (type == typeof(DateTime))
-            {
-                return DbType.DateTime;
-            }
-            return DbType.Object;
-        }
-
         internal static Model ParseModel(string modelFilePath, string parent)
         {
             Model model = new Model();
@@ -718,7 +584,7 @@ namespace CodeM.Common.Orm
                             try
                             {
                                 p.FieldType = Enum.Parse<DbType>(fieldTypeStr, true);
-                                p.RealType = DbType2Type(p.FieldType);
+                                p.RealType = CommandUtils.DbType2Type(p.FieldType);
                             }
                             catch
                             {
@@ -727,7 +593,7 @@ namespace CodeM.Common.Orm
                         }
                         else
                         {
-                            p.FieldType = Type2DbType(type);
+                            p.FieldType = CommandUtils.Type2DbType(type);
                             if (p.Type == typeof(Model))
                             {
                                 dcps.FieldTypeNotSet = true;

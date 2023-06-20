@@ -2,12 +2,17 @@
 { 
     public class DISTINCT : Function
     {
-        public DISTINCT(string name) : base(name)
+        public DISTINCT(object value) : base(value)
         {
         }
 
-        public DISTINCT(Function calculator) : base(calculator)
+        public DISTINCT(Function function) : base(function)
         {
+        }
+
+        internal override bool IsDistinct()
+        {
+            return true;
         }
     }
 }

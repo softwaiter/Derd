@@ -99,7 +99,7 @@ namespace Test
         public void QueryByEquals3()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Equals(Date.DATE("Birthday"), "1949-10-01")
+                .Equals(Funcs.DATE("Birthday"), "1949-10-01")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
@@ -110,7 +110,7 @@ namespace Test
         public void QueryByEquals4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Equals(Date.DATE("Birthday"), Date.DATE("Org.RegisterDate"))
+                .Equals(Funcs.DATE("Birthday"), Funcs.DATE("Org.RegisterDate"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -132,7 +132,7 @@ namespace Test
         }
 
         [TestMethod]
-        [Description("使用1=1常量过滤条件进行查询，应返回所有4条记录")]
+        [Description("使用And常量表达式1=1作为过滤条件进行查询，应返回所有4条记录")]
         public void QueryByEquals6()
         {
             List<dynamic> result = Derd.Model("Person").And("1=1").Query();
@@ -141,15 +141,51 @@ namespace Test
         }
 
         [TestMethod]
-        [Description("查询出生日期为1949-10-01的人，应返回张大1条记录")]
+        [Description("使用123=123作为查询条件进行查询，应返回所有4条记录")]
         public void QueryByEquals7()
         {
+            List<dynamic> result = Derd.Model("Person").Equals(123, 123).Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(4, result.Count);
+        }
+
+        [TestMethod]
+        [Description("查询出生日期为1949-10-01的人，应返回张大1条记录")]
+        public void QueryByEquals8()
+        {
             List<dynamic> result = Derd.Model("Person")
-                .Equals(Date.DATE("Birthday"), Date.DATE("1949-10-01"))
+                .Equals(Funcs.DATE("Birthday"), Funcs.DATE("1949-10-01"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("张大", result[0].Name);
+        }
+
+        [TestMethod]
+        [Description("增加人员并命名为Org，查询姓名为Org的人员，应返回1条记录，且名称为Org")]
+        public void QueryByEquals9()
+        {
+            dynamic newPerson = new DynamicObjectExt();
+            newPerson.Name = "Org";
+            newPerson.Age = 23;
+            newPerson.Deposit = 10000;
+            newPerson.Birthday = new DateTime(1979, 3, 15, 6, 6, 6);
+            newPerson.Org = "microsoft";
+            newPerson.Mobile = "13900000000";
+            Derd.Model("Person").SetValues(newPerson).Save();
+
+            dynamic result = Derd.Model("Person").Equals("Name", Funcs.VALUE("Org")).QueryFirst();
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Org", result.Name);
+        }
+
+        [TestMethod]
+        [Description("使用反向表达式，查询Name等于张大的人，应返回1条记录，且姓名为张大")]
+        public void QueryByEquals91()
+        {
+            dynamic person = Derd.Model("Person").Equals("张大", "Name").QueryFirst();
+            Assert.IsNotNull(person);
+            Assert.AreEqual("张大", person.Name);
         }
 
         [TestMethod]
@@ -170,7 +206,7 @@ namespace Test
         public void QueryByNotEquals2()
         {
             List<dynamic> result = Derd.Model("Person")
-                .NotEquals(Date.DATE("Birthday"), "1949-10-01")
+                .NotEquals(Funcs.DATE("Birthday"), "1949-10-01")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(3, result.Count);
@@ -184,7 +220,7 @@ namespace Test
         public void QueryByNotEquals3()
         {
             List<dynamic> result = Derd.Model("Person")
-                .NotEquals(Date.DATE("Birthday"), Date.DATE("Org.RegisterDate"))
+                .NotEquals(Funcs.DATE("Birthday"), Funcs.DATE("Org.RegisterDate"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -197,10 +233,23 @@ namespace Test
         public void QueryByNotEquals4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .NotEquals(Date.DATE("Birthday"), Date.DATE("1949-02-15"))
+                .NotEquals(Funcs.DATE("Birthday"), Funcs.DATE("1949-02-15"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(3, result.Count);
+        }
+
+        [TestMethod]
+        [Description("使用反向表达式，查询所属机构不是ibm的人，应返回张大、张二2条记录")]
+        public void QueryByNotEquals5()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .NotEquals("ibm", "Org")
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual("张大", result[0].Name);
+            Assert.AreEqual("张二", result[1].Name);
         }
 
         [TestMethod]
@@ -226,7 +275,7 @@ namespace Test
         public void QueryByGt3()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Gt(Date.DATE("Birthday"), "1949-10-01")
+                .Gt(Funcs.DATE("Birthday"), "1949-10-01")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -239,11 +288,46 @@ namespace Test
         public void QueryByGt4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Gt(Date.DATE("Birthday"), Date.DATE("1979-03-15"))
+                .Gt(Funcs.DATE("Birthday"), Funcs.DATE("1979-03-15"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("张二", result[0].Name);
+        }
+
+        [TestMethod]
+        [Description("使用反向表达式，查询年龄小于50岁的人，应返回张二、李二2条记录")]
+        public void QueryByGt5()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Gt(50, "Age")
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual("张二", result[0].Name);
+            Assert.AreEqual("李二", result[1].Name);
+        }
+
+        [TestMethod]
+        [Description("使用常量表达式2>1作为条件进行查询操作，应返回4条记录")]
+        public void QueryByGt6()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Gt(2, 1)
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(4, result.Count);
+        }
+
+        [TestMethod]
+        [Description("使用常量表达式1>2作为条件进行查询操作，应返回0条记录")]
+        public void QueryByGt7()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Gt(1, 2)
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Count);
         }
 
         [TestMethod]
@@ -270,7 +354,7 @@ namespace Test
         [Description("查询出生日期大于等于1979-03-15的人，应返回2条记录")]
         public void QueryByGte3()
         {
-            List<dynamic> result = Derd.Model("Person").Gte(Date.DATE("Birthday"), "1979-03-15").Query();
+            List<dynamic> result = Derd.Model("Person").Gte(Funcs.DATE("Birthday"), "1979-03-15").Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
         }
@@ -280,11 +364,56 @@ namespace Test
         public void QueryByGte4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Gte(Date.DATE("Birthday"), Date.DATE("1980-07-25"))
+                .Gte(Funcs.DATE("Birthday"), Funcs.DATE("1980-07-25"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("张二", result[0].Name);
+        }
+
+        [TestMethod]
+        [Description("使用反向表达式，查询年龄小于等于18的人，应返回张二1条记录")]
+        public void QueryByGte5()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Gte(18, "Age")
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("张二", result[0].Name);
+        }
+
+        [TestMethod]
+        [Description("使用常量表达式3>=3进行查询操作，应返回4条记录")]
+        public void QueryByGte6()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Gte(3, 3)
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(4, result.Count);
+        }
+
+        [TestMethod]
+        [Description("使用常量表达式3>=1进行查询操作，应返回4条记录")]
+        public void QueryByGte7()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Gte(3, 1)
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(4, result.Count);
+        }
+
+        [TestMethod]
+        [Description("使用常量表达式3>=4进行查询操作，应返回0条记录")]
+        public void QueryByGte8()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Gte(3, 4)
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Count);
         }
 
         [TestMethod]
@@ -312,7 +441,7 @@ namespace Test
         public void QueryByLt3()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Lt(Date.DATE("Birthday"), "1949-10-01")
+                .Lt(Funcs.DATE("Birthday"), "1949-10-01")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
@@ -324,12 +453,47 @@ namespace Test
         public void QueryByLt4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Lt(Date.DATE("Birthday"), "1979-03-15")
+                .Lt(Funcs.DATE("Birthday"), "1979-03-15")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual("张大", result[0].Name);
             Assert.AreEqual("李大", result[1].Name);
+        }
+
+        [TestMethod]
+        [Description("使用反向表达式，查询大于50岁的人，应返回李大、张大2条记录")]
+        public void QueryByLt5()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Lt(50, "Age")
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual("李大", result[0].Name);
+            Assert.AreEqual("张大", result[1].Name);
+        }
+
+        [TestMethod]
+        [Description("使用常量表达式1<2进行查询操作，应返回4条记录")]
+        public void QueryByLt6()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Lt(1, 2)
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(4, result.Count);
+        }
+
+        [TestMethod]
+        [Description("使用常量表达式2<1进行查询操作，应返回0条记录")]
+        public void QueryByLt7()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Lt(2, 1)
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Count);
         }
 
         [TestMethod]
@@ -360,7 +524,7 @@ namespace Test
         public void QueryByLte3()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Lte(Date.DATE("Birthday"), "1949-10-01")
+                .Lte(Funcs.DATE("Birthday"), "1949-10-01")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -373,7 +537,7 @@ namespace Test
         public void QueryByLte4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Lte(Date.DATE("Birthday"), Date.DATE("1949-02-15"))
+                .Lte(Funcs.DATE("Birthday"), Funcs.DATE("1949-02-15"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
@@ -422,7 +586,7 @@ namespace Test
         public void QueryByLike4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Like(Date.DATE("Birthday"), "%15")
+                .Like(Funcs.DATE("Birthday"), "%15")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -435,11 +599,33 @@ namespace Test
         public void QueryByLike5()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Like(Date.DATE("Birthday"), Date.DATE("1949-10-01"))
+                .Like(Funcs.DATE("Birthday"), Funcs.DATE("1949-10-01"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("张大", result[0].Name);
+        }
+
+        [TestMethod]
+        [Description("使用常量表达式123 LIKE 123进行查询操作，应返回4条记录")]
+        public void QueryByLike6()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Like(123, 123)
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(4, result.Count);
+        }
+
+        [TestMethod]
+        [Description("使用常量表达式123 LIKE 234进行查询操作，应返回0条记录")]
+        public void QueryByLike7()
+        {
+            List<dynamic> result = Derd.Model("Person")
+                .Like(123, 234)
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Count);
         }
 
         [TestMethod]
@@ -484,7 +670,7 @@ namespace Test
         public void QueryByNotLike4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .NotLike(Date.DATE("Birthday"), "1949%")
+                .NotLike(Funcs.DATE("Birthday"), "1949%")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -497,7 +683,7 @@ namespace Test
         public void QueryByNotLike5()
         {
             List<dynamic> result = Derd.Model("Person")
-                .NotLike(Date.DATE("Birthday"), Date.DATE("1949-10-01"))
+                .NotLike(Funcs.DATE("Birthday"), Funcs.DATE("1949-10-01"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(3, result.Count);
@@ -583,7 +769,7 @@ namespace Test
         public void QueryByBetween3()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Between(Date.DATE("Birthday"), "1970-01-01", "1980-12-31")
+                .Between(Funcs.DATE("Birthday"), "1970-01-01", "1980-12-31")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -596,7 +782,7 @@ namespace Test
         public void QueryByBetween4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Between(Date.DATE("Birthday"), Date.DATE("1940-01-01"), Date.DATE("1950-12-31"))
+                .Between(Funcs.DATE("Birthday"), Funcs.DATE("1940-01-01"), Funcs.DATE("1950-12-31"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -633,7 +819,7 @@ namespace Test
         public void QueryByIn3()
         {
             List<dynamic> result = Derd.Model("Person")
-                .In(Date.DATE("Birthday"), "1949-10-01", "1949-02-15")
+                .In(Funcs.DATE("Birthday"), "1949-10-01", "1949-02-15")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -646,7 +832,7 @@ namespace Test
         public void QueryByIn4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .In(Date.DATE("Birthday"), Date.DATE("1979-03-15"), Date.DATE("1980-07-25"))
+                .In(Funcs.DATE("Birthday"), Funcs.DATE("1979-03-15"), Funcs.DATE("1980-07-25"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -684,7 +870,7 @@ namespace Test
         public void QueryByNotIn3()
         {
             List<dynamic> result = Derd.Model("Person")
-                .NotIn(Date.DATE("Birthday"), "1949-10-01", "1949-02-15", "1979-03-15")
+                .NotIn(Funcs.DATE("Birthday"), "1949-10-01", "1949-02-15", "1979-03-15")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
@@ -696,12 +882,35 @@ namespace Test
         public void QueryByNotIn4()
         {
             List<dynamic> result = Derd.Model("Person")
-                .NotIn(Date.DATE("Birthday"), Date.DATE("1949-10-01"), Date.DATE("1980-07-25"))
+                .NotIn(Funcs.DATE("Birthday"), Funcs.DATE("1949-10-01"), Funcs.DATE("1980-07-25"))
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual("李大", result[0].Name);
             Assert.AreEqual("李二", result[1].Name);
+        }
+
+        [TestMethod]
+        [Description("使用常量作为返回结果进行查询操作，应正常返回")]
+        public void QueryGetConstantValue()
+        {
+            string constant = "Hello World";
+            dynamic obj = Derd.Model("Person")
+                .GetValue(constant, "NewField")
+                .QueryFirst();
+            Assert.IsNotNull(obj);
+            Assert.AreEqual(constant, obj.NewField);
+        }
+
+        [TestMethod]
+        [Description("使用日期函数常量参数进行查询操作，应正常返回")]
+        public void QueryGetConstantValue2()
+        {
+            dynamic obj = Derd.Model("Person")
+                .GetValue(Funcs.DATE("2022-12-22 12:12:12"), "DateTime")
+                .QueryFirst();
+            Assert.IsNotNull(obj);
+            Assert.AreEqual("2022-12-22", obj.DateTime);
         }
     }
 }

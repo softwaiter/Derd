@@ -84,14 +84,14 @@ namespace UnitTest
         [Description("使用Distinct去重同年龄的人，应查询得到2人。")]
         public void Test2()
         {
-            List<dynamic> result = Derd.Model("Person").GetValue(Aggregate.DISTINCT("Age")).Query();
+            List<dynamic> result = Derd.Model("Person").GetValue(Funcs.DISTINCT("Age")).Query();
             Assert.AreEqual(3, result.Count);
         }
 
         [Description("计算所有人的年龄之和，应为60。")]
         public void Test3()
         {
-            dynamic result = Derd.Model("Person").GetValue(Aggregate.SUM("Age")).QueryFirst();
+            dynamic result = Derd.Model("Person").GetValue(Funcs.SUM("Age"), "Age").QueryFirst();
             Assert.AreEqual(60, result.Age);
         }
 
@@ -100,7 +100,7 @@ namespace UnitTest
         {
             dynamic result = Derd.Model("Person")
                 .Equals("Age", 18)
-                .GetValue(Aggregate.COUNT("Id"))
+                .GetValue(Funcs.COUNT("Id"), "Id")
                 .QueryFirst();
             Assert.AreEqual(2, result.Id);
         }
@@ -109,7 +109,7 @@ namespace UnitTest
         public void Test5()
         {
             dynamic result = Derd.Model("Person")
-                .GetValue(Aggregate.MAX("Age"))
+                .GetValue(Funcs.MAX("Age"), "Age")
                 .QueryFirst();
             Assert.IsTrue(18 == result.Age);
         }
@@ -118,7 +118,7 @@ namespace UnitTest
         public void Test6()
         {
             dynamic result = Derd.Model("Person")
-                .GetValue(Aggregate.MIN("Age"))
+                .GetValue(Funcs.MIN("Age"), "Age")
                 .QueryFirst();
             Assert.IsTrue(10 == result.Age);
         }
@@ -127,7 +127,7 @@ namespace UnitTest
         public void Test7()
         {
             dynamic result = Derd.Model("Person")
-                .GetValue(Aggregate.AVG("Age"))
+                .GetValue(Funcs.AVG("Age"), "Age")
                 .QueryFirst();
             Assert.IsTrue(15 == result.Age);
         }
@@ -137,7 +137,7 @@ namespace UnitTest
         {
             List<dynamic> result = Derd.Model("Person")
                 .GetValue("Age")
-                .GetValue(Aggregate.COUNT("Id"), "UserCount")
+                .GetValue(Funcs.COUNT("Id"), "UserCount")
                 .GroupBy("Age")
                 .Query();
 

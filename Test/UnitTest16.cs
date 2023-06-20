@@ -56,7 +56,7 @@ namespace UnitTest
         {
             dynamic result = Derd.Model("Shopping")
                 .Equals("Code", "iPhone 12")
-                .GetValue(Date.DATE("CreateTime"))
+                .GetValue(Funcs.DATE("CreateTime"), "CreateTime")
                 .QueryFirst();
             Assert.IsNotNull(result);
             Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), result.CreateTime);
@@ -67,7 +67,7 @@ namespace UnitTest
         {
             dynamic result = Derd.Model("Shopping")
                 .Equals("Code", "iPhone 12")
-                .GetValue(Date.DATE("CreateTime"), "CDate")
+                .GetValue(Funcs.DATE("CreateTime"), "CDate")
                 .QueryFirst();
             Assert.IsNotNull(result);
             Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), result.CDate);
@@ -83,10 +83,10 @@ namespace UnitTest
             Assert.IsTrue(ret);
 
             List<dynamic> result = Derd.Model("Shopping")
-                .GetValue(Date.DATE("CreateTime"))
+                .GetValue(Funcs.DATE("CreateTime"))
                 .GetValue("Code")
-                .GetValue(Aggregate.COUNT("Id"), "Count")
-                .GroupBy(Date.DATE("CreateTime"))
+                .GetValue(Funcs.COUNT("Id"), "Count")
+                .GroupBy(Funcs.DATE("CreateTime"))
                 .GroupBy("Code")
                 .Query();
             Assert.AreEqual(1, result.Count);

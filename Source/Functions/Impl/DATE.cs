@@ -2,10 +2,10 @@
 {
     public class DATE : Function
     {
-        public DATE(string name)
-            : base(name) { }
+        public DATE(object value) : base(value)
+        {
+        }
 
-        public DATE(Function calculator)
-            : base(calculator) { }
+        public DATE(Function function) : base(function) { }
     }
 }

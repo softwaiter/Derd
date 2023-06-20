@@ -1,4 +1,4 @@
-﻿using CodeM.Common.Orm.Dialect;
+﻿using CodeM.Common.Orm.SQL.Dialect;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
