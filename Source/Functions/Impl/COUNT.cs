@@ -1,6 +1,6 @@
 ﻿namespace CodeM.Common.Orm
 {
-    public class COUNT : Function
+    internal class COUNT : Function
     {
         public COUNT(object value) : base(value)
         {

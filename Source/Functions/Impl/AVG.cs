@@ -1,6 +1,6 @@
 ﻿namespace CodeM.Common.Orm
 {
-    public class AVG : Function
+    internal class AVG : Function
     {
         public AVG(object value) : base(value)
         { 

@@ -44,10 +44,6 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "default", true },
                 { "sqlite", false }
             }},
-            { "ifexists", new Hashtable() {
-                { "default", true },
-                { "oracle", false }
-            }},
             { "exists_sql_format", new Hashtable() {    // 输入database、table
                 { "sqlite", "SELECT COUNT(*) AS c FROM Sqlite_master WHERE type ='table' AND name ='{1}'" },
                 { "mysql", "SELECT COUNT(*) FROM information_schema.TABLES t WHERE t.TABLE_SCHEMA ='{0}' AND t.TABLE_NAME ='{1}'" },
@@ -259,11 +255,23 @@ namespace CodeM.Common.Orm.SQL.Dialect
             { "PROPERTY", new Hashtable() {
                 { "default", "{0}" }
             }},
+            { "DATETIME", new Hashtable() {
+                { "default", "TO_CHAR({0}, 'YYYY-MM-DD HH24:mi:ss')" },
+                { "sqlite", "DATETIME({0})" },
+                { "mysql", "DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')" },
+                { "sqlserver", "CONVERT(VARCHAR(19), {0}, 120)" }
+            }},
             { "DATE", new Hashtable() {
                 { "default", "TO_CHAR({0}, 'YYYY-MM-DD')" },
                 { "sqlite", "DATE({0})" },
                 { "mysql", "DATE_FORMAT({0}, '%Y-%m-%d')" },
                 { "sqlserver", "CONVERT(VARCHAR(10), {0}, 120)" }
+            }},
+            { "TIME", new Hashtable() {
+                { "default", "TO_CHAR({0}, 'HH24:mi:ss')" },
+                { "sqlite", "TIME({0})" },
+                { "mysql", "TIME_FORMAT({0}, '%H:%i:%s')" },
+                { "sqlserver", "CONVERT(VARCHAR(8), {0}, 8)" }
             }},
             { "COUNT", new Hashtable() {
                 { "default", "COUNT({0})" }
@@ -282,12 +290,48 @@ namespace CodeM.Common.Orm.SQL.Dialect
             }},
             { "AVG", new Hashtable() {
                 { "default", "AVG({0})" }
+            }},
+            { "SUBSTR", new Hashtable() {
+                { "default", "SUBSTR({0}, {1}, {2})" },
+                { "sqlserver", "SUBSTRING({0}, {1}, {2})" }
+            }},
+            { "LENGTH", new Hashtable() {
+                { "default", "LENGTH({0})" },
+                { "sqlserver", "LEN({0})" }
+            }},
+            { "UPPER", new Hashtable() {
+                { "default", "UPPER({0})" }
+            }},
+            { "LOWER", new Hashtable() {
+                { "default", "LOWER({0})" }
+            }},
+            { "LTRIM", new Hashtable() {
+                { "default", "LTRIM({0})" }
+            }},
+            { "RTRIM", new Hashtable() {
+                { "default", "RTRIM({0})" }
+            }},
+            { "TRIM", new Hashtable() {
+                { "default", "TRIM({0})" },
+                { "sqlserver", "LTRIM(RTRIM({0}))" }
+            }},
+            { "ABS", new Hashtable() {
+                { "default", "ABS({0})" }
+            }},
+            { "ROUND", new Hashtable() {
+                { "default", "ROUND({0}, {1})" }
             }}
         });
 
         static Hashtable sFunctionReturnTypes = Hashtable.Synchronized(new Hashtable()
         {
+            { "DATETIME", new Hashtable() {
+                { "default", "String" }
+            }},
             { "DATE", new Hashtable() {
+                { "default", "String" }
+            }},
+            { "TIME", new Hashtable() {
                 { "default", "String" }
             }},
             { "COUNT", new Hashtable() {
@@ -297,7 +341,7 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "default", "" }
             }},
             { "SUM", new Hashtable() {
-                { "default", "Double" }
+                { "default", "" }
             }},
             { "MAX", new Hashtable() {
                 { "default", "" }
@@ -307,6 +351,33 @@ namespace CodeM.Common.Orm.SQL.Dialect
             }},
             { "AVG", new Hashtable() {
                 { "default", "Decimal" }
+            }},
+            { "SUBSTR", new Hashtable() {
+                { "default", "String" }
+            }},
+            { "LENGTH", new Hashtable() {
+                { "default", "Int32" }
+            }},
+            { "UPPER", new Hashtable() {
+                { "default", "String" }
+            }},
+            { "LOWER", new Hashtable() {
+                { "default", "String" }
+            }},
+            { "LTRIM", new Hashtable() {
+                { "default", "String" }
+            }},
+            { "RTRIM", new Hashtable() {
+                { "default", "String" }
+            }},
+            { "TRIM", new Hashtable() {
+                { "default", "String" }
+            }},
+            { "ABS", new Hashtable() {
+                { "default", "" }
+            }},
+            { "ROUND", new Hashtable() {
+                { "default", "" }
             }}
         });
 

@@ -1,6 +1,6 @@
 ﻿namespace CodeM.Common.Orm
-{ 
-    public class MIN : Function
+{
+    internal class MIN : Function
     {
         public MIN(object value) : base(value)
         {

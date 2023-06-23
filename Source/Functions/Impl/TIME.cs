@@ -2,13 +2,11 @@
 
 namespace CodeM.Common.Orm
 {
-    internal class DATE : Function
+    internal class TIME : Function
     {
-        public DATE(object value) : base(value)
-        {
-        }
+        public TIME(object value) : base(value) { }
 
-        public DATE(Function function) : base(function) { }
+        public TIME(Function function) : base(function) { }
 
         internal override string Convert2SQL(Model m)
         {
@@ -20,7 +18,7 @@ namespace CodeM.Common.Orm
             {
                 if (DateTime.TryParse(this.Arguments[0].ToString(), out var datetime))
                 {
-                    return string.Concat("'", datetime.ToString("yyyy-MM-dd"), "'");
+                    return string.Concat("'", datetime.ToString("HH:mm:ss"), "'");
                 }
                 else
                 {

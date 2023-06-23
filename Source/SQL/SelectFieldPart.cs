@@ -30,7 +30,7 @@ namespace CodeM.Common.Orm.SQL
         {
             get
             {
-                if (mFunction is PROPERTY)
+                if (mFunction.IsProperty())
                 {
                     return ((PROPERTY)mFunction).Value;
                 }

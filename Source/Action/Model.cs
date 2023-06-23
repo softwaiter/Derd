@@ -861,14 +861,14 @@ namespace CodeM.Common.Orm
             try
             {
                 string[] quotes = Features.GetObjectQuotes(this);
+                string sql = string.Concat("DROP TABLE ", quotes[0], Table, quotes[1]);
 
-                string sql = string.Concat("DROP TABLE IF EXISTS ", quotes[0], Table, quotes[1]);
-                if (!Features.IsSupportIfExists(this))
-                {
-                    sql = string.Concat("DROP TABLE ", quotes[0], Table, quotes[1]);
-                }
                 Derd.PrintSQL(sql);
-                CommandUtils.ExecuteNonQuery(this, Path.ToLower(), sql);
+
+                if (this.TableExists())
+                {
+                    CommandUtils.ExecuteNonQuery(this, Path.ToLower(), sql);
+                }
             }
             catch (Exception exp)
             {
@@ -1485,8 +1485,14 @@ namespace CodeM.Common.Orm
 
                     Property pp = GetPrimaryKey(0);
                     string joinSql = SQLBuilder.BuildJoinTableSQL(this, where.ForeignTables);
-                    string subSql = string.Concat("SELECT ", quotes[0], this.Table, quotes[1], ".", pp.Field, " FROM ", quotes[0], this.Table, quotes[1], joinSql, " WHERE ", where.SQL);
-                    sql += String.Concat(" WHERE ", pp.Field, " IN (", subSql, ")");
+                    string tempTable = string.Concat(quotes[0], "tmp", DateTime.Now.Millisecond, quotes[1]);
+                    string subSql = string.Concat("SELECT ", tempTable, ".", quotes[0], pp.Field, quotes[1], 
+                        " FROM (SELECT ", quotes[0], this.Table, quotes[1], ".", quotes[0], pp.Field, quotes[1], 
+                        " FROM ", quotes[0], this.Table, quotes[1], joinSql, " WHERE ", where.SQL, ") ", tempTable);
+
+                    //string subSql = string.Concat("SELECT ", quotes[0], this.Table, quotes[1], ".", quotes[0], pp.Field, quotes[1], " FROM ", quotes[0], this.Table, quotes[1], joinSql, " WHERE ", where.SQL);
+
+                    sql += String.Concat(" WHERE ", quotes[0], this.Table, quotes[1], ".", quotes[0], pp.Field, quotes[1], " IN (", subSql, ")");
                 }
                 else if (!string.IsNullOrWhiteSpace(where.SQL))
                 {

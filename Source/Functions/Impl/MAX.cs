@@ -1,6 +1,6 @@
 ﻿namespace CodeM.Common.Orm
-{ 
-    public class MAX : Function
+{
+    internal class MAX : Function
     {
         public MAX(object value) : base(value)
         {

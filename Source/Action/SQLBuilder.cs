@@ -169,7 +169,25 @@ namespace CodeM.Common.Orm
                     {
                         sbValues.Append("'");
                     }
-                    sbValues.Append(value);
+
+                    if (p.FieldType == DbType.Date ||
+                        p.FieldType == DbType.DateTime ||
+                        p.FieldType == DbType.DateTime2)
+                    {
+                        if (DateTime.TryParse("" + value, out DateTime datetime))
+                        {
+                            sbValues.Append(datetime.ToString("yyyy-MM-dd HH:mm:ss"));
+                        }
+                        else
+                        {
+                            sbValues.Append(value);
+                        }
+                    }
+                    else
+                    {
+                        sbValues.Append(value);
+                    }
+
                     if (isNeedQuote)
                     {
                         sbValues.Append("'");

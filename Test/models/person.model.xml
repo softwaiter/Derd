@@ -3,7 +3,7 @@
     <property name="Id" field="f_id" notNull="True" primary="true" autoIncrement="true" joinInsert="false" jojnUpdate="false" desc="主键"/>
     <property name="Name" field="f_name" length="32" notNull="true" uniqueGroup="uc_name" desc="名称" />
     <property name="Age" field="f_age" type="UInt16" unsigned="true" indexGroup="idx_age" min="1" max="200" desc="年龄" />
-    <property name="Birthday" type="DateTime" field="f_birthday" fieldType="Date" desc="出生日期" defaultValue="1980/01/01" />
+    <property name="Birthday" type="DateTime" field="f_birthday" fieldType="DateTime" desc="出生日期" defaultValue="1980/01/01" />
 	<property name="IDCard" length="32" desc="身份证号码">
 		<rule pattern="IDCard" message="无效的身份证号码" />
 	</property>

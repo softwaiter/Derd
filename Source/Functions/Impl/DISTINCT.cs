@@ -1,6 +1,6 @@
 ﻿namespace CodeM.Common.Orm
-{ 
-    public class DISTINCT : Function
+{
+    internal class DISTINCT : Function
     {
         public DISTINCT(object value) : base(value)
         {

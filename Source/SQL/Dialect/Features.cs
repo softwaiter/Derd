@@ -23,16 +23,6 @@
         }
 
         /// <summary>
-        /// 判断数据库是否支持IF Exists功能
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        internal static bool IsSupportIfExists(Model model)
-        {
-            return Config.GetConfigValue<bool>("feature", model, "ifexists");
-        }
-
-        /// <summary>
         /// 判断数据库类型是否支持注释功能
         /// </summary>
         /// <param name="model"></param>

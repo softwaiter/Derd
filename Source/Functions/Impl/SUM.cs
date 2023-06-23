@@ -1,6 +1,6 @@
 ﻿namespace CodeM.Common.Orm
 {
-    public class SUM : Function
+    internal class SUM : Function
     {
         public SUM(object value) : base(value)
         {
