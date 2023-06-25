@@ -137,17 +137,17 @@ namespace CodeM.Common.Orm
 
         public static bool IsDefind(string modelName)
         {
-            return ModelUtils.IsDefined(modelName);
+            return ModelUtils.IsDefined(modelName.Trim());
         }
 
         public static Model Model(string modelName)
         {
-            return ModelUtils.GetModel(modelName);
+            return ModelUtils.GetModel(modelName.Trim());
         }
 
         public static int ExecSql(string sql, string path = "/")
         {
-            return DbUtils.ExecuteNonQuery(path.ToLower(), sql);
+            return DbUtils.ExecuteNonQuery(path.Trim().ToLower(), sql);
         }
 
         public static int ExecSql(string sql, int transCode)

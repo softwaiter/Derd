@@ -164,7 +164,7 @@ namespace CodeM.Common.Orm
             }
 
             Property result;
-            if (mProperties.TryGetValue(name.ToLower(), out result))
+            if (mProperties.TryGetValue(name.Trim().ToLower(), out result))
             {
                 return result;
             }
@@ -180,7 +180,7 @@ namespace CodeM.Common.Orm
             }
 
             Property result;
-            if (mPropertyFields.TryGetValue(field.ToLower(), out result))
+            if (mPropertyFields.TryGetValue(field.Trim().ToLower(), out result))
             {
                 return result;
             }
