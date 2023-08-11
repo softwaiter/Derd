@@ -22,6 +22,7 @@ namespace CodeM.Common.Orm
             sAllowedDatabases.TryAdd("oracle", "Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess");
             sAllowedDatabases.TryAdd("sqlserver", "Microsoft.Data.SqlClient.SqlClientFactory, Microsoft.Data.SqlClient");
             sAllowedDatabases.TryAdd("postgres", "Npgsql.NpgsqlFactory, Npgsql");
+            sAllowedDatabases.TryAdd("dm", "Dm.DmClientFactory, DmProvider");
 
             //Postgres个性化设置,Timestamp支持
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);

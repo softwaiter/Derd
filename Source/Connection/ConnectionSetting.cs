@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CodeM.Common.DbHelper;
+using System;
 using System.Collections.Generic;
 
 namespace CodeM.Common.Orm
@@ -32,11 +33,15 @@ namespace CodeM.Common.Orm
 
         public int MinPoolSize { get; set; } = 0;
 
+        public int ConnectionTimeout { get; set; } = 0;
+
+        public int CommandTimeout { get; set; } = 0;
+
         public override string ToString()
         {
             List<string> settings = new List<string>();
 
-            if ("oracle".Equals(Dialect))
+            if ("oracle".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
             {
                 int connPort = Port > 0 ? Port : 1521;
                 string datasourceFormat = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={0})(PORT={1})))(CONNECT_DATA=(SERVICE_NAME={2})))";
@@ -44,16 +49,20 @@ namespace CodeM.Common.Orm
             }
             else
             {
-                if ("sqlite".Equals(Dialect))
+                if ("sqlite".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
                 {
                     settings.Add("Version=3");
                 }
 
                 if (!string.IsNullOrWhiteSpace(Host))
                 {
-                    if ("postgres".Equals(Dialect))
+                    if ("postgres".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
                     {
                         settings.Add(string.Concat("Host=", Host));
+                    }
+                    else if ("dm".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                    {
+                        settings.Add(string.Concat("server=", Host));
                     }
                     else
                     {
@@ -71,14 +80,23 @@ namespace CodeM.Common.Orm
                     settings.Add(string.Concat("Database=", Database));
                 }
 
-                if ("mysql".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrWhiteSpace(Charset))
                 {
-                    if (!string.IsNullOrWhiteSpace(Charset))
+                    if ("mysql".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
                     {
                         settings.Add(string.Concat("Charset=", Charset));
                     }
+                    else if ("dm".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                    {
+                        settings.Add(string.Concat("encoding=", Charset));
+                    }
+                    else if ("postgres".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                    {
+                        settings.Add(string.Concat("Encoding=", Charset));
+                    }
                 }
-                else if ("sqlserver".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+
+                if ("sqlserver".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
                 {
                     if (Encrypt)
                     {
@@ -93,7 +111,14 @@ namespace CodeM.Common.Orm
 
             if (!string.IsNullOrWhiteSpace(User))
             {
-                settings.Add(string.Concat("User Id=", User));
+                if ("dm".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("user=", User));
+                }
+                else
+                {
+                    settings.Add(string.Concat("User Id=", User));
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(Password))
@@ -101,12 +126,85 @@ namespace CodeM.Common.Orm
                 settings.Add(string.Concat("Password=", Password));
             }
 
-            settings.Add(string.Concat("Pooling=", (Pooling ? "True" : "False")));
-
-            if (Pooling && !"postgres".Equals(Dialect))
+            if ("dm".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
             {
-                settings.Add(string.Concat("Max Pool Size=", MaxPoolSize));
-                settings.Add(string.Concat("Min Pool Size=", MinPoolSize));
+                settings.Add(string.Concat("conn_pooling=", (Pooling ? "True" : "False")));
+            }
+            else
+            {
+                settings.Add(string.Concat("Pooling=", (Pooling ? "True" : "False")));
+            }
+
+            if (Pooling)
+            {
+                if ("dm".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("conn_pool_size=", MaxPoolSize));
+                }
+                else if ("postgres".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("Maximum Pool Size=", MaxPoolSize));
+                    settings.Add(string.Concat("Minimum Pool Size=", MinPoolSize));
+                }
+                else
+                {
+                    settings.Add(string.Concat("Max Pool Size=", MaxPoolSize));
+                    settings.Add(string.Concat("Min Pool Size=", MinPoolSize));
+                }
+            }
+
+            if (ConnectionTimeout > 0)
+            {
+                if ("dm".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("connect_timeout=", ConnectionTimeout));
+                }
+                else if ("sqlite".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("busytimeout=", ConnectionTimeout));
+                }
+                else if ("mysql".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("connectiontimeout=", ConnectionTimeout));
+                }
+                else if ("sqlserver".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("Connect Timeout=", ConnectionTimeout));
+                }
+                else if ("oracle".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("CONNECTION TIMEOUT=", ConnectionTimeout));
+                }
+                else if ("postgres".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("Timeout=", ConnectionTimeout));
+                }
+            }
+
+            if (CommandTimeout > 0)
+            {
+                DbUtils.DefaultCommandTimeout = CommandTimeout;
+
+                if ("dm".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("command_timeout=", CommandTimeout));
+                }
+                else if ("sqlite".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("default timeout=", CommandTimeout));
+                }
+                else if ("mysql".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("defaultcommandtimeout=", CommandTimeout));
+                }
+                else if ("sqlserver".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("Command Timeout=", CommandTimeout));
+                }
+                else if ("postgres".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("Command Timeout=", CommandTimeout));
+                }
             }
 
             return string.Join(';', settings);

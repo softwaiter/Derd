@@ -259,7 +259,10 @@ namespace CodeM.Common.Orm
                     sb.Append(" UNSIGNED");
                 }
             }
-            if (IsPrimaryKey && Owner.PrimaryKeyCount == 1)
+
+            ConnectionSetting cs = ConnectionUtils.GetConnectionByModel(Owner);
+            if (!"dm".Equals(cs.Dialect, StringComparison.OrdinalIgnoreCase) && 
+                IsPrimaryKey && Owner.PrimaryKeyCount == 1)
             {
                 sb.Append(" PRIMARY KEY");
             }
@@ -276,6 +279,11 @@ namespace CodeM.Common.Orm
             if (IsNotNull)
             {
                 sb.Append(" NOT NULL");
+            }
+            if ("dm".Equals(cs.Dialect, StringComparison.OrdinalIgnoreCase) &&
+                IsPrimaryKey && Owner.PrimaryKeyCount == 1)
+            {
+                sb.Append(" PRIMARY KEY");
             }
             if (Features.IsSupportComment(Owner) && 
                 !string.IsNullOrWhiteSpace(Description))

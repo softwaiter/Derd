@@ -73,7 +73,8 @@ namespace UnitTest
             {
                 Assert.IsTrue(exp.Message.ToUpper().Contains("UNIQUE") ||
                     exp.Message.ToUpper().Contains("DUPLICATE") ||
-                    exp.Message.ToUpper().Contains("ORA-03115"));
+                    exp.Message.ToUpper().Contains("ORA-03115") ||
+                    exp.Message.ToUpper().Contains("唯一性约束"));
             }
         }
 

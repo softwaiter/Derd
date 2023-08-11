@@ -32,8 +32,8 @@ namespace Test
                 {
                     dynamic newlog = new DynamicObjectExt();
                     newlog.Operator = "wangxm";
-                    newlog.Product = "灵犀超链";
-                    newlog.Module = "产业图谱";
+                    newlog.Product = "大圆Admin";
+                    newlog.Module = "微服务列表";
                     newlog.Content = "这是第" + (k * 100 + i + 1) + "条日志";
                     m.SetBatchInsertValues(newlog);
                 }
@@ -52,8 +52,8 @@ namespace Test
                 {
                     dynamic newlog = new DynamicObjectExt();
                     newlog.Operator = "wangxm";
-                    newlog.Product = "灵犀超链";
-                    newlog.Module = "产业图谱";
+                    newlog.Product = "大圆Admin";
+                    newlog.Module = "统计分析";
                     newlog.Content = "这是第" + (k * 1000 + i + 1) + "条日志";
                     m.SetBatchInsertValues(newlog);
                 }
@@ -72,8 +72,8 @@ namespace Test
                 {
                     dynamic newlog = new DynamicObjectExt();
                     newlog.Operator = "wangxm";
-                    newlog.Product = "灵犀超链";
-                    newlog.Module = "产业图谱";
+                    newlog.Product = "大圆Admin";
+                    newlog.Module = "角色管理";
                     newlog.Content = "这是第" + (k * 1000 + i + 1) + "条日志";
                     m.SetBatchInsertValues(newlog);
                 }

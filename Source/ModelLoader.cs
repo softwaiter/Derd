@@ -244,18 +244,32 @@ namespace CodeM.Common.Orm
                     else if (nodeInfo.Path == "/connection/pool")
                     {
                         string maxStr = nodeInfo.GetAttribute("max");
-                        if (!Xmtool.Regex().IsPositiveInteger(maxStr))
+                        if (maxStr != null)
                         {
-                            throw new Exception("max属性必须是有效正整数。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                            if (string.IsNullOrWhiteSpace(maxStr))
+                            {
+                                throw new Exception("max属性不能为空。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                            }
+                            if (!Xmtool.Regex().IsPositiveInteger(maxStr))
+                            {
+                                throw new Exception("max属性必须是有效正整数。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                            }
+                            result.MaxPoolSize = int.Parse(maxStr);
                         }
-                        result.MaxPoolSize = int.Parse(maxStr);
 
                         string minStr = nodeInfo.GetAttribute("min");
-                        if (!Xmtool.Regex().IsNaturalInteger(minStr))
+                        if (minStr != null)
                         {
-                            throw new Exception("min属性必须是有效自然数。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                            if (string.IsNullOrWhiteSpace(minStr))
+                            {
+                                throw new Exception("min属性不能为空。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                            }
+                            if (!Xmtool.Regex().IsNaturalInteger(minStr))
+                            {
+                                throw new Exception("min属性必须是有效自然数。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                            }
+                            result.MinPoolSize = int.Parse(minStr);
                         }
-                        result.MinPoolSize = int.Parse(minStr);
                     }
                     else if (nodeInfo.Path == "/connection/pool/@text")
                     {
@@ -264,6 +278,36 @@ namespace CodeM.Common.Orm
                             throw new Exception("pool节点值必须是布尔型。 " + connectionFilePath + " - Line " + nodeInfo.Line);
                         }
                         result.Pooling = bool.Parse(nodeInfo.Text.Trim());
+                    }
+                    else if (nodeInfo.Path == "/connection/timeout")
+                    {
+                        string connectionTimeoutStr = nodeInfo.GetAttribute("connection");
+                        if (connectionTimeoutStr != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(connectionTimeoutStr))
+                            {
+                                throw new Exception("connection属性不能为空。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                            }
+                            if (!Xmtool.Regex().IsNaturalInteger(connectionTimeoutStr))
+                            {
+                                throw new Exception("connection属性必须是有效自然数。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                            }
+                            result.ConnectionTimeout = int.Parse(connectionTimeoutStr);
+                        }
+
+                        string commandTimeoutStr = nodeInfo.GetAttribute("command");
+                        if (commandTimeoutStr != null)
+                        {
+                            if (string.IsNullOrWhiteSpace(commandTimeoutStr))
+                            {
+                                throw new Exception("command属性不能为空。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                            }
+                            if (!Xmtool.Regex().IsNaturalInteger(commandTimeoutStr))
+                            {
+                                throw new Exception("command属性必须是有效自然数。 " + connectionFilePath + " - Line " + nodeInfo.Line);
+                            }
+                            result.CommandTimeout = int.Parse(commandTimeoutStr);
+                        }
                     }
                 }
                 return true;

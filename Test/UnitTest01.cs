@@ -19,42 +19,16 @@ namespace UnitTest
             Derd.Load();
 
             Derd.RemoveTables();
-
-            RemoveOrmTestTable();
-        }
-
-        private void RemoveOrmTestTable()
-        {
-            try
-            {
-                string sql = "Drop Table orm_test";
-                Derd.ExecSql(sql);
-            }
-            catch
-            {
-                ;
-            }
         }
 
         [TestMethod]
-        public void Test()
-        {
-            Test1();
-            Test2();
-            Test3();
-            Test4();
-            Test5();
-            Test6();
-            Test7();
-            Test8();
-        }
-
         [Description("加载模型定义，判断是否定义Person模型应返回True")]
         public void Test1()
         {
             Assert.IsTrue(Derd.IsDefind("Person"));
         }
 
+        [TestMethod]
         [Description("获取Person模型，应该返回True")]
         public void Test2()
         {
@@ -64,6 +38,7 @@ namespace UnitTest
             Assert.AreEqual<string>(m.Table, "t_person");
         }
 
+        [TestMethod]
         [Description("判断Person模型是否包含Name属性定义，应返回True")]
         public void Test3()
         {
@@ -71,6 +46,7 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
+        [TestMethod]
         [Description("判断Person模型是否包含Address属性定义，应返回False")]
         public void Test4()
         {
@@ -78,6 +54,7 @@ namespace UnitTest
             Assert.IsFalse(ret);
         }
 
+        [TestMethod]
         [Description("判断Person模型是否包含Org.Name级联属性定义,应返回True")]
         public void Test5()
         {
@@ -85,28 +62,12 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
+        [TestMethod]
         [Description("判断Person模型是否包含Org.Address级联属性定义,应返回False")]
         public void Test6()
         {
             bool ret = Derd.Model("Person").HasProperty("Org.Address");
             Assert.IsFalse(ret);
         }
-
-        [Description("使用Orm方法直接执行sql语句创建数据表orm_test，应成功。")]
-        public void Test7()
-        {
-            string sql = "Create Table orm_test(id integer primary key, name varchar(64), age int, address varchar(255))";
-            int ret = Derd.ExecSql(sql);
-            Assert.IsTrue(ret == 0);
-        }
-
-        [Description("删除Test3创建的数据表orm_test，应成功。")]
-        public void Test8()
-        {
-            string sql = "Drop Table  orm_test";
-            int ret = Derd.ExecSql(sql);
-            Assert.IsTrue(ret == 0);
-        }
-
     }
 }

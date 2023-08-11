@@ -282,7 +282,14 @@ namespace CodeM.Common.Orm
                     i++;
                 }
             }
-            sb.Append(");");
+            sb.Append(")");
+            if (Features.IsNeedCreateSuffix(this))
+            {
+                ConnectionSetting cs = ConnectionUtils.GetConnectionByModel(this);
+                string extCreateSuffix = Features.GetCreateSuffixExtCommand(this, cs.Database);
+                sb.Append(extCreateSuffix);
+            }
+            sb.Append(";");
 
             string extCmd = BuildCommentSQL();
             sb.Append(extCmd);

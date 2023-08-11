@@ -23,7 +23,16 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "default", "" },
                 { "sqlserver", "execute sp_addextendedproperty N'MS_Description',N'{2}',N'SCHEMA',N'dbo',N'table',N'{0}',N'column',N'{1}'" },
                 { "oracle", "comment on column \"{0}\".\"{1}\" is '{2}'" },
-                { "postgres", "comment on column {0}.{1} is '{2}'" }
+                { "postgres", "comment on column {0}.{1} is '{2}'" },
+                { "dm", "COMMENT ON COLUMN \"{0}\".\"{1}\" IS '{2}'" }
+            }},
+            { "create_suffix", new Hashtable() {
+                { "default", false },
+                { "dm", true }
+            }},
+            { "create_suffix_ext_format", new Hashtable() { // 输入database
+                { "default", "" },
+                { "dm", "STORAGE(ON \"{0}\", CLUSTERBTR)" }
             }},
             { "autoincrement", new Hashtable() {
                 { "default", true }
@@ -49,7 +58,8 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "mysql", "SELECT COUNT(*) FROM information_schema.TABLES t WHERE t.TABLE_SCHEMA ='{0}' AND t.TABLE_NAME ='{1}'" },
                 { "oracle", "SELECT COUNT(*) FROM user_tables t WHERE table_name='{1}'" },
                 { "sqlserver", "SELECT COUNT(*) FROM sysObjects WHERE Id=OBJECT_ID(N'{1}') and xtype='U'" },
-                { "postgres", "SELECT COUNT(*) FROM pg_class WHERE relname = '{1}'" }
+                { "postgres", "SELECT COUNT(*) FROM pg_class WHERE relname = '{1}'" },
+                { "dm", "SELECT COUNT(*) FROM sysobjects WHERE NAME='{1}' AND SCHID IN (SELECT ID FROM sysobjects WHERE NAME=UPPER('{0}'))" }
             }},
             { "select_forupdate", new Hashtable() {
                 { "default", true },
@@ -61,6 +71,7 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "sqlserver", new string[] { "[", "]" } },
                 { "oracle", new string[] { "\"", "\"" } },
                 { "postgres", new string[] { "\"", "\"" } },
+                { "dm", new string[] { "\"", "\"" } }
             }},
             { "field_alias_quote", new Hashtable() {
                 { "default", new string[] { } },
@@ -70,7 +81,8 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "default", "?" },
                 { "sqlserver", "@{0}" },
                 { "oracle", ":{0}" },
-                { "postgres", "@{0}" }
+                { "postgres", "@{0}" },
+                { "dm", ":{0}" }
             }},
             { "paging_command_format", new Hashtable() {    // 输入sql、pagesize、pageindex、offset、limit
                 { "default", "SELECT {0} LIMIT {3}, {1}" },
@@ -80,7 +92,8 @@ namespace CodeM.Common.Orm.SQL.Dialect
             }},
             { "exec_multi_command", new Hashtable() {
                 { "default", true },
-                { "oracle", false }
+                { "oracle", false },
+                { "dm", false }
             }},
             { "boolean_is_int", new Hashtable() {
                 { "default", false },
@@ -96,7 +109,8 @@ namespace CodeM.Common.Orm.SQL.Dialect
             { "tag", new Hashtable() {
                 { "default", "AUTOINCREMENT" },
                 { "mysql", "AUTO_INCREMENT" },
-                { "sqlserver", "IDENTITY" }
+                { "sqlserver", "IDENTITY" },
+                { "dm", "IDENTITY" }
             }}
         });
 
@@ -179,19 +193,22 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "default", "integer" },
                 { "mysql", "tinyint" },
                 { "sqlserver", "tinyint" },
-                { "postgres", "smallint" }
+                { "postgres", "smallint" },
+                { "dm", "tinyint" }
             }},
             { DbType.Byte, new Hashtable() {
                 { "default", "integer" },
                 { "mysql", "tinyint" },
                 { "sqlserver", "tinyint" },
-                { "postgres", "smallint" }
+                { "postgres", "smallint" },
+                { "dm", "tinyint" }
             }},
             { DbType.Int16, new Hashtable() {
                 { "default", "integer" },
                 { "mysql", "smallint" },
                 { "sqlserver", "smallint" },
-                { "postgres", "smallint" }
+                { "postgres", "smallint" },
+                { "dm", "smallint" }
             }},
             { DbType.UInt16, new Hashtable() {
                 { "default", "integer" }
@@ -229,7 +246,8 @@ namespace CodeM.Common.Orm.SQL.Dialect
             { DbType.Boolean, new Hashtable() {
                 { "default", "boolean" },
                 { "sqlserver", "bit" },
-                { "oracle", "number" }
+                { "oracle", "number" },
+                { "dm", "bit" }
             }},
             { DbType.DateTime, new Hashtable() {
                 { "default", "datetime" },

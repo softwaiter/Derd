@@ -47,6 +47,28 @@
         }
 
         /// <summary>
+        /// 判断创建表时是否在命令尾部需要增加补充命令信息
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        internal static bool IsNeedCreateSuffix(Model model)
+        {
+            return Config.GetConfigValue<bool>("feature", model, "create_suffix");
+        }
+
+        /// <summary>
+        /// 获取创建表命令的补充命令信息
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="databaseName"></param>
+        /// <returns></returns>
+        internal static string GetCreateSuffixExtCommand(Model model, string databaseName)
+        {
+            string extStr = Config.GetConfigValue<string>("feature", model, "create_suffix_ext_format");
+            return string.Format(extStr, databaseName);
+        }
+
+        /// <summary>
         /// 判断数据库类型是否支持整数自增功能
         /// </summary>
         /// <param name="model"></param>

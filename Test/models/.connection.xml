@@ -7,6 +7,7 @@
     <password></password>
     <database></database>
     <pool max="100" min="0">true</pool>
+	<timeout connection="0" command="0" />
 </connection>
 <!--<connection>
     <dialect>mysql</dialect>
@@ -15,8 +16,9 @@
     <user>root</user>
     <password>root</password>
     <database>test</database>
-	<charset>utf8</charset>
+	<charset>utf-8</charset>
     <pool max="100" min="0">true</pool>
+	<timeout connection="0" command="0" />
 </connection>-->
 <!--<connection>
 	<dialect>sqlserver</dialect>
@@ -25,7 +27,9 @@
 	<user>sa</user>
 	<password>sa123</password>
 	<database>test</database>
+	<encrypt>false</encrypt>
 	<pool max="100" min="0">true</pool>
+	<timeout connection="0" command="0" />
 </connection>-->
 <!--<connection>
 	<dialect>oracle</dialect>
@@ -35,6 +39,7 @@
 	<password>System123</password>
 	<database>test</database>
 	<pool max="100" min="0">true</pool>
+	<timeout connection="0" command="0" />
 </connection>-->
 <!--<connection>
 	<dialect>postgres</dialect>
@@ -43,5 +48,18 @@
 	<user>postgres</user>
 	<password>postgres</password>
 	<database>test</database>
+	<charset>utf-8</charset>
 	<pool max="100" min="0">true</pool>
+	<timeout connection="0" command="0" />
+</connection>-->
+<!--<connection>
+	<dialect>dm</dialect>
+	<host>localhost</host>
+	<port></port>
+	<user>TEST</user>
+	<password>TEST123456</password>
+	<database>test</database>
+	<charset></charset>
+	<pool max="200" min="0">true</pool>
+	<timeout connection="0" command="0" />
 </connection>-->

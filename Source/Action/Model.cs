@@ -858,16 +858,16 @@ namespace CodeM.Common.Orm
 
         public void RemoveTable(bool throwError = false)
         {
+            bool tableRemoved = false;
             try
             {
-                string[] quotes = Features.GetObjectQuotes(this);
-                string sql = string.Concat("DROP TABLE ", quotes[0], Table, quotes[1]);
-
-                Derd.PrintSQL(sql);
-
                 if (this.TableExists())
                 {
+                    string[] quotes = Features.GetObjectQuotes(this);
+                    string sql = string.Concat("DROP TABLE ", quotes[0], Table, quotes[1]);
+                    Derd.PrintSQL(sql);
                     CommandUtils.ExecuteNonQuery(this, Path.ToLower(), sql);
+                    tableRemoved = true;
                 }
             }
             catch (Exception exp)
@@ -878,30 +878,33 @@ namespace CodeM.Common.Orm
                 }
             }
 
-            try
+            if (tableRemoved)
             {
-                for (int i = 0; i < PropertyCount; i++)
+                try
                 {
-                    Property p = GetProperty(i);
-                    if (p.AutoIncrement)
+                    for (int i = 0; i < PropertyCount; i++)
                     {
-                        string[] aiCmds = Features.GetAutoIncrementGCExtCommand(this, Table, p.Field);
-                        foreach (string cmd in aiCmds)
+                        Property p = GetProperty(i);
+                        if (p.AutoIncrement)
                         {
-                            if (!string.IsNullOrEmpty(cmd))
+                            string[] aiCmds = Features.GetAutoIncrementGCExtCommand(this, Table, p.Field);
+                            foreach (string cmd in aiCmds)
                             {
-                                Derd.PrintSQL(cmd);
-                                DbUtils.ExecuteNonQuery(Path.ToLower(), cmd);
+                                if (!string.IsNullOrEmpty(cmd))
+                                {
+                                    Derd.PrintSQL(cmd);
+                                    DbUtils.ExecuteNonQuery(Path.ToLower(), cmd);
+                                }
                             }
                         }
                     }
                 }
-            }
-            catch (Exception exp)
-            {
-                if (throwError)
+                catch (Exception exp)
                 {
-                    throw exp;
+                    if (throwError)
+                    {
+                        throw exp;
+                    }
                 }
             }
         }
@@ -924,7 +927,6 @@ namespace CodeM.Common.Orm
             try
             {
                 string[] quotes = Features.GetObjectQuotes(this);
-
                 string sql = string.Concat("TRUNCATE TABLE ", quotes[0], Table, quotes[1]);
                 if (!Features.IsSupportTruncate(this))
                 {
