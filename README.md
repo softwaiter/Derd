@@ -70,6 +70,7 @@ Derd基于微软的DbProviderFactory技术实现，根据实际使用的数据�
 | Oracle       | Oracle.ManagedDataAccess.Core |
 | SqlServer    | Microsoft.Data.SqlClient      |
 | Postgres     | Npgsql                        |
+| 达梦         | dmdbms.DmProvider             |
 
 使用时，可根据需要添加其中的一项或多项依赖。
 
