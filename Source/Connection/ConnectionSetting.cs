@@ -64,10 +64,19 @@ namespace CodeM.Common.Orm
                     {
                         settings.Add(string.Concat("server=", Host));
                     }
+                    else if ("kingbase".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                    {
+                        settings.Add(string.Concat("Host=", Host));
+                    }
                     else
                     {
                         settings.Add(string.Concat("Data Source=", Host));
                     }
+                }
+
+                if ("kingbase".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    Port = Port > 0 ? Port : 54321;
                 }
 
                 if (Port > 0)
@@ -94,6 +103,10 @@ namespace CodeM.Common.Orm
                     {
                         settings.Add(string.Concat("Encoding=", Charset));
                     }
+                    else if ("kingbase".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                    {
+                        settings.Add(string.Concat("Encoding=", Charset));
+                    }
                 }
 
                 if ("sqlserver".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
@@ -114,6 +127,10 @@ namespace CodeM.Common.Orm
                 if ("dm".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
                 {
                     settings.Add(string.Concat("user=", User));
+                }
+                if ("kingbase".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("Username=", User));
                 }
                 else
                 {
@@ -142,6 +159,11 @@ namespace CodeM.Common.Orm
                     settings.Add(string.Concat("conn_pool_size=", MaxPoolSize));
                 }
                 else if ("postgres".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("Maximum Pool Size=", MaxPoolSize));
+                    settings.Add(string.Concat("Minimum Pool Size=", MinPoolSize));
+                }
+                else if ("kingbase".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
                 {
                     settings.Add(string.Concat("Maximum Pool Size=", MaxPoolSize));
                     settings.Add(string.Concat("Minimum Pool Size=", MinPoolSize));
@@ -179,6 +201,10 @@ namespace CodeM.Common.Orm
                 {
                     settings.Add(string.Concat("Timeout=", ConnectionTimeout));
                 }
+                else if ("kingbase".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("Timeout=", ConnectionTimeout));
+                }
             }
 
             if (CommandTimeout > 0)
@@ -202,6 +228,10 @@ namespace CodeM.Common.Orm
                     settings.Add(string.Concat("Command Timeout=", CommandTimeout));
                 }
                 else if ("postgres".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(string.Concat("Command Timeout=", CommandTimeout));
+                }
+                else if ("kingbase".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
                 {
                     settings.Add(string.Concat("Command Timeout=", CommandTimeout));
                 }

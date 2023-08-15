@@ -24,7 +24,8 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "sqlserver", "execute sp_addextendedproperty N'MS_Description',N'{2}',N'SCHEMA',N'dbo',N'table',N'{0}',N'column',N'{1}'" },
                 { "oracle", "comment on column \"{0}\".\"{1}\" is '{2}'" },
                 { "postgres", "comment on column {0}.{1} is '{2}'" },
-                { "dm", "COMMENT ON COLUMN \"{0}\".\"{1}\" IS '{2}'" }
+                { "dm", "COMMENT ON COLUMN \"{0}\".\"{1}\" IS '{2}'" },
+                { "kingbase", "comment on column \"{0}\".\"{1}\" is '{2}'" }
             }},
             { "create_suffix", new Hashtable() {
                 { "default", false },
@@ -39,7 +40,8 @@ namespace CodeM.Common.Orm.SQL.Dialect
             }},
             { "autoincrement_type_replace", new Hashtable() {
                 { "default", "" },
-                { "postgres", "serial" }
+                { "postgres", "serial" },
+                { "kingbase", "AUTO_INCREMENT" }
             }},
             { "autoincrement_ext_format", new Hashtable() { //输入table、column
                 { "default", new string[] { } },
@@ -59,7 +61,8 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "oracle", "SELECT COUNT(*) FROM user_tables t WHERE table_name='{1}'" },
                 { "sqlserver", "SELECT COUNT(*) FROM sysObjects WHERE Id=OBJECT_ID(N'{1}') and xtype='U'" },
                 { "postgres", "SELECT COUNT(*) FROM pg_class WHERE relname = '{1}'" },
-                { "dm", "SELECT COUNT(*) FROM sysobjects WHERE NAME='{1}' AND SCHID IN (SELECT ID FROM sysobjects WHERE NAME=UPPER('{0}'))" }
+                { "dm", "SELECT COUNT(*) FROM sysobjects WHERE NAME='{1}' AND SCHID IN (SELECT ID FROM sysobjects WHERE NAME=UPPER('{0}'))" },
+                { "kingbase", "SELECT COUNT(*) FROM user_tables t WHERE table_name='{1}'" }
             }},
             { "select_forupdate", new Hashtable() {
                 { "default", true },
@@ -71,18 +74,21 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "sqlserver", new string[] { "[", "]" } },
                 { "oracle", new string[] { "\"", "\"" } },
                 { "postgres", new string[] { "\"", "\"" } },
-                { "dm", new string[] { "\"", "\"" } }
+                { "dm", new string[] { "\"", "\"" } },
+                { "kingbase", new string[] { "\"", "\"" } }
             }},
             { "field_alias_quote", new Hashtable() {
                 { "default", new string[] { } },
-                { "oracle", new string[] { "\"", "\"" } }
+                { "oracle", new string[] { "\"", "\"" } },
+                { "kingbase", new string[] { "\"", "\"" } }
             }},
             { "command_param_format", new Hashtable() { // 输入paramname
                 { "default", "?" },
                 { "sqlserver", "@{0}" },
                 { "oracle", ":{0}" },
                 { "postgres", "@{0}" },
-                { "dm", ":{0}" }
+                { "dm", ":{0}" },
+                { "kingbase", ":{0}" }
             }},
             { "paging_command_format", new Hashtable() {    // 输入sql、pagesize、pageindex、offset、limit
                 { "default", "SELECT {0} LIMIT {3}, {1}" },

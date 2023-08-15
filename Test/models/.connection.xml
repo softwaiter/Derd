@@ -63,3 +63,14 @@
 	<pool max="200" min="0">true</pool>
 	<timeout connection="0" command="0" />
 </connection>-->
+<!--<connection>
+	<dialect>kingbase</dialect>
+	<host>localhost</host>
+	<port></port>
+	<user>system</user>
+	<password>System123</password>
+	<database>test</database>
+	<charset></charset>
+	<pool max="200" min="0">true</pool>
+	<timeout connection="0" command="0" />
+</connection>-->

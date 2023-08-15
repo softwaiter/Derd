@@ -23,4 +23,13 @@
     <ProjectReference Include="..\Source\Source.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="BouncyCastle">
+      <HintPath>lib\BouncyCastle.dll</HintPath>
+    </Reference>
+    <Reference Include="Kdbndp">
+      <HintPath>lib\Kdbndp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

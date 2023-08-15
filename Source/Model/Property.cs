@@ -229,6 +229,7 @@ namespace CodeM.Common.Orm
 
         public override string ToString()
         {
+            ConnectionSetting cs = ConnectionUtils.GetConnectionByModel(Owner);
             string[] quotes = Features.GetObjectQuotes(Owner);
 
             StringBuilder sb = new StringBuilder(64);
@@ -237,6 +238,12 @@ namespace CodeM.Common.Orm
             string autoIncrReplaceType = Features.GetAutoIncrementReplaceType(Owner);
             if (AutoIncrement && !string.IsNullOrWhiteSpace(autoIncrReplaceType))
             {
+                if ("kingbase".Equals(cs.Dialect, StringComparison.OrdinalIgnoreCase))
+                {
+                    string fieldType = FieldUtils.GetFieldType(Owner, FieldType);
+                    sb.Append(string.Concat(" ", fieldType));
+                }
+
                 sb.Append(string.Concat(" ", autoIncrReplaceType));
             }
             else
@@ -260,7 +267,6 @@ namespace CodeM.Common.Orm
                 }
             }
 
-            ConnectionSetting cs = ConnectionUtils.GetConnectionByModel(Owner);
             if (!"dm".Equals(cs.Dialect, StringComparison.OrdinalIgnoreCase) && 
                 IsPrimaryKey && Owner.PrimaryKeyCount == 1)
             {
