@@ -10,7 +10,7 @@
 
 ##  :beginner: 简介
 
-Derd是一个基于.net core开发的跨平台轻量级数据库操作框架。Derd模型定义文件基于XML文件格式，模型管理基于目录自动分类；数据库类型支持Sqlite、MySql、Oracle、Sqlserver、Postgresql、达梦等，数据库配置文件和模型定义一样基于目录划分，并支持基于目录层级的继承能力；数据操作采用链式方式，简单易用。
+Derd是一个基于.net core开发的跨平台轻量级数据库操作框架。Derd模型定义文件基于XML文件格式，模型管理基于目录自动分类；数据库类型支持Sqlite、MySql、Oracle、Sqlserver、Postgresql、达梦、人大金仓等，数据库配置文件和模型定义一样基于目录划分，并支持基于目录层级的继承能力；数据操作采用链式方式，简单易用。
 
 #### 特点列表：
 
@@ -36,25 +36,25 @@ Derd是一个基于.net core开发的跨平台轻量级数据库操作框架。D
 #### Package Manager
 
 ```shell
-Install-Package Derd -Version 2.6.20
+Install-Package Derd -Version 2.6.21
 ```
 
 #### .NET CLI
 
 ```shell
-dotnet add package Derd --version 2.6.20
+dotnet add package Derd --version 2.6.21
 ```
 
 #### PackageReference
 
 ```xml
-<PackageReference Include="Derd" Version="2.6.20" />
+<PackageReference Include="Derd" Version="2.6.21" />
 ```
 
 #### Paket CLI
 
 ```shell
-paket add Derd --version 2.6.20
+paket add Derd --version 2.6.21
 ```
 
 
@@ -71,6 +71,7 @@ Derd基于微软的DbProviderFactory技术实现，根据实际使用的数据�
 | SqlServer    | Microsoft.Data.SqlClient      |
 | Postgres     | Npgsql                        |
 | 达梦         | dmdbms.DmProvider             |
+| 人大金仓     | Kdbndp                        |
 
 使用时，可根据需要添加其中的一项或多项依赖。
 
