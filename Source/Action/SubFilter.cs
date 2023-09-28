@@ -446,7 +446,7 @@ namespace CodeM.Common.Orm
 
             if (values.Length == 1)
             {
-                this.Equals(key, values[0]);
+                this.Equals(key, new VALUE(values[0]));
             }
             else
             {
