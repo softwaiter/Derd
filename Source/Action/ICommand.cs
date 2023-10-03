@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 
 namespace CodeM.Common.Orm
 {
@@ -18,7 +19,7 @@ namespace CodeM.Common.Orm
 
         bool TryTruncateTable();
 
-        int GetTransaction();
+        int GetTransaction(IsolationLevel level = IsolationLevel.Unspecified);
 
         bool Save(int? transCode = null);
 

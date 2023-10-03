@@ -91,9 +91,9 @@ namespace CodeM.Common.Orm
             return trans;
         }
 
-        public static int GetTransaction()
+        public static int GetTransaction(IsolationLevel level = IsolationLevel.Unspecified)
         {
-            DbTransaction trans = DbUtils.GetTransaction("/");
+            DbTransaction trans = DbUtils.GetTransaction("/", level);
             sTransactions.AddOrUpdate(trans.GetHashCode(), trans, (key, value) =>
             {
                 return trans;
@@ -102,7 +102,7 @@ namespace CodeM.Common.Orm
         }
 
         public static int GetTransaction(string path, 
-            IsolationLevel level=IsolationLevel.Unspecified)
+            IsolationLevel level = IsolationLevel.Unspecified)
         {
             DbTransaction trans = DbUtils.GetTransaction(path.ToLower(), level);
             sTransactions.AddOrUpdate(trans.GetHashCode(), trans, (key, value) =>

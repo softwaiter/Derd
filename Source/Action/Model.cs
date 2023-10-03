@@ -973,9 +973,9 @@ namespace CodeM.Common.Orm
             return false;
         }
 
-        public int GetTransaction()
+        public int GetTransaction(IsolationLevel level = IsolationLevel.Unspecified)
         {
-            return Derd.GetTransaction(this.Path);
+            return Derd.GetTransaction(this.Path, level);
         }
 
         private void _CalcPreSaveProperties(dynamic modelValues)
