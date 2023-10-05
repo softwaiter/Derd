@@ -45,6 +45,7 @@ namespace Test
             newPerson.Deposit = 10000;
             newPerson.Birthday = new DateTime(1949, 10, 1, 10, 10, 10);
             newPerson.Org = "microsoft";
+            newPerson.IsAdmin = true;
             Derd.Model("Person").SetValues(newPerson).Save();
 
             dynamic newPerson2 = new DynamicObjectExt();
@@ -63,6 +64,7 @@ namespace Test
             newPerson3.Birthday = new DateTime(1949, 2, 15, 10, 10, 10);
             newPerson3.Org = "ibm";
             newPerson3.IDCard = "130602199907250951";
+            newPerson3.IsAdmin = true;
             Derd.Model("Person").SetValues(newPerson3).Save();
 
             dynamic newPerson4 = new DynamicObjectExt();
@@ -180,12 +182,29 @@ namespace Test
         }
 
         [TestMethod]
-        [Description("使用反向表达式，查询Name等于张大的人，应返回1条记录，且姓名为张大")]
+        [Description("查询Name等于张大的人，应返回1条记录，且姓名为张大")]
         public void QueryByEquals91()
         {
             dynamic person = Derd.Model("Person").Equals("张大", "Name").QueryFirst();
             Assert.IsNotNull(person);
             Assert.AreEqual("张大", person.Name);
+        }
+
+        [TestMethod]
+        [Description("查询IsAdmin为True的人，应返回2条记录，且姓名为张大和李大")]
+        public void QueryByEquals92()
+        {
+            long c = Derd.Model("Person")
+                .Equals("IsAdmin", "true")
+                .Count();
+
+            List<dynamic> result = Derd.Model("Person")
+                .Equals("IsAdmin", true)
+                .Query();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual("张大", result[0].Name);
+            Assert.AreEqual("李大", result[1].Name);
         }
 
         [TestMethod]
@@ -240,7 +259,7 @@ namespace Test
         }
 
         [TestMethod]
-        [Description("使用反向表达式，查询所属机构不是ibm的人，应返回张大、张二2条记录")]
+        [Description("查询所属机构不是ibm的人，应返回张大、张二2条记录")]
         public void QueryByNotEquals5()
         {
             List<dynamic> result = Derd.Model("Person")
@@ -296,7 +315,7 @@ namespace Test
         }
 
         [TestMethod]
-        [Description("使用反向表达式，查询年龄小于50岁的人，应返回张二、李二2条记录")]
+        [Description("查询年龄小于50岁的人，应返回张二、李二2条记录")]
         public void QueryByGt5()
         {
             List<dynamic> result = Derd.Model("Person")
@@ -374,7 +393,7 @@ namespace Test
         }
 
         [TestMethod]
-        [Description("使用反向表达式，查询年龄小于等于18的人，应返回张二1条记录")]
+        [Description("查询年龄小于等于18的人，应返回张二1条记录")]
         public void QueryByGte5()
         {
             List<dynamic> result = Derd.Model("Person")
@@ -469,7 +488,7 @@ namespace Test
         }
 
         [TestMethod]
-        [Description("使用反向表达式，查询大于50岁的人，应返回李大、张大2条记录")]
+        [Description("查询大于50岁的人，应返回李大、张大2条记录")]
         public void QueryByLt5()
         {
             List<dynamic> result = Derd.Model("Person")
