@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CodeM.Common.Orm
 {
-    internal class ConnectionSetting
+    public class ConnectionSetting
     {
         /// <summary>
         /// 数据源名称，即connection定义路径
@@ -119,6 +119,8 @@ namespace CodeM.Common.Orm
                     {
                         settings.Add("Encrypt=no");
                     }
+
+                    settings.Add("trustServerCertificate=true");
                 }
             }
 

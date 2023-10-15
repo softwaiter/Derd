@@ -164,9 +164,21 @@ namespace CodeM.Common.Orm
             }
 
             Property result;
-            if (mProperties.TryGetValue(name.Trim().ToLower(), out result))
+            if (!name.Contains("."))
             {
-                return result;
+                if (mProperties.TryGetValue(name.Trim().ToLower(), out result))
+                {
+                    return result;
+                }
+            }
+            else
+            {
+                int firstIndex = name.IndexOf(".");
+                if (mProperties.TryGetValue(name.Substring(0, firstIndex).Trim().ToLower(), out result))
+                {
+                    Model currM = ModelUtils.GetModel(result.TypeValue);
+                    return currM.GetProperty(name.Substring(firstIndex + 1));
+                }
             }
 
             throw new Exception(string.Concat("属性未定义：", name));
@@ -275,9 +287,15 @@ namespace CodeM.Common.Orm
                     {
                         sb.Append(",");
                     }
-                    
+
+                    string identifierArgs = string.Concat(Table, ",", e.Current.Value);
+                    string name = string.Concat("UNQ$", CommandUtils.GetObjectIdentifier(identifierArgs.Split(",")));
+                    if (name.Length > 30)
+                    {
+                        name = name.Substring(0, 30);
+                    }
                     string constraintFields = e.Current.Value.Replace(",", string.Concat(quotes[1], ",", quotes[0]));
-                    sb.Append(string.Concat("CONSTRAINT ", Table, "$unique$", e.Current.Key, " UNIQUE (", quotes[0], constraintFields, quotes[1], ")"));
+                    sb.Append(string.Concat("CONSTRAINT ", name, " UNIQUE (", quotes[0], constraintFields, quotes[1], ")"));
 
                     i++;
                 }
@@ -309,8 +327,14 @@ namespace CodeM.Common.Orm
                     IEnumerator<KeyValuePair<string, string>> e = mIndexSettings.GetEnumerator();
                     while (e.MoveNext())
                     {
+                        string identifierArgs = string.Concat(Table, ",", e.Current.Value);
+                        string name = string.Concat("IDX$", CommandUtils.GetObjectIdentifier(identifierArgs.Split(",")));
+                        if (name.Length > 30)
+                        {
+                            name = name.Substring(0, 30);
+                        }
                         string indexFields = e.Current.Value.Replace(",", string.Concat(quotes[1], ",", quotes[0]));
-                        sb.Append(string.Concat("CREATE INDEX ", Table, "$", e.Current.Key, " ON ", quotes[0], Table, quotes[1], "(", quotes[0], indexFields, quotes[1], ");"));
+                        sb.Append(string.Concat("CREATE INDEX ", name, " ON ", quotes[0], Table, quotes[1], "(", quotes[0], indexFields, quotes[1], ");"));
                     }
                     return sb.ToString();
                 }

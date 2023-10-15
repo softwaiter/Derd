@@ -3,7 +3,6 @@ using CodeM.Common.Tools.DynamicObject;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 
 namespace Test
@@ -159,6 +158,17 @@ namespace Test
         {
             dynamic result = Derd.Model("Person")
                 .GetValue(Funcs.COUNT(Funcs.DISTINCT("Org")), "Count")
+                .QueryFirst();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count);
+        }
+
+        [TestMethod]
+        [Description("通过人员表统计机构数量，应返回统计数量为2")]
+        public void DISTINCT2()
+        {
+            dynamic result = Derd.Model("Person")
+                .GetValue(Funcs.COUNT(Funcs.DISTINCT("Org.Code")), "Count")
                 .QueryFirst();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);

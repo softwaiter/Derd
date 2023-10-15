@@ -621,7 +621,8 @@ namespace CodeM.Common.Orm
 
             if (mGetValues.Exists(item => item.FieldName == name))
             {
-                mSorts.Add(string.Concat(quotes[0], name, quotes[1], " ASC"));
+                string sortSql = Features.GetAscSortSql(this, string.Concat(quotes[0], name, quotes[1]));
+                mSorts.Add(sortSql);
             }
             else
             {
@@ -632,7 +633,9 @@ namespace CodeM.Common.Orm
                     {
                         throw new Exception(string.Concat("未找到属性：", name));
                     }
-                    mSorts.Add(string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " ASC"));
+
+                    string sortSql = Features.GetAscSortSql(this, string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1]));
+                    mSorts.Add(sortSql);
                 }
                 else
                 {
@@ -647,7 +650,8 @@ namespace CodeM.Common.Orm
                         if (i == subNames.Length - 2)
                         {
                             Property lastProp = subM.GetProperty(subNames[i + 1]);
-                            mSorts.Add(string.Concat(quotes[0], subM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1], " ASC"));
+                            string sortSql = Features.GetAscSortSql(this, string.Concat(quotes[0], subM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1]));
+                            mSorts.Add(sortSql);
                             break;
                         }
                     }
@@ -664,7 +668,8 @@ namespace CodeM.Common.Orm
 
             if (mGetValues.Exists(item => item.FieldName == name))
             {
-                mSorts.Add(string.Concat(quotes[0], name, quotes[1], " DESC"));
+                string sortSql = Features.GetDescSortSql(this, string.Concat(quotes[0], name, quotes[1]));
+                mSorts.Add(sortSql);
             }
             else
             {
@@ -676,7 +681,9 @@ namespace CodeM.Common.Orm
                     {
                         throw new Exception(string.Concat("未找到属性：", name));
                     }
-                    mSorts.Add(string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1], " DESC"));
+
+                    string sortSql = Features.GetDescSortSql(this, string.Concat(quotes[0], p.Owner.Table, quotes[1], ".", quotes[0], p.Field, quotes[1]));
+                    mSorts.Add(sortSql);
                 }
                 else
                 {
@@ -691,7 +698,8 @@ namespace CodeM.Common.Orm
                         if (i == subNames.Length - 2)
                         {
                             Property lastProp = subM.GetProperty(subNames[i + 1]);
-                            mSorts.Add(string.Concat(quotes[0], subM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1], " DESC"));
+                            string sortSql = Features.GetDescSortSql(this, string.Concat(quotes[0], subM.Table, quotes[1], ".", quotes[0], lastProp.Field, quotes[1]));
+                            mSorts.Add(sortSql);
                             break;
                         }
                     }
@@ -805,40 +813,62 @@ namespace CodeM.Common.Orm
         #region ICommand
         public void CreateTable(bool replace = false)
         {
+            if (!replace && TableExists())
+            {
+                throw new Exception(String.Concat("表 ", this.Table, " 已存在。"));
+            }
+
             StringBuilder sb = new StringBuilder(ToString());
             if (replace)
             {
                 RemoveTable();
             }
 
-            Derd.PrintSQL(sb.ToString());
-            CommandUtils.ExecuteNonQuery(this, Path.ToLower(), sb.ToString());
+            DbTransaction transaction = DbUtils.GetTransaction(Path.ToLower());
 
-            string tableIndexSQL = ToString(true);
-            if (!string.IsNullOrWhiteSpace(tableIndexSQL))
+            try
             {
-                Derd.PrintSQL(tableIndexSQL);
-                CommandUtils.ExecuteNonQuery(this, Path.ToLower(), tableIndexSQL);
-            }
+                Derd.PrintSQL(sb.ToString());
+                CommandUtils.ExecuteNonQuery(this, transaction, sb.ToString());
 
-            if (Features.IsSupportAutoIncrement(this))
-            {
-                for (int i = 0; i < PropertyCount; i++)
+                string tableIndexSQL = ToString(true);
+                if (!string.IsNullOrWhiteSpace(tableIndexSQL))
                 {
-                    Property p = GetProperty(i);
-                    if (p.AutoIncrement)
+                    Derd.PrintSQL(tableIndexSQL);
+                    CommandUtils.ExecuteNonQuery(this, transaction, tableIndexSQL);
+                }
+
+                if (Features.IsSupportAutoIncrement(this))
+                {
+                    for (int i = 0; i < PropertyCount; i++)
                     {
-                        string[] aiCmds = Features.GetAutoIncrementExtCommand(this, Table, p.Field);
-                        foreach (string cmd in aiCmds)
+                        Property p = GetProperty(i);
+                        if (p.AutoIncrement)
                         {
-                            if (!string.IsNullOrEmpty(cmd))
+                            string identifierArgs = string.Concat(Table, ",", p.Field);
+                            string objName = CommandUtils.GetObjectIdentifier(identifierArgs.Split(","));
+                            if (objName.Length > 26)
                             {
-                                Derd.PrintSQL(cmd);
-                                DbUtils.ExecuteNonQuery(Path.ToLower(), cmd);
+                                objName = objName.Substring(0, 26);
+                            }
+                            string[] aiCmds = Features.GetAutoIncrementExtCommand(this, Table, p.Field, objName);
+                            foreach (string cmd in aiCmds)
+                            {
+                                if (!string.IsNullOrEmpty(cmd))
+                                {
+                                    Derd.PrintSQL(cmd);
+                                    DbUtils.ExecuteNonQuery(transaction, cmd);
+                                }
                             }
                         }
                     }
                 }
+            }
+            catch (Exception exp)
+            {
+                DbUtils.RollbackTransaction(transaction);
+
+                throw exp;
             }
         }
 
@@ -858,53 +888,54 @@ namespace CodeM.Common.Orm
 
         public void RemoveTable(bool throwError = false)
         {
-            bool tableRemoved = false;
+            DbTransaction transaction = DbUtils.GetTransaction(Path.ToLower());
             try
             {
+                bool tableRemoved = false;
                 if (this.TableExists())
                 {
                     string[] quotes = Features.GetObjectQuotes(this);
                     string sql = string.Concat("DROP TABLE ", quotes[0], Table, quotes[1]);
                     Derd.PrintSQL(sql);
-                    CommandUtils.ExecuteNonQuery(this, Path.ToLower(), sql);
+                    CommandUtils.ExecuteNonQuery(this, transaction, sql);
                     tableRemoved = true;
                 }
-            }
-            catch (Exception exp)
-            {
-                if (throwError)
-                {
-                    throw exp;
-                }
-            }
 
-            if (tableRemoved)
-            {
-                try
+                if (tableRemoved)
                 {
                     for (int i = 0; i < PropertyCount; i++)
                     {
                         Property p = GetProperty(i);
                         if (p.AutoIncrement)
                         {
-                            string[] aiCmds = Features.GetAutoIncrementGCExtCommand(this, Table, p.Field);
+                            string identifierArgs = string.Concat(Table, ",", p.Field);
+                            string objName = CommandUtils.GetObjectIdentifier(identifierArgs.Split(","));
+                            if (objName.Length > 26)
+                            {
+                                objName = objName.Substring(0, 26);
+                            }
+                            string[] aiCmds = Features.GetAutoIncrementGCExtCommand(this, objName);
                             foreach (string cmd in aiCmds)
                             {
                                 if (!string.IsNullOrEmpty(cmd))
                                 {
                                     Derd.PrintSQL(cmd);
-                                    DbUtils.ExecuteNonQuery(Path.ToLower(), cmd);
+                                    DbUtils.ExecuteNonQuery(transaction, cmd);
                                 }
                             }
                         }
                     }
                 }
-                catch (Exception exp)
+
+                DbUtils.CommitTransaction(transaction);
+            }
+            catch (Exception exp)
+            {
+                DbUtils.RollbackTransaction(transaction);
+
+                if (throwError)
                 {
-                    if (throwError)
-                    {
-                        throw exp;
-                    }
+                    throw exp;
                 }
             }
         }
@@ -1492,8 +1523,6 @@ namespace CodeM.Common.Orm
                         " FROM (SELECT ", quotes[0], this.Table, quotes[1], ".", quotes[0], pp.Field, quotes[1], 
                         " FROM ", quotes[0], this.Table, quotes[1], joinSql, " WHERE ", where.SQL, ") ", tempTable);
 
-                    //string subSql = string.Concat("SELECT ", quotes[0], this.Table, quotes[1], ".", quotes[0], pp.Field, quotes[1], " FROM ", quotes[0], this.Table, quotes[1], joinSql, " WHERE ", where.SQL);
-
                     sql += String.Concat(" WHERE ", quotes[0], this.Table, quotes[1], ".", quotes[0], pp.Field, quotes[1], " IN (", subSql, ")");
                 }
                 else if (!string.IsNullOrWhiteSpace(where.SQL))
@@ -1629,11 +1658,32 @@ namespace CodeM.Common.Orm
             }
             else if (prop.RealType == typeof(double))
             {
-                obj.SetValueByPath(propName, dr.GetDouble(fieldName));
+                object value = dr.GetValue(fieldName);
+                if (value.GetType() == typeof(double))
+                {
+                    obj.SetValueByPath(propName, value);
+                }
+                else
+                {
+                    obj.SetValueByPath(propName, double.Parse("" + value));
+                }
             }
             else if (prop.RealType == typeof(bool))
             {
-                obj.SetValueByPath(propName, dr.GetBoolean(fieldName));
+                object value = dr.GetValue(fieldName);
+                if (value.GetType() == typeof(bool))
+                {
+                    obj.SetValueByPath(propName, value);
+                }
+                else
+                {
+                    bool bValue;
+                    if (!bool.TryParse("" + value, out bValue))
+                    {
+                        bValue = !(string.IsNullOrWhiteSpace("" + value) || "" + value == "0");
+                    }
+                    obj.SetValueByPath(propName, bValue);
+                }
             }
             else if (prop.RealType == typeof(DateTime))
             {
@@ -1689,7 +1739,6 @@ namespace CodeM.Common.Orm
                 List<dynamic> result = new List<dynamic>();
 
                 CommandSQL cmd = SQLBuilder.BuildQuerySQL(this);
-
                 Derd.PrintSQL(cmd.SQL, cmd.Params.ToArray());
 
                 dynamic mixedValues = MixActionValues(cmd.FilterProperties);
@@ -1742,8 +1791,18 @@ namespace CodeM.Common.Orm
                                     }
                                     else
                                     {
-                                        object processedValue = dr.GetValue(sfp.FieldName);
-                                        obj.SetValueByPath(sfp.OutputName, processedValue);
+                                        if (sfp.Function != null &&
+                                            (sfp.Function is COUNT ||
+                                            sfp.Function is LENGTH))
+                                        {
+                                            object processedValue = dr.GetInt32(sfp.FieldName);
+                                            obj.SetValueByPath(sfp.OutputName, processedValue);
+                                        }
+                                        else
+                                        {
+                                            object processedValue = dr.GetValue(sfp.FieldName);
+                                            obj.SetValueByPath(sfp.OutputName, processedValue);
+                                        }
                                     }
                                 }
                             }

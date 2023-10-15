@@ -84,6 +84,18 @@ namespace CodeM.Common.Orm
             return GetConnectionByModelName(fullModelName);
         }
 
+        internal static ConnectionSetting GetConnectionByPath(string modelPath)
+        {
+            string key = modelPath.ToLower();
+            if (sConnectionSettings.ContainsKey(key))
+            {
+                ConnectionSetting conns = sConnectionSettings[key];
+                return conns;
+            }
+
+            throw new Exception("未定义数据源：" + modelPath);
+        }
+
         internal static ConnectionSetting GetConnectionByModelName(string modelName)
         {
             string fullModelName = ModelUtils.GetFullModelName(modelName).ToLower();

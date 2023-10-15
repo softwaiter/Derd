@@ -513,6 +513,36 @@ namespace CodeM.Common.Orm
             return this;
         }
 
+        private object CalcExprValue(Model m, DbType dbType, object value)
+        {
+            if ((dbType == DbType.Int16 ||
+                dbType == DbType.Int32 ||
+                dbType == DbType.Int64 ||
+                dbType == DbType.UInt16 ||
+                dbType == DbType.UInt32 ||
+                dbType == DbType.UInt64) &&
+                Features.IsUseIntegerInsteadOfBool(m))
+            {
+                bool boolValue;
+                if (bool.TryParse("" + value, out boolValue))
+                {
+                    return boolValue ? 1 : 0;
+                }
+            }
+            else
+            {
+                if (value != null)
+                {
+                    Type fieldType = CommandUtils.DbType2Type(dbType);
+                    if (fieldType != value.GetType())
+                    {
+                        value = Convert.ChangeType(value, fieldType);
+                    }
+                }
+            }
+            return value;
+        }
+
         private void BuildSimpleOperatorSQL(CommandSQL result, Model m, FilterOperator op,
             Function exprKey, Function exprValue, bool recordEqualsProperties)
         {
@@ -534,15 +564,16 @@ namespace CodeM.Common.Orm
                 DbType dbType = CommandUtils.GetDbParamType(propFunc.Property);
                 string paramName = CommandUtils.GenParamName(propFunc.Property);
                 string paramPlaceholder = Features.GetCommandParamName(m, paramName);
+                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprValue).Value);
                 if (!propFunc.Property.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
-                        ((VALUE)exprValue).Value, dbType, ParameterDirection.Input);
+                        paramValue, dbType, ParameterDirection.Input);
                 }
                 else
                 {
                     dynamic inputObj = new DynamicObjectExt();
-                    inputObj.SetValue(propFunc.Property.Name, ((VALUE)exprValue).Value);
+                    inputObj.SetValue(propFunc.Property.Name, paramValue);
                     dp = DbUtils.CreateParam(m.Path, paramName,
                         propFunc.Property.DoPreSaveProcessor(inputObj), 
                         dbType, ParameterDirection.Input);
@@ -569,15 +600,16 @@ namespace CodeM.Common.Orm
                 DbType dbType = CommandUtils.GetDbParamType(propFunc.Property);
                 string paramName = CommandUtils.GenParamName(propFunc.Property);
                 string paramPlaceholder = Features.GetCommandParamName(m, paramName);
+                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprKey).Value);
                 if (!propFunc.Property.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
-                        ((VALUE)exprKey).Value, dbType, ParameterDirection.Input);
+                        paramValue, dbType, ParameterDirection.Input);
                 }
                 else
                 {
                     dynamic inputObj = new DynamicObjectExt();
-                    inputObj.SetValue(propFunc.Property.Name, ((VALUE)exprKey).Value);
+                    inputObj.SetValue(propFunc.Property.Name, paramValue);
                     dp = DbUtils.CreateParam(m.Path, paramName,
                         propFunc.Property.DoPreSaveProcessor(inputObj),
                         dbType, ParameterDirection.Input);
@@ -594,9 +626,10 @@ namespace CodeM.Common.Orm
                 {
                     DbType dbType = CommandUtils.Type2DbType(((VALUE)exprKey).Value.GetType());
                     string paramName = CommandUtils.GenParamName();
+                    object paramValue = CalcExprValue(m, dbType, ((VALUE)exprKey).Value);
                     exprLeft = Features.GetCommandParamName(m, paramName);
                     DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
-                        ((VALUE)exprKey).Value, dbType, ParameterDirection.Input);
+                        paramValue, dbType, ParameterDirection.Input);
                     result.Params.Add(dp);
                 }
                 else
@@ -608,9 +641,10 @@ namespace CodeM.Common.Orm
                 {
                     DbType dbType2 = CommandUtils.Type2DbType(((VALUE)exprValue).Value.GetType());
                     string paramName2 = CommandUtils.GenParamName();
+                    object paramValue2 = CalcExprValue(m, dbType2, ((VALUE)exprValue).Value);
                     exprRight = Features.GetCommandParamName(m, paramName2);
                     DbParameter dp2 = DbUtils.CreateParam(m.Path, paramName2,
-                        ((VALUE)exprValue).Value, dbType2, ParameterDirection.Input);
+                        paramValue2, dbType2, ParameterDirection.Input);
                     result.Params.Add(dp2);
                 }
                 else
@@ -632,9 +666,10 @@ namespace CodeM.Common.Orm
             {
                 DbType dbType = CommandUtils.Type2DbType(((VALUE)exprKey).Value.GetType());
                 string paramName = CommandUtils.GenParamName();
+                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprKey).Value);
                 exprLeft = Features.GetCommandParamName(m, paramName);
                 DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
-                    ((VALUE)exprKey).Value, dbType, ParameterDirection.Input);
+                    paramValue, dbType, ParameterDirection.Input);
                 result.Params.Add(dp);
             }
             else
@@ -650,18 +685,27 @@ namespace CodeM.Common.Orm
             if (exprValue is VALUE)
             {
                 DbParameter dp;
-                DbType dbType = CommandUtils.Type2DbType(((VALUE)exprValue).Value.GetType());
+                DbType dbType;
+                if (propKey != null)
+                {
+                    dbType = CommandUtils.GetDbParamType(propKey.Property);
+                }
+                else
+                {
+                    dbType = CommandUtils.Type2DbType(((VALUE)exprValue).Value.GetType());
+                }
                 string paramName = CommandUtils.GenParamName();
+                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprValue).Value);
                 exprRight = Features.GetCommandParamName(m, paramName);
                 if (propKey == null || !propKey.Property.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
-                        ((VALUE)exprValue).Value, dbType, ParameterDirection.Input);
+                        paramValue, dbType, ParameterDirection.Input);
                 }
                 else
                 {
                     dynamic inputObj = new DynamicObjectExt();
-                    inputObj.SetValue(propKey.Property.Name, ((VALUE)exprValue).Value);
+                    inputObj.SetValue(propKey.Property.Name, paramValue);
                     dp = DbUtils.CreateParam(m.Path, paramName,
                         propKey.Property.DoPreSaveProcessor(inputObj),
                         dbType, ParameterDirection.Input);
@@ -676,18 +720,27 @@ namespace CodeM.Common.Orm
             if (exprValue2 is VALUE)
             {
                 DbParameter dp;
-                DbType dbType = CommandUtils.Type2DbType(((VALUE)exprValue2).Value.GetType());
+                DbType dbType;
+                if (propKey != null)
+                {
+                    dbType = CommandUtils.GetDbParamType(propKey.Property);
+                }
+                else
+                {
+                    dbType = CommandUtils.Type2DbType(((VALUE)exprValue2).Value.GetType());
+                }
                 string paramName = CommandUtils.GenParamName();
+                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprValue2).Value);
                 exprRight2 = Features.GetCommandParamName(m, paramName);
                 if (propKey == null || !propKey.Property.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
-                        ((VALUE)exprValue2).Value, dbType, ParameterDirection.Input);
+                        paramValue, dbType, ParameterDirection.Input);
                 }
                 else
                 {
                     dynamic inputObj = new DynamicObjectExt();
-                    inputObj.SetValue(propKey.Property.Name, ((VALUE)exprValue2).Value);
+                    inputObj.SetValue(propKey.Property.Name, paramValue);
                     dp = DbUtils.CreateParam(m.Path, paramName,
                         propKey.Property.DoPreSaveProcessor(inputObj),
                         dbType, ParameterDirection.Input);
@@ -712,9 +765,10 @@ namespace CodeM.Common.Orm
             {
                 DbType dbType = CommandUtils.Type2DbType(((VALUE)exprKey).Value.GetType());
                 string paramName = CommandUtils.GenParamName();
+                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprKey).Value);
                 exprLeft = Features.GetCommandParamName(m, paramName);
                 DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
-                    ((VALUE)exprKey).Value, dbType, ParameterDirection.Input);
+                    paramValue, dbType, ParameterDirection.Input);
                 result.Params.Add(dp);
             }
             else
@@ -739,18 +793,27 @@ namespace CodeM.Common.Orm
                 if (values[i] is VALUE)
                 {
                     DbParameter dp;
-                    DbType dbType = CommandUtils.Type2DbType(((VALUE)values[i]).Value.GetType());
+                    DbType dbType;
+                    if (propKey != null)
+                    {
+                        dbType = CommandUtils.GetDbParamType(propKey.Property);
+                    }
+                    else
+                    {
+                        dbType = CommandUtils.Type2DbType(((VALUE)values[i]).Value.GetType());
+                    }
                     string paramName = CommandUtils.GenParamName();
+                    object paramValue = CalcExprValue(m, dbType, ((VALUE)values[i]).Value);
                     string inParamPlaceholder = Features.GetCommandParamName(m, paramName);
                     if (propKey == null || !propKey.Property.NeedCalcPreSaveProcessor)
                     {
                         dp = DbUtils.CreateParam(m.Path, paramName,
-                            ((VALUE)values[i]).Value, dbType, ParameterDirection.Input);
+                            paramValue, dbType, ParameterDirection.Input);
                     }
                     else
                     {
                         dynamic inputObj = new DynamicObjectExt();
-                        inputObj.SetValue(propKey.Property.Name, ((VALUE)values[i]).Value);
+                        inputObj.SetValue(propKey.Property.Name, paramValue);
                         dp = DbUtils.CreateParam(m.Path, paramName,
                             propKey.Property.DoPreSaveProcessor(inputObj),
                             dbType, ParameterDirection.Input);

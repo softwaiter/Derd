@@ -241,6 +241,11 @@ namespace CodeM.Common.Orm
                 if ("kingbase".Equals(cs.Dialect, StringComparison.OrdinalIgnoreCase))
                 {
                     string fieldType = FieldUtils.GetFieldType(Owner, FieldType);
+                    int stringMaxLen = Features.GetStringMaxLength(Owner);
+                    if (this.Length > stringMaxLen)
+                    {
+                        fieldType = Features.GetLargeTextType(Owner);
+                    }
                     sb.Append(string.Concat(" ", fieldType));
                 }
 
@@ -249,8 +254,14 @@ namespace CodeM.Common.Orm
             else
             {
                 string fieldType = FieldUtils.GetFieldType(Owner, FieldType);
+                int stringMaxLen = Features.GetStringMaxLength(Owner);
+                string largeTextType = Features.GetLargeTextType(Owner);
+                if (this.Length > stringMaxLen)
+                {
+                    fieldType = largeTextType;
+                }
                 sb.Append(string.Concat(" ", fieldType));
-                if (Length > 0)
+                if (!fieldType.Equals(largeTextType) && Length > 0)
                 {
                     if (FieldUtils.IsFloat(FieldType))
                     {
@@ -276,7 +287,7 @@ namespace CodeM.Common.Orm
                 Features.IsSupportAutoIncrement(Owner) &&
                 string.IsNullOrWhiteSpace(autoIncrReplaceType))
             {
-                string[] extCmds = Features.GetAutoIncrementExtCommand(Owner, Owner.Table, Field);
+                string[] extCmds = Features.GetAutoIncrementExtCommand(Owner, Owner.Table, Field, "any");
                 if (extCmds.Length == 0)
                 {
                     sb.Append(string.Concat(" ", FieldUtils.GetFieldAutoIncrementTag(Owner)));

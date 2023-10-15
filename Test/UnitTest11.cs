@@ -31,32 +31,35 @@ namespace UnitTest
             Test5();
         }
 
-        [Description("获取当前数据库版本，版本控制未启动，应返回-1")]
+        [Description("获取当前数据库版本，版本控制未启动，应返回0")]
         public void Test1()
         {
             int ver = Derd.GetVersion();
-            Assert.AreEqual(ver, -1);
+            Assert.AreEqual(ver, 0);
         }
 
         [Description("启动数据库版本控制，应成功")]
         public void Test2()
         {
+            bool enabled = Derd.IsVersionControlEnabled();
+            Assert.IsFalse(enabled);
+
             Derd.EnableVersionControl();
-            int ver = Derd.GetVersion();
-            Assert.AreEqual(ver, 0);
+            enabled = Derd.IsVersionControlEnabled();
+            Assert.IsTrue(enabled);
         }
 
         [Description("设置新版本号为1，应成功")]
         public void Test3()
         {
-            bool ret = Derd.SetVersion(1);
+            bool ret = Derd.SetVersion("/", 1);
             Assert.IsTrue(ret);
         }
 
         [Description("设置新版本号为0，应失败")]
         public void Test4()
         {
-            bool ret = Derd.SetVersion(0);
+            bool ret = Derd.SetVersion("/", 0);
             Assert.IsFalse(ret);
         }
 

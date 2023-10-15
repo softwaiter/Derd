@@ -43,13 +43,13 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "postgres", "serial" },
                 { "kingbase", "AUTO_INCREMENT" }
             }},
-            { "autoincrement_ext_format", new Hashtable() { //输入table、column
+            { "autoincrement_ext_format", new Hashtable() { // 输入table、column、对象标识名称
                 { "default", new string[] { } },
-                { "oracle", new string[] { "CREATE SEQUENCE SEQ_{0}_{1} INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE", "CREATE TRIGGER TIG_{0}_{1} BEFORE insert ON \"{0}\" FOR EACH ROW begin select SEQ_{0}_{1}.nextval into:New.\"{1}\" from dual;end;" } }
+                { "oracle", new string[] { "CREATE SEQUENCE SEQ${2} INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE", "CREATE TRIGGER TRG${2} BEFORE insert ON \"{0}\" FOR EACH ROW begin select SEQ${2}.nextval into:New.\"{1}\" from dual;end;" } }
             }},
-            { "autoincrement_gc_ext_format", new Hashtable() { //输入table、column
+            { "autoincrement_gc_ext_format", new Hashtable() { //输入对象标识名称
                 { "default", new string[] { } },
-                { "oracle", new string[] { "DROP SEQUENCE SEQ_{0}_{1}" } }
+                { "oracle", new string[] { "DROP SEQUENCE SEQ${0}" } }
             }},
             { "truncate", new Hashtable() {
                 { "default", true },
@@ -103,7 +103,25 @@ namespace CodeM.Common.Orm.SQL.Dialect
             }},
             { "boolean_is_int", new Hashtable() {
                 { "default", false },
+                { "sqlserver", true },
+                { "postgres", true },
                 { "oracle", true }
+            }},
+            { "string_max_len", new Hashtable() {
+                { "default", 8000 },
+                { "oracle", 4000 }
+            }},
+            { "large_text_type", new Hashtable() {
+                { "default", "text" },
+                { "oracle", "clob" }
+            }},
+            { "orderby_asc", new Hashtable() {  // 输入排序字段
+                { "default", "{0} ASC" },
+                { "oracle", "{0} ASC NULLS FIRST" }
+            }},
+            { "orderby_desc", new Hashtable() { // 输入排序字段
+                { "default", "{0} DESC" },
+                { "oracle", "{0} DESC NULLS LAST" }
             }}
         });
 
@@ -252,6 +270,7 @@ namespace CodeM.Common.Orm.SQL.Dialect
             { DbType.Boolean, new Hashtable() {
                 { "default", "boolean" },
                 { "sqlserver", "bit" },
+                { "postgres", "smallint" },
                 { "oracle", "number" },
                 { "dm", "bit" }
             }},

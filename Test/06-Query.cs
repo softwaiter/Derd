@@ -194,10 +194,6 @@ namespace Test
         [Description("查询IsAdmin为True的人，应返回2条记录，且姓名为张大和李大")]
         public void QueryByEquals92()
         {
-            long c = Derd.Model("Person")
-                .Equals("IsAdmin", "true")
-                .Count();
-
             List<dynamic> result = Derd.Model("Person")
                 .Equals("IsAdmin", true)
                 .Query();

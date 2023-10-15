@@ -32,11 +32,6 @@ namespace CodeM.Common.Orm
                     {
                         if (value != null)
                         {
-                            if (p.RealType == typeof(DynamicObjectExt))
-                            {
-                                value = value.ToString();
-                            }
-
                             if (insertFields.Length > 0)
                             {
                                 insertFields += ",";
@@ -66,6 +61,30 @@ namespace CodeM.Common.Orm
                     if (!modelDefine.TryGetValue(currModelValues, p, out value))
                     {
                         value = null;
+                    }
+
+                    if (value != null)
+                    {
+                        if (p.RealType == typeof(DynamicObjectExt))
+                        {
+                            value = value.ToString();
+                        }
+                        else if (p.RealType == typeof(bool))
+                        {
+                            value = bool.Parse("" + value);
+                            if (Features.IsUseIntegerInsteadOfBool(modelDefine))
+                            {
+                                value = (bool)value ? 1 : 0;
+                            }
+                        }
+                        else
+                        {
+                            Type fieldType = CommandUtils.DbType2Type(p.FieldType);
+                            if (fieldType != value.GetType())
+                            {
+                                value = Convert.ChangeType(value, fieldType);
+                            }
+                        }
                     }
 
                     string paramName = CommandUtils.GenParamName(p) + i;
@@ -110,11 +129,6 @@ namespace CodeM.Common.Orm
                     {
                         if (value != null)
                         {
-                            if (p.RealType == typeof(DynamicObjectExt))
-                            {
-                                value = value.ToString();
-                            }
-
                             if (insertFields.Length > 0)
                             {
                                 insertFields += ",";
@@ -145,19 +159,42 @@ namespace CodeM.Common.Orm
                     {
                         value = null;
                     }
+                    
+                    if (value != null)
+                    {
+                        if (p.RealType == typeof(string) &&
+                            value.GetType() == typeof(string))
+                        {
+                            value = value.ToString().Replace("'", "\"");
+                        }
 
-                    //string paramName = CommandUtils.GenParamName(p) + i;
-                    //DbType dbType = CommandUtils.GetDbParamType(p);
-                    //DbParameter dp = DbUtils.CreateParam(modelDefine.Path, paramName,
-                    //    value, dbType, ParameterDirection.Input);
-                    //result.Params.Add(dp);
+                        if (p.RealType == typeof(DynamicObjectExt))
+                        {
+                            value = value.ToString();
+                        }
+                        else if (p.RealType == typeof(bool))
+                        {
+                            value = bool.Parse("" + value);
+                            if (Features.IsUseIntegerInsteadOfBool(modelDefine))
+                            {
+                                value = (bool)value ? 1 : 0;
+                            }
+                        }
+                        else
+                        {
+                            Type fieldType = CommandUtils.DbType2Type(p.FieldType);
+                            if (fieldType != value.GetType())
+                            {
+                                value = Convert.ChangeType(value, fieldType);
+                            }
+                        }
+                    }
 
                     if (j > 0)
                     {
                         sbValues.Append(",");
                     }
 
-                    //string paramPlaceholder = Features.GetCommandParamName(modelDefine, paramName);
                     bool isNeedQuote = (p.FieldType == DbType.String ||
                         p.FieldType == DbType.StringFixedLength ||
                         p.FieldType == DbType.AnsiString ||
@@ -174,14 +211,7 @@ namespace CodeM.Common.Orm
                         p.FieldType == DbType.DateTime ||
                         p.FieldType == DbType.DateTime2)
                     {
-                        if (DateTime.TryParse("" + value, out DateTime datetime))
-                        {
-                            sbValues.Append(datetime.ToString("yyyy-MM-dd HH:mm:ss"));
-                        }
-                        else
-                        {
-                            sbValues.Append(value);
-                        }
+                        sbValues.Append(((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss"));
                     }
                     else
                     {
@@ -232,11 +262,6 @@ namespace CodeM.Common.Orm
                         {
                             if (value != null)
                             {
-                                if (p.RealType == typeof(DynamicObjectExt))
-                                {
-                                    value = value.ToString();
-                                }
-
                                 if (insertFields.Length > 0)
                                 {
                                     insertFields += ",";
@@ -266,6 +291,30 @@ namespace CodeM.Common.Orm
                         if (!modelDefine.TryGetValue(currModelValues, p, out value))
                         {
                             value = null;
+                        }
+
+                        if (value != null)
+                        {
+                            if (p.RealType == typeof(DynamicObjectExt))
+                            {
+                                value = value.ToString();
+                            }
+                            else if (p.RealType == typeof(bool))
+                            {
+                                value = bool.Parse("" + value);
+                                if (Features.IsUseIntegerInsteadOfBool(modelDefine))
+                                {
+                                    value = (bool)value ? 1 : 0;
+                                }
+                            }
+                            else
+                            {
+                                Type fieldType = CommandUtils.DbType2Type(p.FieldType);
+                                if (fieldType != value.GetType())
+                                {
+                                    value = Convert.ChangeType(value, fieldType);
+                                }
+                            }
                         }
 
                         string paramName = CommandUtils.GenParamName(p) + i;
@@ -314,6 +363,22 @@ namespace CodeM.Common.Orm
                             {
                                 value = value.ToString();
                             }
+                            else if (p.RealType == typeof(Boolean))
+                            {
+                                value = bool.Parse("" + value);
+                                if (Features.IsUseIntegerInsteadOfBool(m))
+                                {
+                                    value = (bool)value ? 1 : 0;
+                                }
+                            }
+                            else
+                            {
+                                Type fieldType = CommandUtils.DbType2Type(p.FieldType);
+                                if (fieldType != value.GetType())
+                                {
+                                    value = Convert.ChangeType(value, fieldType);
+                                }
+                            }
 
                             DbType dbType = CommandUtils.GetDbParamType(p);
                             string paramName = CommandUtils.GenParamName(p);
@@ -357,19 +422,43 @@ namespace CodeM.Common.Orm
                 {
                     if (m.TryGetValue(modelValues, p, out value, false))
                     {
-                        DbType dbType = CommandUtils.GetDbParamType(p);
-                        string paramName = CommandUtils.GenParamName(p);
-                        DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
-                            value, dbType, ParameterDirection.Input);
-                        result.Params.Add(dp);
-
-                        if (sbUpdateContent.Length > 0)
+                        if (value != null)
                         {
-                            sbUpdateContent.Append(",");
+                            if (p.RealType == typeof(DynamicObjectExt))
+                            {
+                                value = value.ToString();
+                            }
+                            else if (p.RealType == typeof(bool))
+                            {
+                                value = bool.Parse("" + value);
+                                if (Features.IsUseIntegerInsteadOfBool(m))
+                                { 
+                                    value = (bool)value ? 1 : 0;
+                                }
+                            }
+                            else
+                            {
+                                Type fieldType = CommandUtils.DbType2Type(p.FieldType);
+                                if (fieldType != value.GetType())
+                                {
+                                    value = Convert.ChangeType(value, fieldType);
+                                }
+                            }
+
+                            DbType dbType = CommandUtils.GetDbParamType(p);
+                            string paramName = CommandUtils.GenParamName(p);
+                            DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
+                                value, dbType, ParameterDirection.Input);
+                            result.Params.Add(dp);
+
+                            if (sbUpdateContent.Length > 0)
+                            {
+                                sbUpdateContent.Append(",");
+                            }
+                            string paramPlaceholder = Features.GetCommandParamName(m, paramName);
+                            sbUpdateContent.Append(quotes[0]).Append(p.Field)
+                                .Append(quotes[1]).Append("=").Append(paramPlaceholder);
                         }
-                        string paramPlaceholder = Features.GetCommandParamName(m, paramName);
-                        sbUpdateContent.Append(quotes[0]).Append(p.Field)
-                            .Append(quotes[1]).Append("=").Append(paramPlaceholder);
                     }
                 }
             }
@@ -533,6 +622,15 @@ namespace CodeM.Common.Orm
             if (m.IsUsePaging)
             {
                 result.SQL = Features.GetPagingCommand(m, result.SQL, m.CurrPageSize, m.CurrPageIndex);
+                if (result.SQL.Contains(" DISTINCT"))
+                {
+                    ConnectionSetting cs = ConnectionUtils.GetConnectionByModel(m);
+                    if ("sqlserver".Equals(cs.Dialect, StringComparison.OrdinalIgnoreCase))
+                    {
+                        result.SQL = result.SQL.Replace("TOP 9223372036854775807", "");
+                        result.SQL = result.SQL.Replace("DISTINCT", "DISTINCT TOP 9223372036854775807");
+                    }
+                }
             }
             else
             {

@@ -92,11 +92,9 @@
         /// 获取AutoIncrement的个性化写法
         /// </summary>
         /// <param name="model"></param>
-        /// <param name="tableName"></param>
-        /// <param name="colName"></param>
-        /// <param name="colDesc"></param>
+        /// <param name="arguments">需包含TableName, FieldName, 对象标识名</param>
         /// <returns></returns>
-        internal static string[] GetAutoIncrementExtCommand(Model model, string tableName, string colName)
+        internal static string[] GetAutoIncrementExtCommand(Model model, params string[] arguments)
         {
             string[] extCmds = Config.GetConfigValue<string[]>("feature", model, "autoincrement_ext_format");
             string[] result = new string[extCmds.Length];
@@ -104,7 +102,7 @@
             {
                 for (int i = 0; i < extCmds.Length; i++)
                 {
-                    result[i] = string.Format(extCmds[i], tableName, colName);
+                    result[i] = string.Format(extCmds[i], arguments);
                 }
             }
             return result;
@@ -114,10 +112,9 @@
         /// 获取RemoveTable时需要清理的Autoincrement相关命令信息
         /// </summary>
         /// <param name="model"></param>
-        /// <param name="tableName"></param>
-        /// <param name="colName"></param>
+        /// <param name="arguments">需包含TableName, FieldName, 对象标识名</param>
         /// <returns></returns>
-        internal static string[] GetAutoIncrementGCExtCommand(Model model, string tableName, string colName)
+        internal static string[] GetAutoIncrementGCExtCommand(Model model, params string[] arguments)
         {
             string[] extCmds = Config.GetConfigValue<string[]>("feature", model, "autoincrement_gc_ext_format");
             string[] result = new string[extCmds.Length];
@@ -125,7 +122,7 @@
             {
                 for (int i = 0; i < extCmds.Length; i++)
                 {
-                    result[i] = string.Format(extCmds[i], tableName, colName);
+                    result[i] = string.Format(extCmds[i], arguments);
                 }
             }
             return result;
@@ -200,6 +197,28 @@
         internal static bool IsUseIntegerInsteadOfBool(Model model)
         {
             return Config.GetConfigValue<bool>("feature", model, "boolean_is_int");
+        }
+
+        internal static int GetStringMaxLength(Model model)
+        {
+            return Config.GetConfigValue<int>("feature", model, "string_max_len");
+        }
+
+        internal static string GetLargeTextType(Model model)
+        {
+            return Config.GetConfigValue<string>("feature", model, "large_text_type");
+        }
+
+        internal static string GetAscSortSql(Model model, string field)
+        {
+            string sortSql = Config.GetConfigValue<string>("feature", model, "orderby_asc");
+            return string.Format(sortSql, field);
+        }
+
+        internal static string GetDescSortSql(Model model, string field)
+        {
+            string sortSql = Config.GetConfigValue<string>("feature", model, "orderby_desc");
+            return string.Format(sortSql, field);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CodeM.Common.DbHelper;
 using CodeM.Common.Orm.SQL.Dialect;
+using CodeM.Common.Tools;
 using CodeM.Common.Tools.DynamicObject;
 using System;
 using System.Collections.Generic;
@@ -190,11 +191,11 @@ namespace CodeM.Common.Orm
             }
             else if (type == typeof(UInt16))
             {
-                return DbType.Int32;
+                return DbType.Int16;
             }
             else if (type == typeof(UInt32))
             {
-                return DbType.Int64;
+                return DbType.Int32;
             }
             else if (type == typeof(UInt64))
             {
@@ -208,6 +209,13 @@ namespace CodeM.Common.Orm
         }
         #endregion
 
+
+        public static string GetObjectIdentifier(params string[] items)
+        {
+            string origin = string.Join("-", items);
+            string result = Xmtool.Hash().MD5(origin);
+            return result.ToUpper();
+        }
 
         /// <summary>
         /// 将所有跨模型引用加入关联列表中，最终将转换为join语句

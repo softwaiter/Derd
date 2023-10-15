@@ -49,6 +49,18 @@ namespace CodeM.Common.Orm
             ModelLoader.Load(ModelPath, true);
         }
 
+        #region Connection Setting
+        public static ConnectionSetting GetConnectionSetting(string modelPath)
+        {
+            return ConnectionUtils.GetConnectionByPath(modelPath);
+        }
+
+        public static ConnectionSetting GetConnectionSetting(Model m)
+        {
+            return ConnectionUtils.GetConnectionByModel(m);
+        }
+        #endregion
+
         #region Debug
         public static bool sAllowDebug = false;
         public static void EnableDebug(bool enable)
@@ -135,6 +147,8 @@ namespace CodeM.Common.Orm
         }
         #endregion
 
+        #region Model
+
         public static bool IsDefind(string modelName)
         {
             return ModelUtils.IsDefined(modelName.Trim());
@@ -170,18 +184,23 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public static bool TryCreateTables(bool force = false)
+        public static bool TryCreateTables(bool force, bool errorStop = true)
         {
             int count = ModelUtils.ModelCount;
             for (int i = 0; i < count; i++)
             {
                 Model m = ModelUtils.Get(i);
-                if (!m.TryCreateTable(force))
+                if (!m.TryCreateTable(force) && errorStop)
                 {
                     return false;
                 }
             }
             return true;
+        }
+
+        public static bool TryCreateTables(bool force = false)
+        {
+            return TryCreateTables(force, true);
         }
 
         public static void RemoveTables()
@@ -236,42 +255,41 @@ namespace CodeM.Common.Orm
         {
             if (!ModelUtils.VersionControlTableExists())
             {
-                if (ModelUtils.CreateVersionControlTable())
-                {
-                    return ModelUtils.SetVersion(0);
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (ModelUtils.GetVersion() == -1)
-                {
-                    return ModelUtils.SetVersion(0);
-                }
+                return ModelUtils.CreateVersionControlTable();
             }
             return true;
         }
 
-        public static int GetVersion()
+        public static bool IsVersionControlEnabled()
         {
-            return ModelUtils.GetVersion();
+            return ModelUtils.VersionControlTableExists();
         }
 
-        public static bool SetVersion(int newVer, int? transCode = null)
+        public static int GetVersion(string path = "/")
         {
-            int currVer = GetVersion();
-            if (currVer >= 0)
+            return ModelUtils.GetVersion(path);
+        }
+
+        public static int GetVersion(string path, int? transCode = null)
+        {
+            return ModelUtils.GetVersion(path, transCode);
+        }
+
+        public static bool SetVersion(int version, string path = "/")
+        {
+            return SetVersion(path, version, null);
+        }
+
+        public static bool SetVersion(string path, int version, int? transCode = null)
+        {
+            int lastVersion = GetVersion(path);
+            if (version > lastVersion)
             {
-                if (newVer > currVer)
-                {
-                    return ModelUtils.SetVersion(newVer, transCode);
-                }
+                return ModelUtils.SetVersion(path, version, transCode);
             }
             return false;
         }
+        #endregion
 
     }
 }
