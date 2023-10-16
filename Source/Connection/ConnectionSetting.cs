@@ -130,7 +130,7 @@ namespace CodeM.Common.Orm
                 {
                     settings.Add(string.Concat("user=", User));
                 }
-                if ("kingbase".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
+                else if ("kingbase".Equals(Dialect, StringComparison.OrdinalIgnoreCase))
                 {
                     settings.Add(string.Concat("Username=", User));
                 }

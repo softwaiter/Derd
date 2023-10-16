@@ -880,7 +880,10 @@ namespace CodeM.Common.Orm
 
             try
             {
-                CreateTable(replace);
+                if (!this.TableExists())
+                {
+                    CreateTable(replace);
+                }
                 return true;
             }
             catch (Exception ex)

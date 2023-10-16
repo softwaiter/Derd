@@ -117,11 +117,13 @@ namespace CodeM.Common.Orm.SQL.Dialect
             }},
             { "orderby_asc", new Hashtable() {  // 输入排序字段
                 { "default", "{0} ASC" },
-                { "oracle", "{0} ASC NULLS FIRST" }
+                { "oracle", "{0} ASC NULLS FIRST" },
+                { "kingbase", "{0} ASC NULLS FIRST" }
             }},
             { "orderby_desc", new Hashtable() { // 输入排序字段
                 { "default", "{0} DESC" },
-                { "oracle", "{0} DESC NULLS LAST" }
+                { "oracle", "{0} DESC NULLS LAST" },
+                { "kingbase", "{0} DESC NULLS LAST" }
             }}
         });
 
