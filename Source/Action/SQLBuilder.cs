@@ -622,13 +622,13 @@ namespace CodeM.Common.Orm
             if (m.IsUsePaging)
             {
                 result.SQL = Features.GetPagingCommand(m, result.SQL, m.CurrPageSize, m.CurrPageIndex);
-                if (result.SQL.Contains(" DISTINCT"))
+                if (result.SQL.Contains("SELECT TOP 9223372036854775807 DISTINCT"))
                 {
                     ConnectionSetting cs = ConnectionUtils.GetConnectionByModel(m);
                     if ("sqlserver".Equals(cs.Dialect, StringComparison.OrdinalIgnoreCase))
                     {
                         result.SQL = result.SQL.Replace("TOP 9223372036854775807", "");
-                        result.SQL = result.SQL.Replace("DISTINCT", "DISTINCT TOP 9223372036854775807");
+                        result.SQL = result.SQL.Replace("SELECT  DISTINCT", "SELECT DISTINCT TOP 9223372036854775807");
                     }
                 }
             }

@@ -184,13 +184,20 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public static bool TryCreateTables(bool force, bool errorStop = true)
+        public static bool TryCreateTables(bool force, bool errorStop, out Exception exp)
         {
+            exp = null;
+
             int count = ModelUtils.ModelCount;
             for (int i = 0; i < count; i++)
             {
                 Model m = ModelUtils.Get(i);
-                if (!m.TryCreateTable(force) && errorStop)
+                if (!force && m.TableExists())
+                {
+                    continue;
+                }
+
+                if (!m.TryCreateTable(force, out exp) && errorStop)
                 {
                     return false;
                 }
@@ -200,7 +207,8 @@ namespace CodeM.Common.Orm
 
         public static bool TryCreateTables(bool force = false)
         {
-            return TryCreateTables(force, true);
+            Exception exp;
+            return TryCreateTables(force, true, out exp);
         }
 
         public static void RemoveTables()

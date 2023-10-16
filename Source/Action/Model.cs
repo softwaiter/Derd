@@ -863,6 +863,8 @@ namespace CodeM.Common.Orm
                         }
                     }
                 }
+
+                DbUtils.CommitTransaction(transaction);
             }
             catch (Exception exp)
             {
@@ -872,70 +874,78 @@ namespace CodeM.Common.Orm
             }
         }
 
-        public bool TryCreateTable(bool replace = false)
+        public bool TryCreateTable(bool replace, out Exception exp)
         {
+            exp = null;
+
             try
             {
                 CreateTable(replace);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
-                ;
+                exp = ex;
             }
             return false;
         }
 
+        public bool TryCreateTable(bool replace = false)
+        {
+            Exception exp;
+            return TryCreateTable(replace, out exp);
+        }
+
         public void RemoveTable(bool throwError = false)
         {
-            DbTransaction transaction = DbUtils.GetTransaction(Path.ToLower());
-            try
+            if (this.TableExists())
             {
-                bool tableRemoved = false;
-                if (this.TableExists())
+                DbTransaction transaction = DbUtils.GetTransaction(Path.ToLower());
+                try
                 {
+                    bool tableRemoved = false;
                     string[] quotes = Features.GetObjectQuotes(this);
                     string sql = string.Concat("DROP TABLE ", quotes[0], Table, quotes[1]);
                     Derd.PrintSQL(sql);
                     CommandUtils.ExecuteNonQuery(this, transaction, sql);
                     tableRemoved = true;
-                }
 
-                if (tableRemoved)
-                {
-                    for (int i = 0; i < PropertyCount; i++)
+                    if (tableRemoved)
                     {
-                        Property p = GetProperty(i);
-                        if (p.AutoIncrement)
+                        for (int i = 0; i < PropertyCount; i++)
                         {
-                            string identifierArgs = string.Concat(Table, ",", p.Field);
-                            string objName = CommandUtils.GetObjectIdentifier(identifierArgs.Split(","));
-                            if (objName.Length > 26)
+                            Property p = GetProperty(i);
+                            if (p.AutoIncrement)
                             {
-                                objName = objName.Substring(0, 26);
-                            }
-                            string[] aiCmds = Features.GetAutoIncrementGCExtCommand(this, objName);
-                            foreach (string cmd in aiCmds)
-                            {
-                                if (!string.IsNullOrEmpty(cmd))
+                                string identifierArgs = string.Concat(Table, ",", p.Field);
+                                string objName = CommandUtils.GetObjectIdentifier(identifierArgs.Split(","));
+                                if (objName.Length > 26)
                                 {
-                                    Derd.PrintSQL(cmd);
-                                    DbUtils.ExecuteNonQuery(transaction, cmd);
+                                    objName = objName.Substring(0, 26);
+                                }
+                                string[] aiCmds = Features.GetAutoIncrementGCExtCommand(this, objName);
+                                foreach (string cmd in aiCmds)
+                                {
+                                    if (!string.IsNullOrEmpty(cmd))
+                                    {
+                                        Derd.PrintSQL(cmd);
+                                        DbUtils.ExecuteNonQuery(transaction, cmd);
+                                    }
                                 }
                             }
                         }
                     }
+
+                    DbUtils.CommitTransaction(transaction);
                 }
-
-                DbUtils.CommitTransaction(transaction);
-            }
-            catch (Exception exp)
-            {
-                DbUtils.RollbackTransaction(transaction);
-
-                if (throwError)
+                catch (Exception exp)
                 {
-                    throw exp;
+                    DbUtils.RollbackTransaction(transaction);
+
+                    if (throwError)
+                    {
+                        throw exp;
+                    }
                 }
             }
         }

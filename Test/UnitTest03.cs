@@ -1,6 +1,5 @@
 ﻿using CodeM.Common.Orm;
 using CodeM.Common.Tools.DynamicObject;
-using CodeM.Common.Tools.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -74,8 +73,8 @@ namespace UnitTest
                 Assert.IsTrue(exp.Message.ToUpper().Contains("UNIQUE") ||
                     exp.Message.ToUpper().Contains("DUPLICATE") ||
                     exp.Message.ToUpper().Contains("ORA-00001") ||
-                    exp.Message.ToUpper().Contains("唯一性约束") ||
-                    exp.Message.ToUpper().Contains("唯一约束条件"));
+                    exp.Message.ToUpper().Contains("唯一约束") ||
+                    exp.Message.ToUpper().Contains("唯一性约束"));
             }
         }
 
