@@ -37,11 +37,11 @@ namespace UnitTest
             Assert.IsTrue(ret);
         }
 
-        [Description("再次创建User模型物理表，因为已存在，所以应该失败")]
+        [Description("再次创建User模型物理表，表已存在，不做任何操作直接返回成功")]
         public void Test2()
         {
             bool ret = Derd.Model("Person").TryCreateTable();
-            Assert.IsFalse(ret);
+            Assert.IsTrue(ret);
         }
 
         [Description("使用Force参数第三次创建User模型物理表，应成功。")]

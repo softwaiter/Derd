@@ -513,15 +513,17 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        private object CalcExprValue(Model m, DbType dbType, object value)
+        private object CalcExprValue(Model m, Property p, DbType dbType, object value)
         {
-            if ((dbType == DbType.Int16 ||
+            if (p != null &&
+                p.Type == typeof(Boolean) &&
+                Features.IsUseIntegerInsteadOfBool(m) &&
+                (dbType == DbType.Int16 ||
                 dbType == DbType.Int32 ||
                 dbType == DbType.Int64 ||
                 dbType == DbType.UInt16 ||
                 dbType == DbType.UInt32 ||
-                dbType == DbType.UInt64) &&
-                Features.IsUseIntegerInsteadOfBool(m))
+                dbType == DbType.UInt64))
             {
                 bool boolValue;
                 if (bool.TryParse("" + value, out boolValue))
@@ -564,7 +566,7 @@ namespace CodeM.Common.Orm
                 DbType dbType = CommandUtils.GetDbParamType(propFunc.Property);
                 string paramName = CommandUtils.GenParamName(propFunc.Property);
                 string paramPlaceholder = Features.GetCommandParamName(m, paramName);
-                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprValue).Value);
+                object paramValue = CalcExprValue(m, propFunc.Property, dbType, ((VALUE)exprValue).Value);
                 if (!propFunc.Property.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
@@ -600,7 +602,7 @@ namespace CodeM.Common.Orm
                 DbType dbType = CommandUtils.GetDbParamType(propFunc.Property);
                 string paramName = CommandUtils.GenParamName(propFunc.Property);
                 string paramPlaceholder = Features.GetCommandParamName(m, paramName);
-                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprKey).Value);
+                object paramValue = CalcExprValue(m, propFunc.Property, dbType, ((VALUE)exprKey).Value);
                 if (!propFunc.Property.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
@@ -626,7 +628,7 @@ namespace CodeM.Common.Orm
                 {
                     DbType dbType = CommandUtils.Type2DbType(((VALUE)exprKey).Value.GetType());
                     string paramName = CommandUtils.GenParamName();
-                    object paramValue = CalcExprValue(m, dbType, ((VALUE)exprKey).Value);
+                    object paramValue = CalcExprValue(m, null, dbType, ((VALUE)exprKey).Value);
                     exprLeft = Features.GetCommandParamName(m, paramName);
                     DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
                         paramValue, dbType, ParameterDirection.Input);
@@ -641,7 +643,7 @@ namespace CodeM.Common.Orm
                 {
                     DbType dbType2 = CommandUtils.Type2DbType(((VALUE)exprValue).Value.GetType());
                     string paramName2 = CommandUtils.GenParamName();
-                    object paramValue2 = CalcExprValue(m, dbType2, ((VALUE)exprValue).Value);
+                    object paramValue2 = CalcExprValue(m, null, dbType2, ((VALUE)exprValue).Value);
                     exprRight = Features.GetCommandParamName(m, paramName2);
                     DbParameter dp2 = DbUtils.CreateParam(m.Path, paramName2,
                         paramValue2, dbType2, ParameterDirection.Input);
@@ -666,7 +668,7 @@ namespace CodeM.Common.Orm
             {
                 DbType dbType = CommandUtils.Type2DbType(((VALUE)exprKey).Value.GetType());
                 string paramName = CommandUtils.GenParamName();
-                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprKey).Value);
+                object paramValue = CalcExprValue(m, null, dbType, ((VALUE)exprKey).Value);
                 exprLeft = Features.GetCommandParamName(m, paramName);
                 DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
                     paramValue, dbType, ParameterDirection.Input);
@@ -684,19 +686,23 @@ namespace CodeM.Common.Orm
 
             if (exprValue is VALUE)
             {
-                DbParameter dp;
+                Property prop;
                 DbType dbType;
                 if (propKey != null)
                 {
-                    dbType = CommandUtils.GetDbParamType(propKey.Property);
+                    prop = propKey.Property;
+                    dbType = CommandUtils.GetDbParamType(prop);
                 }
                 else
                 {
+                    prop = null;
                     dbType = CommandUtils.Type2DbType(((VALUE)exprValue).Value.GetType());
                 }
                 string paramName = CommandUtils.GenParamName();
-                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprValue).Value);
+                object paramValue = CalcExprValue(m, prop, dbType, ((VALUE)exprValue).Value);
                 exprRight = Features.GetCommandParamName(m, paramName);
+
+                DbParameter dp;
                 if (propKey == null || !propKey.Property.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
@@ -719,19 +725,23 @@ namespace CodeM.Common.Orm
 
             if (exprValue2 is VALUE)
             {
-                DbParameter dp;
+                Property prop;
                 DbType dbType;
                 if (propKey != null)
                 {
-                    dbType = CommandUtils.GetDbParamType(propKey.Property);
+                    prop = propKey.Property;
+                    dbType = CommandUtils.GetDbParamType(prop);
                 }
                 else
                 {
+                    prop = null;
                     dbType = CommandUtils.Type2DbType(((VALUE)exprValue2).Value.GetType());
                 }
                 string paramName = CommandUtils.GenParamName();
-                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprValue2).Value);
+                object paramValue = CalcExprValue(m, prop, dbType, ((VALUE)exprValue2).Value);
                 exprRight2 = Features.GetCommandParamName(m, paramName);
+
+                DbParameter dp;
                 if (propKey == null || !propKey.Property.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
@@ -765,7 +775,7 @@ namespace CodeM.Common.Orm
             {
                 DbType dbType = CommandUtils.Type2DbType(((VALUE)exprKey).Value.GetType());
                 string paramName = CommandUtils.GenParamName();
-                object paramValue = CalcExprValue(m, dbType, ((VALUE)exprKey).Value);
+                object paramValue = CalcExprValue(m, null, dbType, ((VALUE)exprKey).Value);
                 exprLeft = Features.GetCommandParamName(m, paramName);
                 DbParameter dp = DbUtils.CreateParam(m.Path, paramName,
                     paramValue, dbType, ParameterDirection.Input);
@@ -792,19 +802,23 @@ namespace CodeM.Common.Orm
 
                 if (values[i] is VALUE)
                 {
-                    DbParameter dp;
+                    Property prop;
                     DbType dbType;
                     if (propKey != null)
                     {
-                        dbType = CommandUtils.GetDbParamType(propKey.Property);
+                        prop = propKey.Property;
+                        dbType = CommandUtils.GetDbParamType(prop);
                     }
                     else
                     {
+                        prop = null;
                         dbType = CommandUtils.Type2DbType(((VALUE)values[i]).Value.GetType());
                     }
                     string paramName = CommandUtils.GenParamName();
-                    object paramValue = CalcExprValue(m, dbType, ((VALUE)values[i]).Value);
+                    object paramValue = CalcExprValue(m, prop, dbType, ((VALUE)values[i]).Value);
                     string inParamPlaceholder = Features.GetCommandParamName(m, paramName);
+
+                    DbParameter dp;
                     if (propKey == null || !propKey.Property.NeedCalcPreSaveProcessor)
                     {
                         dp = DbUtils.CreateParam(m.Path, paramName,
