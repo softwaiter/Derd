@@ -146,7 +146,7 @@ namespace Test
         [Description("使用123=123作为查询条件进行查询，应返回所有4条记录")]
         public void QueryByEquals7()
         {
-            List<dynamic> result = Derd.Model("Person").Equals(123, 123).Query();
+            List<dynamic> result = Derd.Model("Person").And("123 = 123").Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(4, result.Count);
         }
@@ -185,7 +185,7 @@ namespace Test
         [Description("查询Name等于张大的人，应返回1条记录，且姓名为张大")]
         public void QueryByEquals91()
         {
-            dynamic person = Derd.Model("Person").Equals("张大", "Name").QueryFirst();
+            dynamic person = Derd.Model("Person").Equals("Name", "张大").QueryFirst();
             Assert.IsNotNull(person);
             Assert.AreEqual("张大", person.Name);
         }
@@ -259,7 +259,7 @@ namespace Test
         public void QueryByNotEquals5()
         {
             List<dynamic> result = Derd.Model("Person")
-                .NotEquals("ibm", "Org")
+                .NotEquals("Org", "ibm")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -315,7 +315,7 @@ namespace Test
         public void QueryByGt5()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Gt(50, "Age")
+                .Lt("Age", 50)
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count);
@@ -328,7 +328,7 @@ namespace Test
         public void QueryByGt6()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Gt(2, 1)
+                .And("2 > 1")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(4, result.Count);
@@ -339,7 +339,7 @@ namespace Test
         public void QueryByGt7()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Gt(1, 2)
+                .And("1 > 2")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(0, result.Count);
@@ -393,7 +393,7 @@ namespace Test
         public void QueryByGte5()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Gte(18, "Age")
+                .Lte("Age", 18)
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
@@ -405,7 +405,7 @@ namespace Test
         public void QueryByGte6()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Gte(3, 3)
+                .And("3 >= 3")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(4, result.Count);
@@ -416,7 +416,7 @@ namespace Test
         public void QueryByGte7()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Gte(3, 1)
+                .And("3 >= 1")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(4, result.Count);
@@ -427,7 +427,7 @@ namespace Test
         public void QueryByGte8()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Gte(3, 4)
+                .And("3 >= 4")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(0, result.Count);
@@ -488,7 +488,7 @@ namespace Test
         public void QueryByLt5()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Lt(50, "Age")
+                .Gt("Age", 50)
                 .AscendingSort("Id")
                 .Query();
             Assert.IsNotNull(result);
@@ -502,7 +502,7 @@ namespace Test
         public void QueryByLt6()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Lt(1, 2)
+                .And("1 < 2")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(4, result.Count);
@@ -513,7 +513,7 @@ namespace Test
         public void QueryByLt7()
         {
             List<dynamic> result = Derd.Model("Person")
-                .Lt(2, 1)
+                .And("2 < 1")
                 .Query();
             Assert.IsNotNull(result);
             Assert.AreEqual(0, result.Count);
@@ -628,28 +628,6 @@ namespace Test
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("张大", result[0].Name);
-        }
-
-        [TestMethod]
-        [Description("使用常量表达式123 LIKE 123进行查询操作，应返回4条记录")]
-        public void QueryByLike6()
-        {
-            List<dynamic> result = Derd.Model("Person")
-                .Like("123", "123")
-                .Query();
-            Assert.IsNotNull(result);
-            Assert.AreEqual(4, result.Count);
-        }
-
-        [TestMethod]
-        [Description("使用常量表达式123 LIKE 234进行查询操作，应返回0条记录")]
-        public void QueryByLike7()
-        {
-            List<dynamic> result = Derd.Model("Person")
-                .Like("123", "234")
-                .Query();
-            Assert.IsNotNull(result);
-            Assert.AreEqual(0, result.Count);
         }
 
         [TestMethod]

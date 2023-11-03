@@ -102,17 +102,17 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public new IFilter Equals(object key, object value)
+        public new IFilter Equals(string prop, object value)
         {
             if (value is Function)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), value)));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), value)));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), Funcs.VALUE(value))));
             }
             return this;
         }
@@ -127,22 +127,22 @@ namespace CodeM.Common.Orm
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Equals,
-                    new KeyValuePair<Function, object>(function, new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(function, Funcs.VALUE(value))));
             }
             return this;
         }
 
-        public IFilter NotEquals(object key, object value)
+        public IFilter NotEquals(string prop, object value)
         {
             if (value is Function)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), value)));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), value)));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), Funcs.VALUE(value))));
             }
             return this;
         }
@@ -157,22 +157,22 @@ namespace CodeM.Common.Orm
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotEquals,
-                    new KeyValuePair<Function, object>(function, new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(function, Funcs.VALUE(value))));
             }
             return this;
         }
 
-        public IFilter Gt(object key, object value)
+        public IFilter Gt(string prop, object value)
         {
             if (value is Function)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gt,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), value)));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), value)));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gt,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), Funcs.VALUE(value))));
             }
             return this;
         }
@@ -187,22 +187,22 @@ namespace CodeM.Common.Orm
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gt,
-                    new KeyValuePair<Function, object>(function, new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(function, Funcs.VALUE(value))));
             }
             return this;
         }
 
-        public IFilter Gte(object key, object value)
+        public IFilter Gte(string prop, object value)
         {
             if (value is Function)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gte,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), value)));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), value)));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gte,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), Funcs.VALUE(value))));
             }
             return this;
         }
@@ -217,22 +217,22 @@ namespace CodeM.Common.Orm
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Gte,
-                    new KeyValuePair<Function, object>(function, new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(function, Funcs.VALUE(value))));
             }
             return this;
         }
 
-        public IFilter Lt(object key, object value)
+        public IFilter Lt(string prop, object value)
         {
             if (value is Function)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lt,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), value)));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), value)));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lt,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), Funcs.VALUE(value))));
             }
             return this;
         }
@@ -247,22 +247,22 @@ namespace CodeM.Common.Orm
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lt,
-                    new KeyValuePair<Function, object>(function, new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(function, Funcs.VALUE(value))));
             }
             return this;
         }
 
-        public IFilter Lte(object key, object value)
+        public IFilter Lte(string prop, object value)
         {
             if (value is Function)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lte,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), value)));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), value)));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lte,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), Funcs.VALUE(value))));
             }
             return this;
         }
@@ -277,22 +277,22 @@ namespace CodeM.Common.Orm
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Lte,
-                    new KeyValuePair<Function, object>(function, new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(function, Funcs.VALUE(value))));
             }
             return this;
         }
 
-        public IFilter Like(object key, object value)
+        public IFilter Like(string prop, object value)
         {
             if (value is Function)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Like,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), value)));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), value)));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Like,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), Funcs.VALUE(value))));
             }
             return this;
         }
@@ -307,22 +307,22 @@ namespace CodeM.Common.Orm
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Like,
-                    new KeyValuePair<Function, object>(function, new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(function, Funcs.VALUE(value))));
             }
             return this;
         }
 
-        public IFilter NotLike(object key, object value)
+        public IFilter NotLike(string prop, object value)
         {
             if (value is Function)
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotLike,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), value)));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), value)));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotLike,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), Funcs.VALUE(value))));
             }
             return this;
         }
@@ -337,15 +337,15 @@ namespace CodeM.Common.Orm
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotLike,
-                    new KeyValuePair<Function, object>(function, new UNDECIDED(value))));
+                    new KeyValuePair<Function, object>(function, Funcs.VALUE(value))));
             }
             return this;
         }
 
-        public IFilter IsNull(object key)
+        public IFilter IsNull(string prop)
         {
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNull,
-                new KeyValuePair<Function, object>(new UNDECIDED(key), true)));
+                new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), true)));
             return this;
         }
 
@@ -356,10 +356,10 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public IFilter IsNotNull(object key)
+        public IFilter IsNotNull(string prop)
         {
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.IsNotNull,
-                new KeyValuePair<Function, object>(new UNDECIDED(key), true)));
+                new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), true)));
             return this;
         }
 
@@ -370,7 +370,7 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public IFilter Between(object key, object value, object value2)
+        public IFilter Between(string prop, object value, object value2)
         {
             object[] values = new object[2];
             if (value is Function)
@@ -379,7 +379,7 @@ namespace CodeM.Common.Orm
             }
             else
             {
-                values[0] = new UNDECIDED(value);
+                values[0] = Funcs.VALUE(value);
             }
             if (value2 is Function)
             {
@@ -387,11 +387,11 @@ namespace CodeM.Common.Orm
             }
             else
             { 
-                values[1] = new UNDECIDED(value2);
+                values[1] = Funcs.VALUE(value2);
             }
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Between,
-                new KeyValuePair<Function, object>(new UNDECIDED(key), values)));
+                new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), values)));
             return this;
         }
 
@@ -404,7 +404,7 @@ namespace CodeM.Common.Orm
             }
             else
             {
-                values[0] = new UNDECIDED(value);
+                values[0] = Funcs.VALUE(value);
             }
             if (value2 is Function)
             {
@@ -412,7 +412,7 @@ namespace CodeM.Common.Orm
             }
             else
             {
-                values[1] = new UNDECIDED(value2);
+                values[1] = Funcs.VALUE(value2);
             }
 
             mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.Between,
@@ -431,13 +431,13 @@ namespace CodeM.Common.Orm
                 }
                 else
                 {
-                    result.Add(new UNDECIDED(value));
+                    result.Add(Funcs.VALUE(value));
                 }
             }
             return result.ToArray();
         }
 
-        public IFilter In(object key, params object[] values)
+        public IFilter In(string prop, params object[] values)
         {
             if (values.Length == 0)
             {
@@ -446,12 +446,12 @@ namespace CodeM.Common.Orm
 
             if (values.Length == 1)
             {
-                this.Equals(key, new VALUE(values[0]));
+                this.Equals(prop, new VALUE(values[0]));
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.In,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), PreprocessArguments(values))));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), PreprocessArguments(values))));
             }
             return this;
         }
@@ -475,7 +475,7 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public IFilter NotIn(object key, params object[] values)
+        public IFilter NotIn(string prop, params object[] values)
         {
             if (values.Length == 0)
             {
@@ -484,12 +484,12 @@ namespace CodeM.Common.Orm
 
             if (values.Length == 1)
             {
-                this.NotEquals(key, values[0]);
+                this.NotEquals(prop, values[0]);
             }
             else
             {
                 mFilterItems.Add(new KeyValuePair<FilterOperator, object>(FilterOperator.NotIn,
-                    new KeyValuePair<Function, object>(new UNDECIDED(key), PreprocessArguments(values))));
+                    new KeyValuePair<Function, object>(Funcs.PROPERTY(prop), PreprocessArguments(values))));
             }
             return this;
         }
@@ -562,12 +562,14 @@ namespace CodeM.Common.Orm
                     }
                 }
 
-                DbParameter dp;
-                DbType dbType = CommandUtils.GetDbParamType(propFunc.Property);
-                string paramName = CommandUtils.GenParamName(propFunc.Property);
+                Property p = propFunc.Resolve(m);
+                DbType dbType = CommandUtils.GetDbParamType(p);
+                string paramName = CommandUtils.GenParamName(p);
                 string paramPlaceholder = Features.GetCommandParamName(m, paramName);
-                object paramValue = CalcExprValue(m, propFunc.Property, dbType, ((VALUE)exprValue).Value);
-                if (!propFunc.Property.NeedCalcPreSaveProcessor)
+                object paramValue = CalcExprValue(m, p, dbType, ((VALUE)exprValue).Value);
+
+                DbParameter dp;
+                if (!p.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
                         paramValue, dbType, ParameterDirection.Input);
@@ -575,9 +577,9 @@ namespace CodeM.Common.Orm
                 else
                 {
                     dynamic inputObj = new DynamicObjectExt();
-                    inputObj.SetValue(propFunc.Property.Name, paramValue);
+                    inputObj.SetValue(p.Name, paramValue);
                     dp = DbUtils.CreateParam(m.Path, paramName,
-                        propFunc.Property.DoPreSaveProcessor(inputObj), 
+                        p.DoPreSaveProcessor(inputObj), 
                         dbType, ParameterDirection.Input);
                 }
                 result.Params.Add(dp);
@@ -598,12 +600,14 @@ namespace CodeM.Common.Orm
                     }
                 }
 
-                DbParameter dp;
-                DbType dbType = CommandUtils.GetDbParamType(propFunc.Property);
-                string paramName = CommandUtils.GenParamName(propFunc.Property);
+                Property p = propFunc.Resolve(m);
+                DbType dbType = CommandUtils.GetDbParamType(p);
+                string paramName = CommandUtils.GenParamName(p);
                 string paramPlaceholder = Features.GetCommandParamName(m, paramName);
-                object paramValue = CalcExprValue(m, propFunc.Property, dbType, ((VALUE)exprKey).Value);
-                if (!propFunc.Property.NeedCalcPreSaveProcessor)
+                object paramValue = CalcExprValue(m, p, dbType, ((VALUE)exprKey).Value);
+
+                DbParameter dp;
+                if (!p.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
                         paramValue, dbType, ParameterDirection.Input);
@@ -611,9 +615,9 @@ namespace CodeM.Common.Orm
                 else
                 {
                     dynamic inputObj = new DynamicObjectExt();
-                    inputObj.SetValue(propFunc.Property.Name, paramValue);
+                    inputObj.SetValue(p.Name, paramValue);
                     dp = DbUtils.CreateParam(m.Path, paramName,
-                        propFunc.Property.DoPreSaveProcessor(inputObj),
+                        p.DoPreSaveProcessor(inputObj),
                         dbType, ParameterDirection.Input);
                 }
                 result.Params.Add(dp);
@@ -686,24 +690,24 @@ namespace CodeM.Common.Orm
 
             if (exprValue is VALUE)
             {
-                Property prop;
+                Property p;
                 DbType dbType;
                 if (propKey != null)
                 {
-                    prop = propKey.Property;
-                    dbType = CommandUtils.GetDbParamType(prop);
+                    p = propKey.Resolve(m);
+                    dbType = CommandUtils.GetDbParamType(p);
                 }
                 else
                 {
-                    prop = null;
+                    p = null;
                     dbType = CommandUtils.Type2DbType(((VALUE)exprValue).Value.GetType());
                 }
                 string paramName = CommandUtils.GenParamName();
-                object paramValue = CalcExprValue(m, prop, dbType, ((VALUE)exprValue).Value);
+                object paramValue = CalcExprValue(m, p, dbType, ((VALUE)exprValue).Value);
                 exprRight = Features.GetCommandParamName(m, paramName);
 
                 DbParameter dp;
-                if (propKey == null || !propKey.Property.NeedCalcPreSaveProcessor)
+                if (p == null || !p.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
                         paramValue, dbType, ParameterDirection.Input);
@@ -711,9 +715,9 @@ namespace CodeM.Common.Orm
                 else
                 {
                     dynamic inputObj = new DynamicObjectExt();
-                    inputObj.SetValue(propKey.Property.Name, paramValue);
+                    inputObj.SetValue(p.Name, paramValue);
                     dp = DbUtils.CreateParam(m.Path, paramName,
-                        propKey.Property.DoPreSaveProcessor(inputObj),
+                        p.DoPreSaveProcessor(inputObj),
                         dbType, ParameterDirection.Input);
                 }
                 result.Params.Add(dp);
@@ -725,24 +729,24 @@ namespace CodeM.Common.Orm
 
             if (exprValue2 is VALUE)
             {
-                Property prop;
+                Property p;
                 DbType dbType;
                 if (propKey != null)
                 {
-                    prop = propKey.Property;
-                    dbType = CommandUtils.GetDbParamType(prop);
+                    p = propKey.Resolve(m);
+                    dbType = CommandUtils.GetDbParamType(p);
                 }
                 else
                 {
-                    prop = null;
+                    p = null;
                     dbType = CommandUtils.Type2DbType(((VALUE)exprValue2).Value.GetType());
                 }
                 string paramName = CommandUtils.GenParamName();
-                object paramValue = CalcExprValue(m, prop, dbType, ((VALUE)exprValue2).Value);
+                object paramValue = CalcExprValue(m, p, dbType, ((VALUE)exprValue2).Value);
                 exprRight2 = Features.GetCommandParamName(m, paramName);
 
                 DbParameter dp;
-                if (propKey == null || !propKey.Property.NeedCalcPreSaveProcessor)
+                if (p == null || !p.NeedCalcPreSaveProcessor)
                 {
                     dp = DbUtils.CreateParam(m.Path, paramName,
                         paramValue, dbType, ParameterDirection.Input);
@@ -750,9 +754,9 @@ namespace CodeM.Common.Orm
                 else
                 {
                     dynamic inputObj = new DynamicObjectExt();
-                    inputObj.SetValue(propKey.Property.Name, paramValue);
+                    inputObj.SetValue(p.Name, paramValue);
                     dp = DbUtils.CreateParam(m.Path, paramName,
-                        propKey.Property.DoPreSaveProcessor(inputObj),
+                        p.DoPreSaveProcessor(inputObj),
                         dbType, ParameterDirection.Input);
                 }
                 result.Params.Add(dp);
@@ -802,24 +806,24 @@ namespace CodeM.Common.Orm
 
                 if (values[i] is VALUE)
                 {
-                    Property prop;
+                    Property p;
                     DbType dbType;
                     if (propKey != null)
                     {
-                        prop = propKey.Property;
-                        dbType = CommandUtils.GetDbParamType(prop);
+                        p = propKey.Resolve(m);
+                        dbType = CommandUtils.GetDbParamType(p);
                     }
                     else
                     {
-                        prop = null;
+                        p = null;
                         dbType = CommandUtils.Type2DbType(((VALUE)values[i]).Value.GetType());
                     }
                     string paramName = CommandUtils.GenParamName();
-                    object paramValue = CalcExprValue(m, prop, dbType, ((VALUE)values[i]).Value);
+                    object paramValue = CalcExprValue(m, p, dbType, ((VALUE)values[i]).Value);
                     string inParamPlaceholder = Features.GetCommandParamName(m, paramName);
 
                     DbParameter dp;
-                    if (propKey == null || !propKey.Property.NeedCalcPreSaveProcessor)
+                    if (propKey == null || !p.NeedCalcPreSaveProcessor)
                     {
                         dp = DbUtils.CreateParam(m.Path, paramName,
                             paramValue, dbType, ParameterDirection.Input);
@@ -827,9 +831,9 @@ namespace CodeM.Common.Orm
                     else
                     {
                         dynamic inputObj = new DynamicObjectExt();
-                        inputObj.SetValue(propKey.Property.Name, paramValue);
+                        inputObj.SetValue(p.Name, paramValue);
                         dp = DbUtils.CreateParam(m.Path, paramName,
-                            propKey.Property.DoPreSaveProcessor(inputObj),
+                            p.DoPreSaveProcessor(inputObj),
                             dbType, ParameterDirection.Input);
                     }
                     result.Params.Add(dp);
@@ -864,10 +868,6 @@ namespace CodeM.Common.Orm
                     expr = (KeyValuePair<Function, object>)item.Value;
 
                     exprKey = expr.Key;
-                    if (exprKey is UNDECIDED)
-                    {
-                        exprKey = ((UNDECIDED)exprKey).Resolve(model);
-                    }
                     CommandUtils.CheckFunctionForeignProperty(model, exprKey, result.ForeignTables);
 
                     if (!string.IsNullOrEmpty(result.SQL))
@@ -952,10 +952,6 @@ namespace CodeM.Common.Orm
                     case FilterOperator.Like:
                     case FilterOperator.NotLike:
                         exprValue = (Function)expr.Value;
-                        if (exprValue is UNDECIDED)
-                        {
-                            exprValue = ((UNDECIDED)exprValue).Resolve(model);
-                        }
                         CommandUtils.CheckFunctionForeignProperty(model, exprValue, result.ForeignTables);
 
                         BuildSimpleOperatorSQL(result, model, item.Key, exprKey, exprValue, recordEqualsProperties);
@@ -969,17 +965,9 @@ namespace CodeM.Common.Orm
                         object[] values = (object[])expr.Value;
 
                         exprValue = (Function)values[0];
-                        if (exprValue is UNDECIDED)
-                        {
-                            exprValue = ((UNDECIDED)exprValue).Resolve(model);
-                        }
                         CommandUtils.CheckFunctionForeignProperty(model, exprValue, result.ForeignTables);
 
                         exprValue2 = (Function)values[1];
-                        if (exprValue2 is UNDECIDED)
-                        {
-                            exprValue2 = ((UNDECIDED)exprValue2).Resolve(model);
-                        }
                         CommandUtils.CheckFunctionForeignProperty(model, exprValue2, result.ForeignTables);
 
                         BuildBetweenOperatorSQL(result, model, exprKey, exprValue, exprValue2);
@@ -990,11 +978,6 @@ namespace CodeM.Common.Orm
                         object[] inValues = (object[])expr.Value;
                         for (int i = 0; i < inValues.Length; i++)
                         {
-                            if (inValues[i] is UNDECIDED)
-                            {
-                                inValues[i] = ((UNDECIDED)inValues[i]).Resolve(model);
-                            }
-
                             if (inValues[i] is Function)
                             {
                                 CommandUtils.CheckFunctionForeignProperty(model, (Function)inValues[i], result.ForeignTables);

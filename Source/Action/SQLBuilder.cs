@@ -572,7 +572,7 @@ namespace CodeM.Common.Orm
                 for (int i = 0; i < m.PropertyCount; i++)
                 {
                     Property p = m.GetProperty(i);
-                    queryFields.Add(new SelectFieldPart(new PROPERTY(p.Name, p), i + 1));
+                    queryFields.Add(new SelectFieldPart(Funcs.PROPERTY(p.Name), i + 1));
                 }
             }
 

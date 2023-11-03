@@ -310,7 +310,7 @@ namespace CodeM.Common.Orm
         {
             if (CommandUtils.IsProperty(this, propName, out Property p))
             {
-                mGetValues.Add(new SelectFieldPart(new PROPERTY(propName, p), mGetValues.Count + 1, alias));
+                mGetValues.Add(new SelectFieldPart(Funcs.PROPERTY(propName), mGetValues.Count + 1, alias));
             }
             else
             {
@@ -384,9 +384,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public new Model Equals(object key, object value)
+        public Model Equals(string propName, object value)
         {
-            mFilter.Equals(key, value);
+            mFilter.Equals(propName, value);
             return this;
         }
 
@@ -396,9 +396,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model NotEquals(object key, object value)
+        public Model NotEquals(string propName, object value)
         {
-            mFilter.NotEquals(key, value);
+            mFilter.NotEquals(propName, value);
             return this;
         }
 
@@ -408,9 +408,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Gt(object key, object value)
+        public Model Gt(string propName, object value)
         {
-            mFilter.Gt(key, value);
+            mFilter.Gt(propName, value);
             return this;
         }
 
@@ -420,9 +420,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Gte(object key, object value)
+        public Model Gte(string propName, object value)
         {
-            mFilter.Gte(key, value);
+            mFilter.Gte(propName, value);
             return this;
         }
 
@@ -432,9 +432,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Lt(object key, object value)
+        public Model Lt(string propName, object value)
         {
-            mFilter.Lt(key, value);
+            mFilter.Lt(propName, value);
             return this;
         }
 
@@ -444,9 +444,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Lte(object key, object value)
+        public Model Lte(string propName, object value)
         {
-            mFilter.Lte(key, value);
+            mFilter.Lte(propName, value);
             return this;
         }
 
@@ -456,9 +456,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Like(object key, object value)
+        public Model Like(string propName, object value)
         {
-            mFilter.Like(key, value);
+            mFilter.Like(propName, value);
             return this;
         }
 
@@ -468,9 +468,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model NotLike(object key, object value)
+        public Model NotLike(string propName, object value)
         {
-            mFilter.NotLike(key, value);
+            mFilter.NotLike(propName, value);
             return this;
         }
 
@@ -480,9 +480,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model IsNull(object key)
+        public Model IsNull(string propName)
         {
-            mFilter.IsNull(key);
+            mFilter.IsNull(propName);
             return this;
         }
 
@@ -492,9 +492,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model IsNotNull(object key)
+        public Model IsNotNull(string propName)
         {
-            mFilter.IsNotNull(key);
+            mFilter.IsNotNull(propName);
             return this;
         }
 
@@ -504,9 +504,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model Between(object key, object value, object value2)
+        public Model Between(string propName, object value, object value2)
         {
-            mFilter.Between(key, value, value2);
+            mFilter.Between(propName, value, value2);
             return this;
         }
 
@@ -516,9 +516,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model In(object key, params object[] values)
+        public Model In(string propName, params object[] values)
         {
-            mFilter.In(key, values);
+            mFilter.In(propName, values);
             return this;
         }
 
@@ -528,9 +528,9 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public Model NotIn(object key, params object[] values)
+        public Model NotIn(string propName, params object[] values)
         {
-            mFilter.NotIn(key, values);
+            mFilter.NotIn(propName, values);
             return this;
         }
 
@@ -793,7 +793,7 @@ namespace CodeM.Common.Orm
             {
                 if (CommandUtils.IsProperty(this, name, out Property p))
                 {
-                    mGroupByNames.Add(new GroupByPart(new PROPERTY(name, p)));
+                    mGroupByNames.Add(new GroupByPart(Funcs.PROPERTY(name)));
                 }
                 else
                 {
@@ -1745,7 +1745,7 @@ namespace CodeM.Common.Orm
                     for (int i = 0; i < PropertyCount; i++)
                     {
                         Property p = GetProperty(i);
-                        mGetValues.Add(new SelectFieldPart(new PROPERTY(p.Name, p), i + 1));
+                        mGetValues.Add(new SelectFieldPart(Funcs.PROPERTY(p.Name), i + 1));
                     }
                 }
 

@@ -1,21 +1,13 @@
-﻿using System;
-
-namespace CodeM.Common.Orm
+﻿namespace CodeM.Common.Orm
 {
     /// <summary>
     /// 表示value值是一个Model的Property名称
     /// </summary>
     internal class PROPERTY : Function
     {
-        private Property mProperty;
-        internal PROPERTY(object value, Property p) : base(value)
+        internal PROPERTY(string value)
+            : base(value)
         {
-            if (value is Function)
-            {
-                throw new ArgumentException("value");
-            }
-
-            mProperty = p;
         }
 
         internal override bool IsProperty()
@@ -31,12 +23,9 @@ namespace CodeM.Common.Orm
             }
         }
 
-        internal Property Property
+        internal Property Resolve(Model m)
         {
-            get
-            {
-                return mProperty;
-            }
+            return m.GetProperty(this.Value);
         }
     }
 }

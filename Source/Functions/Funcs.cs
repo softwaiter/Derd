@@ -2,6 +2,11 @@
 {
     public class Funcs
     {
+        public static Function PROPERTY(string name)
+        {
+            return new PROPERTY(name);
+        }
+
         public static Function VALUE(object value)
         {
             return new VALUE(value);

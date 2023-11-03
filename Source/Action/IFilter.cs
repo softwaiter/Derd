@@ -14,55 +14,55 @@
 
         IFilter Or(IFilter subFilter);
 
-        IFilter Equals(object key, object value);
+        IFilter Equals(string prop, object value);
 
         IFilter Equals(Function function, object value);
 
-        IFilter NotEquals(object key, object value);
+        IFilter NotEquals(string prop, object value);
 
         IFilter NotEquals(Function function, object value);
 
-        IFilter Gt(object key, object value);
+        IFilter Gt(string prop, object value);
 
         IFilter Gt(Function function, object value);
 
-        IFilter Gte(object key, object value);
+        IFilter Gte(string prop, object value);
 
         IFilter Gte(Function function, object value);
 
-        IFilter Lt(object key, object value);
+        IFilter Lt(string prop, object value);
 
         IFilter Lt(Function function, object value);
 
-        IFilter Lte(object key, object value);
+        IFilter Lte(string prop, object value);
 
         IFilter Lte(Function function, object value);
 
-        IFilter Like(object key, object value);
+        IFilter Like(string prop, object value);
 
         IFilter Like(Function function, object value);
 
-        IFilter NotLike(object key, object value);
+        IFilter NotLike(string prop, object value);
 
         IFilter NotLike(Function function, object value);
 
-        IFilter IsNull(object key);
+        IFilter IsNull(string prop);
 
         IFilter IsNull(Function function);
 
-        IFilter IsNotNull(object key);
+        IFilter IsNotNull(string prop);
 
         IFilter IsNotNull(Function function);
 
-        IFilter Between(object key, object value, object value2);
+        IFilter Between(string prop, object value, object value2);
 
         IFilter Between(Function function, object value, object value2);
 
-        IFilter In(object key, params object[] values);
+        IFilter In(string prop, params object[] values);
 
         IFilter In(Function function, params object[] values);
 
-        IFilter NotIn(object key, params object[] values);
+        IFilter NotIn(string prop, params object[] values);
 
         IFilter NotIn(Function function, params object[] values);
     }
