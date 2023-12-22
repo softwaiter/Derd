@@ -36,25 +36,25 @@ Derd是一个基于.net core开发的跨平台轻量级数据库操作框架。D
 #### Package Manager
 
 ```shell
-Install-Package Derd -Version 2.7.9
+Install-Package Derd -Version 2.7.10
 ```
 
 #### .NET CLI
 
 ```shell
-dotnet add package Derd --version 2.7.9
+dotnet add package Derd --version 2.7.10
 ```
 
 #### PackageReference
 
 ```xml
-<PackageReference Include="Derd" Version="2.7.9" />
+<PackageReference Include="Derd" Version="2.7.10" />
 ```
 
 #### Paket CLI
 
 ```shell
-paket add Derd --version 2.7.9
+paket add Derd --version 2.7.10
 ```
 
 
