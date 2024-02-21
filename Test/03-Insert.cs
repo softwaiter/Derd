@@ -12,9 +12,6 @@ namespace Test
         [TestInitialize]
         public void Init()
         {
-            Derd.RegisterProcessor("EncryptDeposit", "Test.Processors.EncryptDeposit");
-            Derd.RegisterProcessor("DecryptDeposit", "Test.Processors.DecryptDeposit");
-
             string modelPath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\models");
             Derd.ModelPath = modelPath;
             Derd.Load();
@@ -142,6 +139,22 @@ namespace Test
 
             dynamic personObj = Derd.Model("Person").Equals("Name", "manman").QueryFirst();
             Assert.AreNotEqual(100, personObj.Id);
+        }
+
+        [TestMethod]
+        [Description("使用SqlExpr方法为Email属性赋值，应成功。")]
+        public void SetValueBySqlExpr()
+        {
+            dynamic newperson = new DynamicObjectExt();
+            newperson.Id = 100;
+            newperson.Name = "liaoliao";
+            newperson.Org = "microsoft";
+            newperson.Email = PropValues.SqlExpr("'liaoliao@microsoft.com'");
+            bool ret = Derd.Model("Person").SetValues(newperson).Save();
+            Assert.IsTrue(ret);
+
+            dynamic personObj = Derd.Model("Person").Equals("Name", "liaoliao").QueryFirst();
+            Assert.AreEqual("liaoliao@microsoft.com", personObj.Email);
         }
     }
 }

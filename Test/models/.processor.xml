@@ -1,4 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <processors>
 	<processor id="OrgExists" class="Test.Processors.OrgExists" />
+	<processor id="EncryptMobile" class="Test.Processors.EncryptMobile" />
+	<processor id="DecryptMobile" class="Test.Processors.DecryptMobile" />
 </processors>

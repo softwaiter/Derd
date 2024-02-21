@@ -71,6 +71,14 @@ namespace CodeM.Common.Orm
                         }
                         sbValues.Append(((Function)value).Convert2SQL(modelDefine));
                     }
+                    else if (value != null && value is PropertyValue)
+                    {
+                        if (j > 0)
+                        {
+                            sbValues.Append(",");
+                        }
+                        sbValues.Append(((PropertyValue)value).Convert2SQL(p));
+                    }
                     else
                     {
                         if (value != null)
@@ -190,11 +198,37 @@ namespace CodeM.Common.Orm
 
                         if (isNeedQuote && !funcValue.StartsWith("'") && !funcValue.EndsWith("'"))
                         {
-                            sbValues.Append("'").Append(value).Append("'");
+                            sbValues.Append("'").Append(funcValue).Append("'");
                         }
                         else
                         {
-                            sbValues.Append(value);
+                            sbValues.Append(funcValue);
+                        }
+                    }
+                    else if (value != null && value is PropertyValue)
+                    {
+                        if (j > 0)
+                        {
+                            sbValues.Append(",");
+                        }
+
+                        bool isNeedQuote = (p.FieldType == DbType.String ||
+                            p.FieldType == DbType.StringFixedLength ||
+                            p.FieldType == DbType.AnsiString ||
+                            p.FieldType == DbType.AnsiStringFixedLength ||
+                            p.FieldType == DbType.Date ||
+                            p.FieldType == DbType.DateTime ||
+                            p.FieldType == DbType.DateTime2);
+
+                        string propValue = ((PropertyValue)value).Convert2SQL(p);
+
+                        if (isNeedQuote && !propValue.StartsWith("'") && !propValue.EndsWith("'"))
+                        {
+                            sbValues.Append("'").Append(propValue).Append("'");
+                        }
+                        else
+                        {
+                            sbValues.Append(propValue);
                         }
                     }
                     else
@@ -342,6 +376,15 @@ namespace CodeM.Common.Orm
 
                             sbValues.Append(((Function)value).Convert2SQL(modelDefine));
                         }
+                        else if (value != null && value is PropertyValue)
+                        {
+                            if (j > 0)
+                            {
+                                sbValues.Append(",");
+                            }
+
+                            sbValues.Append(((PropertyValue)value).Convert2SQL(p));
+                        }
                         else
                         {
                             if (value != null)
@@ -425,6 +468,20 @@ namespace CodeM.Common.Orm
                                 }
                                 insertValues += ((Function)value).Convert2SQL(m);
                             }
+                            else if (value is PropertyValue)
+                            {
+                                if (insertFields.Length > 0)
+                                {
+                                    insertFields += ",";
+                                }
+                                insertFields += string.Concat(quotes[0], p.Field, quotes[1]);
+
+                                if (insertValues.Length > 0)
+                                {
+                                    insertValues += ",";
+                                }
+                                insertValues += ((PropertyValue)value).Convert2SQL(p);
+                            }
                             else
                             {
                                 if (p.RealType == typeof(DynamicObjectExt))
@@ -501,6 +558,15 @@ namespace CodeM.Common.Orm
                                 }
                                 sbUpdateContent.Append(quotes[0]).Append(p.Field)
                                     .Append(quotes[1]).Append("=").Append(((Function)value).Convert2SQL(m));
+                            }
+                            else if (value is PropertyValue)
+                            {
+                                if (sbUpdateContent.Length > 0)
+                                {
+                                    sbUpdateContent.Append(",");
+                                }
+                                sbUpdateContent.Append(quotes[0]).Append(p.Field)
+                                    .Append(quotes[1]).Append("=").Append(((PropertyValue)value).Convert2SQL(p));
                             }
                             else
                             {

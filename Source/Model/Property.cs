@@ -144,6 +144,12 @@ namespace CodeM.Common.Orm
         {
             if (NeedCalcPreSaveProcessor)
             {
+                object value = obj[Name];
+                if (value is Function || value is PropertyValue)
+                {
+                    throw new NotSupportedException("属性值不是最终态，Processor无法计算。");
+                }
+
                 return Processor.CallPropertyProcessor(PreSaveProcessor, Owner, Name, 
                     obj.Has(Name) ? obj[Name] : null);
             }

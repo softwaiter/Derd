@@ -10,11 +10,11 @@
 	<property name="Org" field="f_org_code" type="Org" joinProp="Code" desc="所属机构">
 		<rule validation="{{OrgExists}}" />
 	</property>
-    <property name="Deposit" field="f_deposit" type="Decimal" length="12" precision="2" preSave="{{EncryptDeposit}}" postQuery="{{DecryptDeposit}}" desc="银行存款" defaultValue="12345" />
+    <property name="Deposit" field="f_deposit" type="Decimal" length="12" precision="2" desc="银行存款" defaultValue="12345" />
 	<property name="Email" length="256" desc="常用邮箱">
 		<rule pattern="email" />
 	</property>
-	<property name="Mobile" length="32" desc="手机号码">
+	<property name="Mobile" length="128" preSave="{{EncryptMobile}}" postQuery="{{DecryptMobile}}" desc="手机号码">
 		<rule regex="^1\d{10}$" />
 	</property>
 	<property name="IsAdmin" field="f_is_admin" indexGroup="idx_age" type="Boolean" desc="是否超级管理员" defaultValue="false" />

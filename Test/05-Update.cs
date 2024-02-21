@@ -12,9 +12,6 @@ namespace Test
         [TestInitialize]
         public void Init()
         {
-            Derd.RegisterProcessor("EncryptDeposit", "Test.Processors.EncryptDeposit");
-            Derd.RegisterProcessor("DecryptDeposit", "Test.Processors.DecryptDeposit");
-
             string modelPath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\models");
             Derd.ModelPath = modelPath;
             Derd.Load();
@@ -140,6 +137,76 @@ namespace Test
 
             dynamic personObj = Derd.Model("Person").Equals("Name", "李大").QueryFirst();
             Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), personObj.Birthday.ToString("yyyy-MM-dd"));
+        }
+
+        [TestMethod]
+        [Description("使用SelfAdd方法为张大增加一岁，应成功；查询其年龄应为61。")]
+        public void UpdateWithSelfAdd()
+        {
+            bool bRet = Derd.Model("Person")
+                .Equals("Name", "张大")
+                .SetValue("Age", PropValues.SelfAdd())
+                .Update();
+            Assert.IsTrue(bRet);
+
+            dynamic personObj = Derd.Model("Person").Equals("Name", "张大").QueryFirst();
+            Assert.AreEqual(61, personObj.Age);
+        }
+
+        [TestMethod]
+        [Description("使用SelfSubtract方法为李二减去5岁，应成功；查询其年龄应为14。")]
+        public void UpdateWithSelfSubtract()
+        {
+            bool bRet = Derd.Model("Person")
+                .Equals("Name", "李二")
+                .SetValue("Age", PropValues.SelfSubtract(5))
+                .Update();
+            Assert.IsTrue(bRet);
+
+            dynamic personObj = Derd.Model("Person").Equals("Name", "李二").QueryFirst();
+            Assert.AreEqual(14, personObj.Age);
+        }
+
+        [TestMethod]
+        [Description("使用SelfMultiply方法为张二的存款扩大10倍，应成功；查询其存款应为5000。")]
+        public void UpdateWithSelfMultiply()
+        {
+            bool bRet = Derd.Model("Person")
+                .Equals("Name", "张二")
+                .SetValue("Deposit", PropValues.SelfMultiply(10))
+                .Update();
+            Assert.IsTrue(bRet);
+
+            dynamic personObj = Derd.Model("Person").Equals("Name", "张二").QueryFirst();
+            Assert.AreEqual(5000, personObj.Deposit);
+        }
+
+        [TestMethod]
+        [Description("使用SelfDivide方法为李二的存款缩小2倍，应成功；查询其存款应为500。")]
+        public void UpdateWithSelfDivide()
+        {
+            bool bRet = Derd.Model("Person")
+                .Equals("Name", "李二")
+                .SetValue("Deposit", PropValues.SelfDivide(2))
+                .Update();
+            Assert.IsTrue(bRet);
+
+            dynamic personObj = Derd.Model("Person").Equals("Name", "李二").QueryFirst();
+            Assert.AreEqual(500, personObj.Deposit);
+        }
+
+        [TestMethod]
+        [Description("使用SqlExpr方法修改李大的身份证号为100000000000000000，应成功。")]
+        public void UpdateWithSqlExpr()
+        {
+            bool bRet = Derd.Model("Person")
+                .Equals("Name", "李大")
+                .SetValue("IDCard", PropValues.SqlExpr("100000000000000000"))
+                .Update();
+            Assert.IsTrue(bRet);
+
+            dynamic personObj = Derd.Model("Person").Equals("Name", "李大").QueryFirst();
+            Assert.AreEqual("100000000000000000", personObj.IDCard);
         }
     }
 }

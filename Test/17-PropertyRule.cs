@@ -12,9 +12,6 @@ namespace Test
         [TestInitialize]
         public void Init()
         {
-            Derd.RegisterProcessor("EncryptDeposit", "Test.Processors.EncryptDeposit");
-            Derd.RegisterProcessor("DecryptDeposit", "Test.Processors.DecryptDeposit");
-
             string modelPath = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\models");
             Derd.ModelPath = modelPath;
             Derd.Load();
