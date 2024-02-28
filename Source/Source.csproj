@@ -1,43 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>2.8.0</Version>
-    <Authors>softwaiter</Authors>
-    <AssemblyVersion></AssemblyVersion>
-    <FileVersion></FileVersion>
-    <RepositoryUrl>https://github.com/softwaiter/Derd</RepositoryUrl>
-    <Description>Derd是一款使用简单、功能强大的对象关系映射（O/RM）组件</Description>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/softwaiter/Derd</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Copyright>softwaiter</Copyright>
-    <AssemblyName>Derd</AssemblyName>
-    <RootNamespace>CodeM.Common.Orm</RootNamespace>
-    <PackageTags>ORM;Mysql;Oracle;SqlServer;Sqlite;Postgres</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>derd.png</PackageIcon>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <Version>2.8.1</Version>
+        <Authors>softwaiter</Authors>
+        <AssemblyVersion></AssemblyVersion>
+        <FileVersion></FileVersion>
+        <RepositoryUrl>https://github.com/softwaiter/Derd</RepositoryUrl>
+        <Description>Derd是一款使用简单、功能强大的对象关系映射（O/RM）组件</Description>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <RepositoryType>git</RepositoryType>
+        <PackageProjectUrl>https://github.com/softwaiter/Derd</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Copyright>softwaiter</Copyright>
+        <AssemblyName>Derd</AssemblyName>
+        <RootNamespace>CodeM.Common.Orm</RootNamespace>
+        <PackageTags>ORM;Mysql;Oracle;SqlServer;Sqlite;Postgres</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>derd.png</PackageIcon>
+	    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="..\README.md">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CodeM.Common.DbHelper" Version="1.1.10" />
-    <PackageReference Include="Wukong" Version="2.0.12" />
-    <PackageReference Include="Xmtool" Version="2.2.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CodeM.Common.DbHelper" Version="1.1.10" />
+        <PackageReference Include="Wukong" Version="2.0.13" />
+        <PackageReference Include="Xmtool" Version="2.2.1" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Update="derd.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+        <None Update="derd.png">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
 
 </Project>
