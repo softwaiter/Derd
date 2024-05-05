@@ -38,6 +38,15 @@ namespace CodeM.Common.Orm
 
         internal static bool AddConnection(string datasource, ConnectionSetting conn)
         {
+            datasource = datasource.Trim();
+            if (datasource.Length > 1)
+            {
+                if (datasource.EndsWith("/"))
+                {
+                    datasource = datasource.Substring(0, datasource.Length - 1);
+                }
+            }
+
             if (sConnectionSettings.TryAdd(datasource.ToLower(), conn))
             {
                 sConnectionSettingIndexes.AddOrUpdate(sConnectionSettingIndexes.Count, 
@@ -112,10 +121,13 @@ namespace CodeM.Common.Orm
             int pos = modelPath.LastIndexOf("/");
             while (pos >= 0)
             {
-                modelPath = modelPath.Substring(0, pos);
                 if (pos == 0)
                 {
                     modelPath = "/";
+                }
+                else
+                {
+                    modelPath = modelPath.Substring(0, pos);
                 }
 
                 if (sConnectionSettings.ContainsKey(modelPath))
@@ -128,10 +140,7 @@ namespace CodeM.Common.Orm
                     return conns;
                 }
 
-                if (pos == 0)
-                {
-                    break;
-                }
+                pos = modelPath.LastIndexOf("/");
             }
 
             throw new Exception("未定义数据源：" + modelName);

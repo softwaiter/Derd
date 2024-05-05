@@ -187,7 +187,17 @@ namespace CodeM.Common.Orm
         {
             string connectionFilePath = connectionFile.FullName;
             ConnectionSetting conn = ParseConnectionSetting(connectionFilePath);
-            conn.DataSource = parent.ToLower();
+
+            string datasource = parent.Trim();
+            if (datasource.Length > 1)
+            {
+                if (datasource.EndsWith("/"))
+                {
+                    datasource = datasource.Substring(0, datasource.Length - 1);
+                }
+            }
+            conn.DataSource = datasource.ToLower();
+
             ConnectionUtils.AddConnection(parent, conn);
         }
 
@@ -371,6 +381,15 @@ namespace CodeM.Common.Orm
         internal static Model ParseModel(string modelFilePath, string parent)
         {
             Model model = new Model();
+
+            parent = parent.Trim();
+            if (parent.Length > 1)
+            {
+                if (parent.EndsWith("/"))
+                {
+                    parent = parent.Substring(0, parent.Length - 1);
+                }
+            }
             model.Path = parent.ToLower();
 
             Property currProp = null;
