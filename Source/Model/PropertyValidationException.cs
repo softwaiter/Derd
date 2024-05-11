@@ -19,10 +19,5 @@ namespace CodeM.Common.Orm
             : base(message, innerException)
         { 
         }
-
-        public PropertyValidationException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        { 
-        }
     }
 }

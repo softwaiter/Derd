@@ -102,7 +102,7 @@ namespace CodeM.Common.Orm
             return this;
         }
 
-        public new IFilter Equals(string prop, object value)
+        public IFilter Equals(string prop, object value)
         {
             if (value is Function)
             {
