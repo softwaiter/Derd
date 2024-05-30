@@ -18,7 +18,7 @@
         }
 
         public static Function DATETIME(Function function)
-        {
+        { 
             return new DATETIME(function);
         }
 
@@ -40,6 +40,36 @@
         public static Function TIME(Function function)
         {
             return new TIME(function);
+        }
+
+        public static Function DATETIME_FORMAT(object value)
+        {
+            return new DATETIME_FORMAT(value);
+        }
+
+        public static Function DATETIME_FORMAT(Function function)
+        {
+            return new DATETIME_FORMAT(function);
+        }
+
+        public static Function DATE_FORMAT(object value)
+        {
+            return new DATE_FORMAT(value);
+        }
+
+        public static Function DATE_FORMAT(Function function)
+        {
+            return new DATE_FORMAT(function);
+        }
+
+        public static Function TIME_FORMAT(object value)
+        {
+            return new TIME_FORMAT(value);
+        }
+
+        public static Function TIME_FORMAT(Function function)
+        {
+            return new TIME_FORMAT(function);
         }
 
         public static Function COUNT(object value)

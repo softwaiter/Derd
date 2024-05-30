@@ -1139,13 +1139,13 @@ namespace CodeM.Common.Orm
 
                 return bRet;
             }
-            catch (Exception exp)
+            catch
             {
                 if (trans != null && !haveUserTransCode)
                 {
                     Derd.RollbackTransaction(transCode.Value);
                 }
-                throw exp;
+                throw;
             }
             finally
             {

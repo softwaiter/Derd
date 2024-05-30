@@ -126,7 +126,7 @@ namespace Test
         }
 
         [TestMethod]
-        [Description("使用DATE函数修改李大的Birthday属性为当前日期，应成功。")]
+        [Description("修改李大的Birthday属性为当前日期，应成功。")]
         public void UpdateBirthdayByDateFunction()
         {
             bool bRet = Derd.Model("Person")

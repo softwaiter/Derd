@@ -99,8 +99,8 @@ namespace Test
         }
 
         [TestMethod]
-        [Description("向Person模型物理表写入一条数据，Birthday属性使用DATE函数赋值，应成功。")]
-        public void FunctionValue()
+        [Description("向Person模型物理表写入一条数据，Birthday当前日期，应成功。")]
+        public void SetBirthdayWithNow()
         {
             dynamic newperson = new DynamicObjectExt();
             newperson.Name = "huxy";
@@ -111,6 +111,21 @@ namespace Test
 
             dynamic personObj = Derd.Model("Person").Equals("Name", "huxy").QueryFirst();
             Assert.AreEqual(DateTime.Now.ToString("yyyy-MM-dd"), personObj.Birthday.ToString("yyyy-MM-dd"));
+        }
+
+        [TestMethod]
+        [Description("向Person模型物理表写入一条数据，Birthday赋值1987-09-18，应成功。")]
+        public void SetBirthdayWith19870918()
+        {
+            dynamic newperson = new DynamicObjectExt();
+            newperson.Name = "huxy";
+            newperson.Age = 18;
+            newperson.Birthday = Funcs.DATE("1987-09-18");
+            bool ret = Derd.Model("Person").SetValues(newperson).Save();
+            Assert.IsTrue(ret);
+
+            dynamic personObj = Derd.Model("Person").Equals("Name", "huxy").QueryFirst();
+            Assert.AreEqual("1987-09-18", personObj.Birthday.ToString("yyyy-MM-dd"));
         }
 
         [TestMethod]
@@ -125,6 +140,36 @@ namespace Test
 
             dynamic personObj = Derd.Model("Person").Equals("Name", "wangss").QueryFirst();
             Assert.AreEqual("1980/01/01", personObj.Birthday.ToString("yyyy/MM/dd"));
+        }
+
+        [TestMethod]
+        [Description("向Person模型物理表写入一条数据，CreateTime用日期时间2023-05-17 18:30:00赋值，应成功。")]
+        public void SetCreateTimeWith2023Y5M17D18H30m00s() {
+            dynamic newperson = new DynamicObjectExt();
+            newperson.Name = "wangjy";
+            newperson.Age = 1;
+            newperson.CreateTime = Funcs.DATETIME("2023-05-17 18:30:00");
+            bool ret = Derd.Model("Person").SetValues(newperson).Save();
+            Assert.IsTrue(ret);
+
+            dynamic personObj = Derd.Model("Person").Equals("Name", "wangjy").QueryFirst();
+            Assert.AreEqual("2023-05-17 18:30:00", personObj.CreateTime.ToString("yyyy-MM-dd HH:mm:ss"));
+        }
+
+        [TestMethod]
+        [Description("向Person模型物理表写入一条数据，CreateTime用时间18:30:00赋值，应成功。")]
+        public void SetCreatetTimeWith18H30m00s()
+        {
+            dynamic newperson = new DynamicObjectExt();
+            newperson.Name = "wangjy";
+            newperson.Age = 1;
+            newperson.CreateTime = Funcs.TIME("18:30:00");
+            Derd.EnableDebug(true);
+            bool ret = Derd.Model("Person").SetValues(newperson).Save();
+            Assert.IsTrue(ret);
+
+            dynamic personObj = Derd.Model("Person").Equals("Name", "wangjy").QueryFirst();
+            Assert.AreEqual("18:30:00", personObj.CreateTime.ToString("HH:mm:ss"));
         }
 
         [TestMethod]

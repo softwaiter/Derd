@@ -58,7 +58,7 @@
 	<port></port>
 	<user>TEST</user>
 	<password>TEST123456</password>
-	<database>test</database>
+	<database>TEST</database>
 	<charset></charset>
 	<pool max="200" min="0">true</pool>
 	<timeout connection="0" command="0" />

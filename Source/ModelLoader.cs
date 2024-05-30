@@ -422,7 +422,7 @@ namespace CodeM.Common.Orm
                         }
                         else
                         {
-                            model.Table = model.Name;
+                            model.Table = string.Concat("t_", model.Name.ToLower());
                         }
 
                         string beforeNewProcStr = nodeInfo.GetAttribute("beforeNew");

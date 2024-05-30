@@ -228,7 +228,7 @@ namespace Test
         public void DeleteByBetween()
         {
             bool bRet = Derd.Model("Person")
-                .Between(Funcs.DATE("Birthday"), "1970-01-01", "1980-12-31")
+                .Between(Funcs.DATE_FORMAT("Birthday"), "1970-01-01", "1980-12-31")
                 .Delete();
             Assert.IsTrue(bRet);
 
