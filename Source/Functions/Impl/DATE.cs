@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CodeM.Common.Orm.SQL.Dialect;
+using System;
 
 namespace CodeM.Common.Orm
 {
@@ -14,25 +15,13 @@ namespace CodeM.Common.Orm
         {
             if (this.Arguments.Length == 1 && this.Arguments[0] != null)
             {
-                if (CommandUtils.IsProperty(m, this.Arguments[0]))
-                {
-                    return base.Convert2SQL(m);
-                }
-                else
-                {
-                    if (DateTime.TryParse(this.Arguments[0].ToString(), out var datetime))
-                    {
-                        return string.Concat("'", datetime.ToString("yyyy-MM-dd"), "'");
-                    }
-                    else
-                    {
-                        return string.Concat("'", this.Arguments[0], "'");
-                    }
-                }
+                return base.Convert2SQL(m);
             }
             else
             {
-                return string.Concat("'", DateTime.Now.ToString("yyyy-MM-dd"), "'");
+                string funcName = this.GetType().Name.ToUpper();
+                object[] args = new object[] { $"'{DateTime.Now.ToString("yyyy-MM-dd")}'" };
+                return Features.GetFunctionCommand(m, funcName, args);
             }
         }
     }

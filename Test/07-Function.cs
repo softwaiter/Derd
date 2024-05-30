@@ -119,7 +119,7 @@ namespace Test
         {
             dynamic person = Derd.Model("Person")
                 .Equals("Name", "张二")
-                .GetValue(Funcs.DATETIME("Birthday"), "Birthday")
+                .GetValue(Funcs.DATETIME_FORMAT("Birthday"), "Birthday")
                 .QueryFirst();
             Assert.IsNotNull(person);
             Assert.AreEqual("1980-07-25 08:08:08", person.Birthday);
@@ -131,7 +131,7 @@ namespace Test
         {
             dynamic person = Derd.Model("Person")
                 .Equals("Name", "张二")
-                .GetValue(Funcs.DATE("Birthday"), "Birthday")
+                .GetValue(Funcs.DATE_FORMAT("Birthday"), "Birthday")
                 .QueryFirst();
             Assert.IsNotNull(person);
             Assert.AreEqual("1980-07-25", person.Birthday);
@@ -143,7 +143,7 @@ namespace Test
         {
             dynamic person = Derd.Model("Person")
                 .Equals("Name", "张二")
-                .GetValue(Funcs.TIME("Birthday"), "Birthday")
+                .GetValue(Funcs.TIME_FORMAT("Birthday"), "Birthday")
                 .QueryFirst();
             Assert.IsNotNull(person);
             Assert.AreEqual("08:08:08", person.Birthday);

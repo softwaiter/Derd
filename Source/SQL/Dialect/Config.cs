@@ -301,22 +301,46 @@ namespace CodeM.Common.Orm.SQL.Dialect
                 { "default", "{0}" }
             }},
             { "DATETIME", new Hashtable() {
+                { "default", "DATETIME({0})" },
+                { "oracle", "TO_DATE({0}, 'YYYY-MM-DD HH24:mi:ss')" },
+                { "mysql", "TIMESTAMP({0})" },
+                { "sqlserver", "CONVERT(DATETIME, {0})" },
+                { "postgres", "TO_TIMESTAMP({0}, 'YYYY-MM-DD HH24:mi:ss')" },
+                { "dm", "TO_TIMESTAMP({0}, 'YYYY-MM-DD HH24:mi:ss')" },
+                { "kingbase", "TO_DATE({0}, 'YYYY-MM-DD HH24:mi:ss')" }
+            }},
+            { "DATE", new Hashtable() {
+                { "default", "DATE({0})" },
+                { "oracle", "TO_DATE({0}, 'YYYY-MM-DD')" },
+                { "sqlserver", "CONVERT(DATE, {0})" },
+                { "dm", "TO_DATE({0}, 'YYYY-MM-DD')" },
+                { "kingbase", "TO_DATE({0}, 'YYYY-MM-DD')" }
+            }},
+            { "TIME", new Hashtable() {
+                { "default", "TIME({0})" },
+                { "oracle", "TO_DATE({0}, 'HH24:mi:ss')" },
+                { "sqlserver", "CONVERT(TIME, {0})" },
+                { "postgres", "TO_DATE({0}, 'HH24:mi:ss')" },
+                { "dm", "TO_DATE({0}, 'HH24:mi:ss')" },
+                { "kingbase", "TO_DATE(CONCAT('1970-01-01 ', {0}), 'YYYY-MM-DD HH24:mi:ss')" }
+            }},
+            { "DATETIME_FORMAT", new Hashtable() {
                 { "default", "TO_CHAR({0}, 'YYYY-MM-DD HH24:mi:ss')" },
-                { "sqlite", "DATETIME({0})" },
+                { "sqlite", "STRFTIME('%Y-%m-%d %H:%M:%S', {0})" },
                 { "mysql", "DATE_FORMAT({0}, '%Y-%m-%d %H:%i:%s')" },
                 { "sqlserver", "CONVERT(VARCHAR(19), {0}, 120)" }
             }},
-            { "DATE", new Hashtable() {
+            { "DATE_FORMAT", new Hashtable() {
                 { "default", "TO_CHAR({0}, 'YYYY-MM-DD')" },
-                { "sqlite", "DATE({0})" },
+                { "sqlite", "STRFTIME('%Y-%m-%d', {0})" },
                 { "mysql", "DATE_FORMAT({0}, '%Y-%m-%d')" },
                 { "sqlserver", "CONVERT(VARCHAR(10), {0}, 120)" }
             }},
-            { "TIME", new Hashtable() {
+            { "TIME_FORMAT", new Hashtable() {
                 { "default", "TO_CHAR({0}, 'HH24:mi:ss')" },
-                { "sqlite", "TIME({0})" },
+                { "sqlite", "STRFTIME('%H:%M:%S', {0})" },
                 { "mysql", "TIME_FORMAT({0}, '%H:%i:%s')" },
-                { "sqlserver", "CONVERT(VARCHAR(8), {0}, 8)" }
+                { "sqlserver", "CONVERT(VARCHAR(8), {0}, 108)" }
             }},
             { "COUNT", new Hashtable() {
                 { "default", "COUNT({0})" }
