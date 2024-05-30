@@ -866,11 +866,10 @@ namespace CodeM.Common.Orm
 
                 DbUtils.CommitTransaction(transaction);
             }
-            catch (Exception exp)
+            catch
             {
                 DbUtils.RollbackTransaction(transaction);
-
-                throw exp;
+                throw;
             }
         }
 
@@ -941,13 +940,13 @@ namespace CodeM.Common.Orm
 
                     DbUtils.CommitTransaction(transaction);
                 }
-                catch (Exception exp)
+                catch
                 {
                     DbUtils.RollbackTransaction(transaction);
 
                     if (throwError)
                     {
-                        throw exp;
+                        throw;
                     }
                 }
             }
@@ -979,11 +978,11 @@ namespace CodeM.Common.Orm
                 Derd.PrintSQL(sql);
                 CommandUtils.ExecuteNonQuery(this, Path.ToLower(), sql);
             }
-            catch (Exception exp)
+            catch
             {
                 if (throwError)
                 {
-                    throw exp;
+                    throw;
                 }
             }
         }
@@ -1221,13 +1220,13 @@ namespace CodeM.Common.Orm
 
                 return bRet;
             }
-            catch (Exception exp)
+            catch
             {
                 if (isInnerTransaction)
                 {
                     Derd.RollbackTransaction(transCode.Value);
                 }
-                throw exp;
+                throw;
             }
         }
 
@@ -1425,13 +1424,13 @@ namespace CodeM.Common.Orm
 
                 return bRet;
             }
-            catch (Exception exp)
+            catch
             {
                 if (trans != null && !haveUserTransCode)
                 {
                     Derd.RollbackTransaction(transCode.Value);
                 }
-                throw exp;
+                throw;
             }
             finally
             {
@@ -1578,13 +1577,13 @@ namespace CodeM.Common.Orm
 
                 return bRet;
             }
-            catch (Exception exp)
+            catch
             {
                 if (trans != null && !haveUserTransCode)
                 {
                     Derd.RollbackTransaction(transCode.Value);
                 }
-                throw exp;
+                throw;
             }
             finally
             {
