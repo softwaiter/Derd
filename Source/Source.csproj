@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <Version>2.8.3</Version>
+        <Version>2.8.5</Version>
         <Authors>softwaiter</Authors>
         <AssemblyVersion></AssemblyVersion>
         <FileVersion></FileVersion>
@@ -30,8 +30,8 @@
 
     <ItemGroup>
         <PackageReference Include="CodeM.Common.DbHelper" Version="1.1.10" />
-        <PackageReference Include="Wukong" Version="2.0.13" />
-        <PackageReference Include="Xmtool" Version="2.2.1" />
+        <PackageReference Include="Wukong" Version="2.0.15" />
+        <PackageReference Include="Xmtool" Version="2.3.0" />
     </ItemGroup>
 
     <ItemGroup>
