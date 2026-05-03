@@ -16,6 +16,9 @@ namespace CodeM.Common.Orm
                 Register("CurrentDateTime", "CodeM.Common.Orm.Processors.CurrentDateTime");
                 Register("CurrentDate", "CodeM.Common.Orm.Processors.CurrentDate");
                 Register("CurrentTime", "CodeM.Common.Orm.Processors.CurrentTime");
+                Register("CurrentUtcDateTime", "CodeM.Common.Orm.Processors.CurrentUtcDateTime");
+                Register("CurrentUtcDate", "CodeM.Common.Orm.Processors.CurrentUtcDate");
+                Register("CurrentUtcTime", "CodeM.Common.Orm.Processors.CurrentUtcTime");
                 Register("Upper", "CodeM.Common.Orm.Processors.Upper");
                 Register("Lower", "CodeM.Common.Orm.Processors.Lower");
 
