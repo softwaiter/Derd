@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <Version>3.0.1</Version>
+        <Version>3.0.2</Version>
         <Authors>softwaiter</Authors>
         <AssemblyVersion></AssemblyVersion>
         <FileVersion></FileVersion>
@@ -30,8 +30,8 @@
 
     <ItemGroup>
         <PackageReference Include="CodeM.Common.DbHelper" Version="2.0.0" />
-        <PackageReference Include="Wukong" Version="3.0.0" />
-        <PackageReference Include="Xmtool" Version="3.0.0" />
+        <PackageReference Include="Wukong" Version="3.0.1" />
+        <PackageReference Include="Xmtool" Version="3.0.1" />
     </ItemGroup>
 
     <ItemGroup>
